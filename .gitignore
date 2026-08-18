@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Environment variables & keys
+.env
+.env.local
+
+# Experiment outputs & logs
+results_*.json
+*.log
+
+# IDE & OS
+.DS_Store
+.vscode/
+.idea/
