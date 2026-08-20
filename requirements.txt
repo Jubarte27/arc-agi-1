@@ -1,3 +1,2 @@
-# Optional SDKs for LLM API integration (install based on your provider)
 google-genai>=0.1.0
 requests>=2.28.0

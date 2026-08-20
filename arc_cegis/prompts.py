@@ -5,6 +5,12 @@ Prompt engineering and semantic counterexample feedback builders for ARC tasks.
 import json
 from typing import Dict, List, Optional
 
+ANTI_IMPORT_RULES = (
+    "REGRAS OBRIGATÓRIAS DE CÓDIGO:\n"
+    "- NÃO utilize nenhuma instrução `import` (ex: collections, numpy, math, etc.).\n"
+    "- Utilize APENAS tipos e funções nativas puras do Python (list, dict, set, tuple, range, len, min, max, sum, enumerate, zip, abs).\n"
+)
+
 
 def build_initial_prompt(task_train_pairs: List[Dict[str, List[List[int]]]]) -> str:
     """
@@ -20,7 +26,8 @@ def build_initial_prompt(task_train_pairs: List[Dict[str, List[List[int]]]]) -> 
         prompt += f"Output:\n{json.dumps(pair['output'])}\n\n"
 
     prompt += (
-        "Write a Python function `transform(grid: list[list[int]]) -> list[list[int]]` that implements this rule.\n"
+        "Write a Python function `transform(grid: list[list[int]]) -> list[list[int]]` that implements this rule.\n\n"
+        f"{ANTI_IMPORT_RULES}\n"
         "Requirements:\n"
         "- The function must accept a 2D list of integers representing the input grid.\n"
         "- The function must return a 2D list of integers representing the transformed output grid.\n"
@@ -45,6 +52,7 @@ def build_counterexample_feedback(
         f"- Input:\n{json.dumps(input_grid)}\n"
         f"- Expected Output:\n{json.dumps(expected_grid)}\n"
         f"- Produced Output:\n{output_repr}\n\n"
+        f"{ANTI_IMPORT_RULES}\n"
         "Please analyze the discrepancy, fix your logic, and provide the updated `transform(grid)` function "
         "inside a ```python ... ``` block."
     )

@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from . import config
-from .llm import call_llm
+from .llm import AuthError, QuotaExceededError, call_llm
 from .prompts import build_counterexample_feedback, build_initial_prompt
 from .sandbox import extract_python_code, run_transform
 
@@ -54,10 +54,13 @@ def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> Dict[s
     start_time = time.time()
     try:
         response_text = call_llm(messages, model=model)
+    except (AuthError, QuotaExceededError):
+        raise
     except Exception as e:
         return {
             "strategy": "baseline",
             "success": False,
+            "api_error": True,
             "error": f"LLM Call Failed: {str(e)}",
             "latency": time.time() - start_time,
             "generated_code": "",
@@ -71,6 +74,7 @@ def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> Dict[s
     return {
         "strategy": "baseline",
         "success": all_test_passed,
+        "api_error": False,
         "latency": latency,
         "generated_code": code_str,
         "test_results": test_results,
@@ -98,11 +102,15 @@ def run_cegis(
     iteration_history = []
     converged_train = False
     current_code = ""
+    had_api_error = False
 
     for iteration in range(1, max_iters + 1):
         try:
             response_text = call_llm(messages, model=model)
+        except (AuthError, QuotaExceededError):
+            raise
         except Exception as e:
+            had_api_error = True
             iteration_history.append({"iteration": iteration, "error": f"LLM Call Failed: {str(e)}"})
             break
 
@@ -149,6 +157,7 @@ def run_cegis(
     return {
         "strategy": "cegis",
         "success": all_test_passed,
+        "api_error": had_api_error,
         "converged_train": converged_train,
         "iterations_used": len(iteration_history),
         "latency": latency,
