@@ -12,6 +12,7 @@ ENV/
 # Environment variables & keys
 .env
 .env.local
+.env.*
 
 # Experiment outputs & logs
 results_*.json
