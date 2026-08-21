@@ -4,13 +4,15 @@ Main entry point for running comparative ARC-AGI-1 experiments (Baseline vs CEGI
 """
 
 import argparse
+import asyncio
 import json
+import time
 from typing import Any, Dict, List
 
 from arc_cegis import config, load_tasks, run_baseline, run_cegis
 
 
-def main() -> None:
+async def main() -> None:
     parser = argparse.ArgumentParser(
         description="ARC-AGI-1 Comparative Experiment: Baseline (1-shot) vs CEGIS (Semantic Counterexample Feedback)"
     )
@@ -44,12 +46,22 @@ def main() -> None:
         default="results_experiment.json",
         help="Output JSON path to save experiment results (default: results_experiment.json)",
     )
+    parser.add_argument(
+        "--max-concurrent-tasks",
+        type=int,
+        default=config.MAX_CONCURRENT_TASKS,
+        help=f"Maximum tasks to run concurrently (default: {config.MAX_CONCURRENT_TASKS})",
+    )
 
     args = parser.parse_args()
 
     print("=" * 70)
     print(" ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS")
-    print(f" Model: {args.model} | Max CEGIS Iters: {args.max_iters} | Timeout: {config.TIMEOUT_SECONDS}s")
+    print(
+        f" Model: {args.model} | Max CEGIS Iters: {args.max_iters} | "
+        f"Timeout: {config.TIMEOUT_SECONDS}s | Concurrent Tasks: {args.max_concurrent_tasks} | "
+        f"API Interval: {config.REQUEST_DELAY}s"
+    )
     print("=" * 70)
 
     # 1. Load tasks
@@ -60,36 +72,40 @@ def main() -> None:
     total_tasks = len(tasks_dict)
     print(f"Loaded {total_tasks} task(s) to evaluate.\n")
 
-    detailed_results: List[Dict[str, Any]] = []
-    baseline_correct = 0
-    cegis_correct = 0
+    async def run_task(
+        task_number: int, task_id: str, task_data: Dict[str, Any], semaphore: asyncio.Semaphore
+    ) -> Dict[str, Any]:
+        async with semaphore:
+            task_start = time.perf_counter()
+            print(f"[{task_number}/{total_tasks}] Task started: {task_id}", flush=True)
+            base_res, cegis_res = await asyncio.gather(
+                run_baseline(task_data, model=args.model),
+                run_cegis(task_data, max_iters=args.max_iters, model=args.model),
+            )
+            print(
+                f"[{task_number}/{total_tasks}] Task completed: {task_id} | "
+                f"Baseline={'PASSED' if base_res['success'] else 'FAILED'} "
+                f"({base_res['latency']:.2f}s) | "
+                f"CEGIS={'PASSED' if cegis_res['success'] else 'FAILED'} "
+                f"({cegis_res['latency']:.2f}s) | "
+                f"wall={time.perf_counter() - task_start:.2f}s",
+                flush=True,
+            )
+            return {
+                "task_id": task_id,
+                "baseline": base_res,
+                "cegis": cegis_res,
+            }
 
-    # 2. Run evaluations
-    for i, (task_id, task_data) in enumerate(tasks_dict.items(), start=1):
-        print(f"[{i}/{total_tasks}] Task: {task_id}")
-        
-        # Run Baseline
-        base_res = run_baseline(task_data, model=args.model)
-        if base_res["success"]:
-            baseline_correct += 1
-        print(f"   - Baseline: {'PASSED' if base_res['success'] else 'FAILED'} ({base_res['latency']:.2f}s)")
+    semaphore = asyncio.Semaphore(max(1, args.max_concurrent_tasks))
+    task_results = await asyncio.gather(*(
+        run_task(task_number, task_id, task_data, semaphore)
+        for task_number, (task_id, task_data) in enumerate(tasks_dict.items(), start=1)
+    ))
 
-        # Run CEGIS
-        cegis_res = run_cegis(task_data, max_iters=args.max_iters, model=args.model)
-        if cegis_res["success"]:
-            cegis_correct += 1
-        print(
-            f"   - CEGIS:    {'PASSED' if cegis_res['success'] else 'FAILED'} "
-            f"(Iters: {cegis_res.get('iterations_used', 0)}, "
-            f"Train Converged: {cegis_res.get('converged_train', False)}, "
-            f"{cegis_res['latency']:.2f}s)"
-        )
-
-        detailed_results.append({
-            "task_id": task_id,
-            "baseline": base_res,
-            "cegis": cegis_res,
-        })
+    detailed_results: List[Dict[str, Any]] = list(task_results)
+    baseline_correct = sum(result["baseline"]["success"] for result in detailed_results)
+    cegis_correct = sum(result["cegis"]["success"] for result in detailed_results)
 
     # 3. Print Summary
     base_acc = (baseline_correct / total_tasks) * 100 if total_tasks > 0 else 0.0
@@ -110,6 +126,8 @@ def main() -> None:
             "model": args.model,
             "max_cegis_iters": args.max_iters,
             "timeout_seconds": config.TIMEOUT_SECONDS,
+            "request_delay": config.REQUEST_DELAY,
+            "max_concurrent_tasks": args.max_concurrent_tasks,
             "total_tasks": total_tasks,
         },
         "summary": {
@@ -128,4 +146,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
