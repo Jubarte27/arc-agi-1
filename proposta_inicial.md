@@ -8,7 +8,7 @@ Solicitar 1 uníca vez para llm uma regra que solucione a tarefa do becnhmark.
 
 ## Intervenção
 
-Solicitar uma solução para a llm. Se a regra proposta não for válida para todos os casos, solicitar uma revisão indicando o caso em que a regra não vale.
+Se a regra proposta não for válida para todos os casos, solicitar uma revisão indicando o caso em que a regra não vale e a resposta esperada.
 
 ## Hipótese
 
