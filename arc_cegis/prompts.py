@@ -6,11 +6,15 @@ import json
 from typing import Dict, List, Optional
 
 ANTI_IMPORT_RULES = (
-    "REGRAS OBRIGATÓRIAS DE CÓDIGO:\n"
-    "- NÃO utilize nenhuma instrução `import` (ex: collections, numpy, math, etc.).\n"
-    "- Utilize APENAS tipos e funções nativas puras do Python (list, dict, set, tuple, range, len, min, max, sum, enumerate, zip, abs).\n"
+    "CODE RULES:\n"
+    "- DO NOT use any `import` statements (e.g., collections, numpy, math, etc.).\n"
+    "- USE ONLY pure native Python types and functions (list, dict, set, tuple, range, len, min, max, sum, enumerate, zip, abs).\n"
 )
 
+ANTI_CHEAT_RULES = (
+    "- DO NOT add conditional branches (if/else) targeting specific example indices, hardcoded coordinates, or specific row values of a single training case. The transformation must be a single, uniform mathematical/geometric rule that applies to ALL grids identically.\n"
+    "- Before writing the code, explicitly state the single abstract invariant that explains why the previous code failed on Example X and how the new logic naturally handles Examples 0, 1, and 2 without special cases.\n""
+)
 
 def build_initial_prompt(task_train_pairs: List[Dict[str, List[List[int]]]]) -> str:
     """
@@ -26,7 +30,7 @@ def build_initial_prompt(task_train_pairs: List[Dict[str, List[List[int]]]]) -> 
         prompt += f"Output:\n{json.dumps(pair['output'])}\n\n"
 
     prompt += (
-        "Write a Python function `transform(grid: list[list[int]]) -> list[list[int]]` that implements this rule.\n\n"
+        "Write a Python function `transform(grid: list[list[int]]) -> list[list[int]]` that implements the solution.\n\n"
         f"{ANTI_IMPORT_RULES}\n"
         "Requirements:\n"
         "- The function must accept a 2D list of integers representing the input grid.\n"
@@ -53,7 +57,8 @@ def build_counterexample_feedback(
         f"- Expected Output:\n{json.dumps(expected_grid)}\n"
         f"- Produced Output:\n{output_repr}\n\n"
         f"{ANTI_IMPORT_RULES}\n"
-        "Please analyze the discrepancy, fix your logic, and provide the updated `transform(grid)` function "
+        f"{ANTI_CHEAT_RULES}\n"
+        "Analyze the discrepancy, fix your logic, and provide the updated `transform(grid)` function "
         "inside a ```python ... ``` block."
     )
     return feedback
