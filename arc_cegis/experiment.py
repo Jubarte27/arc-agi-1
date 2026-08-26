@@ -3,6 +3,7 @@ Experiment workflows: Baseline (1-shot) vs CEGIS (Counterexample-Guided Inductiv
 """
 
 import time
+import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from . import config
@@ -11,8 +12,7 @@ from .prompts import build_counterexample_feedback, build_initial_prompt
 from .sandbox import extract_python_code, run_transform
 
 
-def _log(message: str) -> None:
-    print(f"[EXPERIMENT {time.strftime('%H:%M:%S')}] {message}", flush=True)
+logger = logging.getLogger(__name__)
 
 
 def evaluate_on_test(
@@ -32,11 +32,13 @@ def evaluate_on_test(
         example_start = time.perf_counter()
         success, actual, error_msg = run_transform(code_str, inp)
         is_match = (success and actual == expected)
-        _log(
-            f"test example {i + 1}/{len(test_pairs)}: "
-            f"{('PASS' if is_match else 'FAIL')} "
-            f"in {time.perf_counter() - example_start:.3f}s"
-            + (f" ({error_msg})" if error_msg else "")
+        logger.debug(
+            "test example %d/%d: %s in %.3fs%s",
+            i + 1,
+            len(test_pairs),
+            "PASS" if is_match else "FAIL",
+            time.perf_counter() - example_start,
+            f" ({error_msg})" if error_msg else "",
         )
         if not is_match:
             all_passed = False
@@ -48,7 +50,7 @@ def evaluate_on_test(
             "actual_output": actual,
             "expected_output": expected,
         })
-    _log(f"test evaluation completed in {time.perf_counter() - evaluation_start:.2f}s")
+    logger.debug("test evaluation completed in %.2fs", time.perf_counter() - evaluation_start)
     return all_passed, test_results
 
 
@@ -65,7 +67,7 @@ async def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> 
     ]
 
     start_time = time.time()
-    _log(f"baseline started: train_examples={len(train_pairs)}, test_examples={len(test_pairs)}")
+    logger.info("baseline started: train_examples=%d, test_examples=%d", len(train_pairs), len(test_pairs))
     try:
         response_text = await call_llm(messages, model=model)
     except Exception as e:
@@ -79,7 +81,7 @@ async def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> 
         }
 
     code_str = extract_python_code(response_text)
-    _log(f"baseline response received: chars={len(response_text)}, code_chars={len(code_str)}")
+    logger.debug("baseline response received: chars=%d, code_chars=%d", len(response_text), len(code_str))
     all_test_passed, test_results = evaluate_on_test(code_str, test_pairs)
     latency = time.time() - start_time
 
@@ -116,16 +118,16 @@ async def run_cegis(
 
     for iteration in range(1, max_iters + 1):
         iteration_start = time.perf_counter()
-        _log(f"CEGIS iteration {iteration}/{max_iters} started: messages={len(messages)}")
+        logger.info("CEGIS iteration %d/%d started", iteration, max_iters)
         try:
             response_text = await call_llm(messages, model=model)
         except Exception as e:
-            _log(f"CEGIS iteration {iteration} LLM failed after {time.perf_counter() - iteration_start:.2f}s: {e}")
+            logger.error("CEGIS iteration %d LLM failed after %.2fs: %s", iteration, time.perf_counter() - iteration_start, e)
             iteration_history.append({"iteration": iteration, "error": f"LLM Call Failed: {str(e)}"})
             break
 
         current_code = extract_python_code(response_text)
-        _log(f"CEGIS iteration {iteration} response received: chars={len(response_text)}, code_chars={len(current_code)}")
+        logger.debug("CEGIS iteration %d response received: chars=%d, code_chars=%d", iteration, len(response_text), len(current_code))
         messages.append({"role": "assistant", "content": response_text})
 
         # Validate against all training examples
@@ -136,11 +138,13 @@ async def run_cegis(
             expected = pair["output"]
             example_start = time.perf_counter()
             success, actual, error_msg = run_transform(current_code, inp)
-            _log(
-                f"train example {idx + 1}/{len(train_pairs)}: "
-                f"{('PASS' if success and actual == expected else 'FAIL')} "
-                f"in {time.perf_counter() - example_start:.3f}s"
-                + (f" ({error_msg})" if error_msg else "")
+            logger.debug(
+                "train example %d/%d: %s in %.3fs%s",
+                idx + 1,
+                len(train_pairs),
+                "PASS" if success and actual == expected else "FAIL",
+                time.perf_counter() - example_start,
+                f" ({error_msg})" if error_msg else "",
             )
             
             if not success or actual != expected:
@@ -155,9 +159,11 @@ async def run_cegis(
                 "status": "passed_all_train",
                 "code": current_code
             })
-            _log(
-                f"CEGIS iteration {iteration} completed in {time.perf_counter() - iteration_start:.2f}s; "
-                f"training evaluation={time.perf_counter() - training_eval_start:.2f}s"
+            logger.info(
+                "CEGIS iteration %d completed in %.2fs; training evaluation=%.2fs",
+                iteration,
+                time.perf_counter() - iteration_start,
+                time.perf_counter() - training_eval_start,
             )
             break
         else:
@@ -173,9 +179,11 @@ async def run_cegis(
             feedback_msg = build_counterexample_feedback(idx, inp, expected, actual, error_msg)
             messages.append({"role": "user", "content": feedback_msg})
 
-        _log(
-            f"CEGIS iteration {iteration} completed in {time.perf_counter() - iteration_start:.2f}s; "
-            f"training evaluation={time.perf_counter() - training_eval_start:.2f}s"
+        logger.info(
+            "CEGIS iteration %d completed in %.2fs; training evaluation=%.2fs",
+            iteration,
+            time.perf_counter() - iteration_start,
+            time.perf_counter() - training_eval_start,
         )
 
     # Evaluate final candidate code on test pairs

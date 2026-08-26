@@ -1,55 +1,13 @@
-I’ll trace the project from its entry points, configuration, workflow modules, and README, then turn that into a concise Markdown overview with the execution flow and key design choices.
-
-Read 
-
-Read 
-
-Read 
-
-Read 
-
-Read 
-
-Read 
-
-The core structure is clear: `main.py` orchestrates task loading and parallel runs, while `experiment.py` owns the baseline and iterative CEGIS comparison. I’m checking the LLM adapter, package exports, and launch scripts now so the explanation also covers provider selection, result format, and practical run behavior.
-
-Read 
-
-Read 
-
-Read 
-
-Read 
-
-Read 
-
-Read 
-
 # ARC-AGI-1: Baseline vs CEGIS
 
-This project compares two LLM-based program-synthesis strategies for solving ARC-AGI-1 grid-transformation tasks:
+Compara duas estratégias de síntese de programas baseadas em LLMs para resolver tarefas de transformação de grids do ARC-AGI-1:
 
-1. **Baseline:** Generates a solution once.
-2. **CEGIS:** Iteratively improves the solution using counterexamples from failed training examples.
+1. **Baseline:** Gera uma solução uma única vez.
+2. **CEGIS:** Melhora a solução iterativamente usando contraexemplos obtidos a partir de exemplos de treino que falharam.
 
-## Project Structure
+## Formato das tarefas ARC
 
-- `main.py`: Command-line entry point and experiment orchestration.
-- `config.py`: Environment variables and runtime configuration.
-- `data_loader.py`: Loads ARC tasks from JSON files or directories.
-- `prompts.py`: Builds prompts and counterexample feedback.
-- `llm.py`: Communicates with Google, OpenAI-compatible, or HTTP APIs.
-- `sandbox.py`: Extracts and safely executes generated Python code.
-- `experiment.py`: Implements the Baseline and CEGIS workflows.
-- `training`: Training task examples.
-- `evaluation`: Evaluation task examples.
-- `requirements.txt`: Python dependencies.
-- `proposta_inicial.md`: Original project hypothesis.
-
-## ARC Task Format
-
-Each task contains training and test pairs:
+Cada tarefa contém pares de treino e teste:
 
 ```json
 {
@@ -68,107 +26,104 @@ Each task contains training and test pairs:
 }
 ```
 
-The LLM must infer the transformation rule and produce:
+A LLM deve inferir a regra de transformação e produzir:
 
 ```python
 def transform(grid):
     ...
 ```
 
-## Baseline Workflow
+## Fluxos de execução
 
-The Baseline strategy:
+### Baseline
 
-1. Sends all training examples to the LLM.
-2. Requests a Python `transform(grid)` function.
-3. Extracts the generated code.
-4. Executes it against the test examples.
-5. Records whether every test example passed.
+1. Envia todos os exemplos de treino à LLM.
+2. Solicita uma função Python `transform(grid)`.
+3. Extrai o código gerado.
+4. Executa o código nos exemplos de teste.
+5. Registra se todos os exemplos de teste passaram.
 
-It does not provide feedback or request revisions.
+O Baseline não fornece feedback nem solicita revisões.
 
-## CEGIS Workflow
+### CEGIS
 
-CEGIS means **Counterexample-Guided Inductive Synthesis**.
+*Counterexample-Guided Inductive Synthesis*
 
-For each iteration:
+Em cada iteração:
 
-1. Send the training examples to the LLM.
-2. Extract the generated `transform` function.
-3. Execute it against the training examples.
-4. Stop if all training examples pass.
-5. Otherwise, select the first failed example.
-6. Send the LLM:
-   - The input grid
-   - The expected output
-   - The actual output or execution error
-7. Ask the LLM to revise the function.
-8. Repeat until convergence or `MAX_CEGIS_ITERS` is reached.
-9. Evaluate the final program against the test examples.
+1. Envia os exemplos de treino à LLM.
+2. Extrai a função `transform` gerada.
+3. Executa a função nos exemplos de treino.
+4. Para se todos os exemplos de treino passarem.
+5. Caso contrário, seleciona o primeiro exemplo que falhou.
+6. Envia à LLM:
+  - O grid de entrada
+  - A saída esperada
+  - A saída obtida ou o erro de execução
+7. Solicita à LLM que revise a função.
+8. Repete o processo até a convergência ou até atingir `MAX_CEGIS_ITERS`.
+9. Avalia o programa final nos exemplos de teste.
 
-The key hypothesis is that explicit counterexamples help the LLM repair incorrect rules.
+A hipótese é que contraexemplos explícitos ajudam o LLM a corrigir regras incorretas. O projeto testa se o feedback semântico iterativo melhora o desempenho da síntese de programas, permitindo que a LLM identifique e corrija falhas na regra de transformação inicial.
 
-## Code Execution
+## Execução do código
 
-Generated code is executed in a separate process by `sandbox.py`.
+O código gerado é executado em um processo separado por `sandbox.py`.
 
-The sandbox:
+O sandbox:
 
-- Requires a callable `transform(grid)` function.
-- Passes a copy of the input grid.
-- Restricts available built-ins.
-- Enforces a timeout.
-- Captures exceptions and invalid return values.
-- Prevents an infinite loop from blocking the experiment.
+- Exige uma função chamável `transform(grid)`.
+- Passa uma cópia do grid de entrada.
+- Restringe as funções integradas disponíveis.
+- Impõe um tempo limite.
+- Captura exceções e valores de retorno inválidos.
 
-## Experiment Orchestration
+## Orquestração do experimento
 
-`main.py` loads tasks and runs both strategies concurrently for each task:
+`main.py` carrega as tarefas e executa:
 
-```text
-Load tasks
-   |
-   +-- Baseline LLM request -> evaluate on test
-   |
-   +-- CEGIS LLM request -> train validation/refinement -> evaluate on test
-   |
-Compare accuracy and save results
-```
+- `--max-tasks` tarefas, ou todas as tarefas disponíveis
+- Maximo de `MAX_CONCURRENT_TASKS` tarefas em paralelo
+- Cada tarefa é processada por ambas as estratégias, uma após a outra, e os resultados são comparados.
 
-The final summary reports:
+O resumo final informa:
 
-- Number of evaluated tasks
-- Baseline accuracy
-- CEGIS accuracy
-- Absolute accuracy gain
-- Per-task generated code
-- Test results
-- CEGIS iteration history
-- Latency information
+- Precisão do Baseline
+- Precisão do CEGIS
+- Ganho absoluto de precisão
 
-Results are saved as JSON, by default to:
+- Código gerado para cada tarefa
+- Resultados dos testes
+- Histórico de iterações do CEGIS
+- Informações de latência
+
+Os resultados são salvos em JSON, por padrão em:
 
 ```text
 results_experiment.json
 ```
 
-## LLM Providers
+Talvez um tabelão fique mais prático, em algum momento
 
-The project supports:
+## Provedores de LLM
+
+O projeto oferece suporte a:
 
 - Google GenAI
-- OpenAI-compatible APIs
-- Generic HTTP chat-completion endpoints
+- APIs compatíveis com OpenAI
+- Endpoints HTTP genéricos de conclusão de chat
 
-Configuration is controlled through environment variables:
+Não é muito à prova de erros, ainda.
+
+A configuração é controlada por meio de variáveis de ambiente:
 
 ```bash
 export GOOGLE_API_KEY="your_api_key"
-export MODEL_NAME="gemma-2-27b-it"
+export MODEL_NAME="gemma-4-26b-a4b-it"
 export API_PROVIDER="google"
 ```
 
-For an OpenAI-compatible endpoint:
+Para um endpoint compatível com OpenAI:
 
 ```bash
 export API_PROVIDER="openai"
@@ -176,21 +131,21 @@ export API_BASE_URL="https://example.com/v1"
 export OPENAI_API_KEY="your_api_key"
 ```
 
-## Running the Project
+## Execução do projeto
 
-Install dependencies:
+Instale as dependências:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run all tasks from the data directory:
+Execute todas as tarefas do diretório de dados:
 
 ```bash
 python3 main.py --tasks ./data
 ```
 
-Run a limited experiment:
+Execute um experimento limitado:
 
 ```bash
 python3 main.py \
@@ -200,7 +155,7 @@ python3 main.py \
   --output results.json
 ```
 
-Control concurrency:
+Controle a concorrência:
 
 ```bash
 python3 main.py \
@@ -208,53 +163,38 @@ python3 main.py \
   --max-concurrent-tasks 4
 ```
 
-## Important Configuration
+## Configuração via váriaveis de ambiente
+
+
+
+*Defaults podem estar desatualizados*
+
+Por padrão, carrega variáveis presentes em arquivos dotenv
 
 | Variable | Default | Purpose |
 |---|---:|---|
-| `MODEL_NAME` | `gemma-2-27b-it` | LLM model identifier |
-| `MAX_CEGIS_ITERS` | `5` | Maximum CEGIS revisions |
-| `MAX_CONCURRENT_TASKS` | `4` | Number of tasks processed concurrently |
-| `TIMEOUT_SECONDS` | `2.0` | Execution timeout for generated code |
-| `REQUEST_DELAY` | `2.0` | Minimum delay between API requests |
-| `TEMPERATURE` | `0.0` | Intended determinism setting |
-| `API_PROVIDER` | `google` | LLM transport |
-| `API_BASE_URL` | empty | Custom API endpoint |
+| `DOTENV` | vazio | Carrega as váriaveis contidas no conjunto de arquivos .env separados por : |
+| `MODEL_NAME` | `gemma-4-26b-a4b-it` | Identificador do modelo LLM |
+| `MAX_CEGIS_ITERS` | `5` | Número máximo de revisões CEGIS |
+| `MAX_CONCURRENT_TASKS` | `4` | Número de tarefas processadas concorrentemente |
+| `TIMEOUT_SECONDS` | `2.0` | Tempo limite de execução do código gerado |
+| `REQUEST_DELAY` | `2.0` | Intervalo mínimo entre solicitações à API |
+| `TEMPERATURE` | `0.42` | Configuração pretendida de determinismo |
+| `RATE_LIMIT_BACKOFF_FACTOR` | 2 | Se uma requisição falhar por falta de limite na API, multiplica o delay por isso |
+| `MAX_REQUEST_DELAY` | 150 | Chegou aqui, assume-se que o limite acabou de vez e termina o programa |
+| `API_PROVIDER` | `google` | Transporte do LLM |
+| `API_BASE_URL` | vazio | Endpoint de API personalizado |
 
-## Research Question
+## Resumo unga bunga
 
-The project tests this hypothesis:
+### Ideia base
 
-> Iterative semantic feedback should improve program-synthesis performance because the LLM can identify and correct failures in its initial transformation rule.
+Resolver problemas ARC usando LLMs.
 
-However, the improvement may be limited because ARC training demonstrations already provide substantial information about the intended rule.
+### Como
 
-## Security Note
+Pedir ao LLM um programa em Python que resolva cada tarefa.
 
-The `a.sh` script contains a hard-coded API token. That token should be revoked and replaced immediately. API credentials should be supplied through environment variables rather than committed to the repository.
+### CEGIS
 
-
-
-
-
-
-
-# Ideia base:
-
-  Resolver problemas ARC
-    Usando LLMs
-
-## Como
-
-  Pede por um programa em PYTHON que o resolva
-
-
-# CEGIS
-
-  Roda o código em todos os casos de TREINO. Se algum estiver errado, aponta que tá errado, diz o que era esperado, e manda corrigir
-    Falhou nos de teste? Azar, toma FAIL.
-
-
-# Detalhes idiotas que eu esqueci na hora
-
-Não usa a mesma "sessão" direto no servidor da api, mas todo o histórico da conversa é passado a cada correção
+Executar o código em todos os casos de treino. Se algum falhar, informar o erro, o resultado esperado e pedir uma correção. Se falhar nos casos de teste, o resultado é `FAIL`.

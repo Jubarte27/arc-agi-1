@@ -27,8 +27,11 @@ Optional environment variables:
 - `MAX_CONCURRENT_TASKS`: Maximum tasks evaluated concurrently (default: `4`)
 - `TIMEOUT_SECONDS`: Python execution timeout per test (default: `2.0`)
 - `REQUEST_DELAY`: Delay in seconds between API requests to prevent rate limiting (default: `2.0`)
+- `RATE_LIMIT_BACKOFF_FACTOR`: Multiplier applied to the request delay after an “Out of Rate”, rate-limit, HTTP 429, or “Too Many Requests” error (default: `2.0`)
+- `MAX_REQUEST_DELAY`: Maximum adaptive request delay in seconds (default: `120.0`)
 - `API_PROVIDER`: LLM transport: `google`, `openai`, or `http` (defaults to `openai` when `API_BASE_URL` is set, otherwise `google`)
 - `API_BASE_URL`: Custom OpenAI-compatible base URL, used by `openai` or `http`
+- `LOG_FILE`: Log file path (default: `logs/arc_cegis.log`); debug details are file-only, while significant messages also appear on stdout
 
 ### 3. Run Experiments
 

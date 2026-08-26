@@ -3,18 +3,43 @@ LLM Client Module for interacting with chat model endpoints (e.g., Gemma 31B IT)
 """
 
 import asyncio
-from typing import Dict, List
+import logging
+from typing import Any, Dict, List
 import time
 from . import config
 
 
-def _log(message: str) -> None:
-
-    print(f"[LLM {time.strftime('%H:%M:%S')}] {message}", flush=True)
+logger = logging.getLogger(__name__)
 
 
 _rate_limit_lock = asyncio.Lock()
 _last_request_start: float | None = None
+_adaptive_request_delay = config.REQUEST_DELAY
+
+
+def _is_rate_limit_error(error: Exception) -> bool:
+    """Recognize provider rate-limit errors across SDKs and HTTP clients."""
+    error_text = str(error).lower()
+    return (
+        "out of rate" in error_text
+        or "rate limit" in error_text
+        or "too many requests" in error_text
+        or "429" in error_text
+    )
+
+
+def _increase_request_delay() -> float:
+    """Increase the delay after a rate-limit response, up to the configured cap."""
+    global _adaptive_request_delay
+
+    _adaptive_request_delay *= config.RATE_LIMIT_BACKOFF_FACTOR
+    if _adaptive_request_delay > config.MAX_REQUEST_DELAY:
+        raise SystemExit(
+            "Maximum request delay exceeded: "
+            f"{_adaptive_request_delay:.2f}s > "
+            f"configured limit of {config.MAX_REQUEST_DELAY:.2f}s."
+        )
+    return _adaptive_request_delay
 
 
 async def _wait_for_request_slot() -> None:
@@ -24,9 +49,9 @@ async def _wait_for_request_slot() -> None:
     async with _rate_limit_lock:
         now = time.monotonic()
         if _last_request_start is not None:
-            wait_seconds = config.REQUEST_DELAY - (now - _last_request_start)
+            wait_seconds = _adaptive_request_delay - (now - _last_request_start)
             if wait_seconds > 0:
-                _log(f"rate limiter waiting {wait_seconds:.2f}s")
+                logger.debug("rate limiter waiting %.2fs", wait_seconds)
                 await asyncio.sleep(wait_seconds)
         _last_request_start = time.monotonic()
 
@@ -51,15 +76,18 @@ def _call_google(
             retry_options=types.HttpRetryOptions(attempts=0),
         ),
     )
-    chat = client.chats.create(model=model)
-    response = chat.send_message(
-        full_prompt,
-        config=types.GenerateContentConfig(
-            max_output_tokens=4096,
-            temperature=0.2,
-        ),
-    )
-    return response.text or ""
+    try:
+        chat = client.chats.create(model=model)
+        response = chat.send_message(
+            full_prompt,
+            config=types.GenerateContentConfig(
+                max_output_tokens=4096,
+                temperature=0.2,
+            ),
+        )
+        return response.text or ""
+    finally:
+        client.close()
 
 
 def _call_openai(
@@ -67,20 +95,23 @@ def _call_openai(
 ) -> str:
     from openai import OpenAI
 
-    client_kwargs = {"api_key": api_key}
+    client_kwargs: dict[str,Any] = {"api_key": api_key}
     if api_base_url:
         client_kwargs["base_url"] = api_base_url
     client = OpenAI(**client_kwargs)
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=0.2,
-        top_p=0.95,
-        max_tokens=16384,
-        extra_body={"chat_template_kwargs":{"enable_thinking":False},"reasoning_budget":16384},
-        stream=False
-    )
-    return response.choices[0].message.content or ""
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.2,
+            top_p=0.95,
+            max_tokens=16384,
+            extra_body={"chat_template_kwargs":{"enable_thinking":False},"reasoning_budget":16384},
+            stream=False
+        )
+        return response.choices[0].message.content or ""
+    finally:
+        client.close()
 
 
 def _call_http(
@@ -89,7 +120,7 @@ def _call_http(
     import requests
 
     base = api_base_url.rstrip("/") if api_base_url else "https://api.openai.com/v1"
-    res = requests.post(
+    with requests.post(
         f"{base}/chat/completions",
         headers={
             "Authorization": f"Bearer {api_key}",
@@ -97,9 +128,9 @@ def _call_http(
         },
         json={"model": model, "messages": messages, "temperature": 0.2},
         timeout=120,
-    )
-    res.raise_for_status()
-    return res.json()["choices"][0]["message"]["content"]
+    ) as res:
+        res.raise_for_status()
+        return res.json()["choices"][0]["message"]["content"]
 
 
 async def call_llm(
@@ -113,16 +144,18 @@ async def call_llm(
     Uses the provider selected by config.API_PROVIDER.
     """
     call_start = time.perf_counter()
-    _log(
-        f"request started: model={model}, messages={len(messages)}, "
-        f"chars={sum(len(msg.get('content', '')) for msg in messages)}"
+    logger.debug(
+        "request started: model=%s, messages=%d, chars=%d",
+        model,
+        len(messages),
+        sum(len(msg.get("content", "")) for msg in messages),
     )
 
     await _wait_for_request_slot()
     provider = config.API_PROVIDER
     provider_start = time.perf_counter()
     try:
-        _log(f"selected provider: {provider}")
+        logger.debug("selected provider: %s", provider)
         if provider == "google":
             provider_call = _call_google
             response_text = await asyncio.to_thread(provider_call, messages, model, api_key)
@@ -134,14 +167,25 @@ async def call_llm(
             response_text = await asyncio.to_thread(
                 _call_http, messages, model, api_key, api_base_url
             )
-        _log(
-            f"{provider} request completed in {time.perf_counter() - provider_start:.2f}s; "
-            f"total={time.perf_counter() - call_start:.2f}s"
+        logger.debug(
+            "%s request completed in %.2fs; total=%.2fs",
+            provider,
+            time.perf_counter() - provider_start,
+            time.perf_counter() - call_start,
         )
         return response_text
     except Exception as e:
-        _log(
-            f"{provider} request failed after {time.perf_counter() - provider_start:.2f}s: {e}"
+        if _is_rate_limit_error(e):
+            new_delay = _increase_request_delay()
+            logger.warning(
+                "Rate limit detected; increasing request delay to %.2fs",
+                new_delay,
+            )
+        logger.error(
+            "%s request failed after %.2fs: %s",
+            provider,
+            time.perf_counter() - provider_start,
+            e,
         )
         raise RuntimeError(
             f"Failed to communicate with the configured {provider} API. "
