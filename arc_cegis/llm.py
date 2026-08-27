@@ -6,6 +6,8 @@ and intelligent 429/RPM wait-and-retry protections.
 
 import random
 import re
+import logging
+import threading
 import time
 from typing import Any, Dict, List, Optional
 
@@ -13,6 +15,9 @@ from google import genai
 from google.genai import errors, types
 
 from . import config
+
+
+logger = logging.getLogger(__name__)
 
 
 class AuthError(Exception):
@@ -29,17 +34,36 @@ class QuotaExceededError(Exception):
 _REQUEST_COUNT: int = 0
 _LAST_REQUEST_TIME: float = 0.0
 _CLIENT_CACHE: Dict[str, genai.Client] = {}
+_REQUEST_LOCK = threading.Lock()
 
 
 def get_request_count() -> int:
     """Returns the total number of API requests made in this session."""
-    return _REQUEST_COUNT
+    with _REQUEST_LOCK:
+        return _REQUEST_COUNT
 
 
 def reset_request_count(value: int = 0) -> None:
     """Resets or initializes the session request counter."""
     global _REQUEST_COUNT
-    _REQUEST_COUNT = value
+    with _REQUEST_LOCK:
+        _REQUEST_COUNT = value
+
+
+def _reserve_request_slot() -> None:
+    """Serializes rate-limit waiting and quota accounting for concurrent workers."""
+    global _REQUEST_COUNT, _LAST_REQUEST_TIME
+
+    with _REQUEST_LOCK:
+        if _REQUEST_COUNT >= config.MAX_DAILY_REQUESTS:
+            raise QuotaExceededError(
+                f"Daily Free Tier request safety limit reached ({_REQUEST_COUNT}/{config.MAX_DAILY_REQUESTS} requests). "
+                "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
+            )
+
+        _wait_for_rate_limit()
+        _LAST_REQUEST_TIME = time.time()
+        _REQUEST_COUNT += 1
 
 
 def _extract_retry_delay(error: Exception) -> Optional[float]:
@@ -182,13 +206,6 @@ def call_llm(
     """
     global _REQUEST_COUNT, _LAST_REQUEST_TIME
 
-    # 1. Proactive Daily Quota Check (RPD Guard)
-    if _REQUEST_COUNT >= config.MAX_DAILY_REQUESTS:
-        raise QuotaExceededError(
-            f"Daily Free Tier request safety limit reached ({_REQUEST_COUNT}/{config.MAX_DAILY_REQUESTS} requests). "
-            "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
-        )
-
     client = get_gemini_client(api_key=api_key)
     system_instruction, contents = format_messages_for_gemini(messages)
 
@@ -197,21 +214,31 @@ def call_llm(
         system_instruction=system_instruction,
     )
 
+    if not contents:
+        raise ValueError("At least one user message is required")
+
+    chat = client.chats.create(
+        model=model,
+        config=gen_config,
+        history=contents[:-1],
+    )
+    latest_message = contents[-1].parts
+
     base_delay = 4.0
 
     for attempt in range(1, max_retries + 1):
         try:
-            # Enforce proactive inter-request delay (RPM Guard)
-            _wait_for_rate_limit()
-
-            _LAST_REQUEST_TIME = time.time()
-            _REQUEST_COUNT += 1
-
-            response = client.models.generate_content(
-                model=model,
-                contents=contents,
-                config=gen_config,
+            # Reserve the quota and rate-limit slot before making the request.
+            _reserve_request_slot()
+            logger.debug(
+                "Starting API request: model=%s attempt=%s request=%s/%s",
+                model,
+                attempt,
+                get_request_count(),
+                config.MAX_DAILY_REQUESTS,
             )
+
+            response = chat.send_message(latest_message)
             return response.text or ""
 
         except errors.APIError as e:
@@ -252,7 +279,6 @@ def call_llm(
                     sleep_duration = max(35.0, base_delay * (2 ** (attempt - 1))) + random.uniform(1.0, 3.0)
 
                 time.sleep(sleep_duration)
-                _LAST_REQUEST_TIME = time.time()
                 continue
 
             # Retry other transient errors (500, 503, etc.)
@@ -263,7 +289,6 @@ def call_llm(
 
             sleep_duration = base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5)
             time.sleep(sleep_duration)
-            _LAST_REQUEST_TIME = time.time()
 
         except Exception as e:
             err_msg = str(e).lower()
@@ -289,7 +314,6 @@ def call_llm(
 
                 sleep_duration = (retry_delay + 3.0) if retry_delay is not None else (max(35.0, base_delay * (2 ** (attempt - 1))) + random.uniform(1.0, 3.0))
                 time.sleep(sleep_duration)
-                _LAST_REQUEST_TIME = time.time()
                 continue
 
             if attempt == max_retries:
@@ -299,7 +323,6 @@ def call_llm(
 
             sleep_duration = base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5)
             time.sleep(sleep_duration)
-            _LAST_REQUEST_TIME = time.time()
 
     return ""
 

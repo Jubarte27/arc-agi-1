@@ -36,6 +36,7 @@ Optional environment variables:
 - `TIMEOUT_SECONDS`: Python execution timeout per test (default: 2.0)
 - `REQUEST_DELAY`: Delay in seconds between API requests (default: 4.2s for <= 14.3 RPM)
 - `MAX_DAILY_REQUESTS`: Daily quota safety ceiling (default: 1450)
+- `LOG_FILE`: Log output path; overwritten when the program starts (default: `experiment.log`)
 
 ### 3. Run Experiments
 

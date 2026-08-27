@@ -56,3 +56,9 @@ REQUEST_DELAY = float(os.getenv("REQUEST_DELAY", "4.2"))
 # Daily Quota Guard (Google AI Studio Free Tier: 1500 RPD limit / 250K TPM)
 # Hard safety ceiling of 1450 requests before gracefully pausing
 MAX_DAILY_REQUESTS = int(os.getenv("MAX_DAILY_REQUESTS", "1450"))
+
+# Maximum number of ARC tasks evaluated concurrently.
+MAX_CONCURRENT_TASKS = int(os.getenv("MAX_CONCURRENT_TASKS", "8"))
+
+# Log file is truncated whenever a new experiment process starts.
+LOG_FILE = os.getenv("LOG_FILE", "experiment.log")

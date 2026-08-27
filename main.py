@@ -5,9 +5,10 @@ Includes Proactive Rate Limiter (RPM), Daily Quota Guard (RPD), and Checkpoint /
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import logging
 import os
-import sys
 from typing import Any, Dict, List, Set
 
 from arc_cegis import (
@@ -22,33 +23,30 @@ from arc_cegis import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 def perform_health_check(model: str) -> None:
     """
     Executes a fast test query to validate API key, connectivity, and model availability.
     Terminates execution immediately if the check fails.
     """
-    print("Performing initial Gemini API health check...")
+    logger.info("Performing initial Gemini API health check...")
     test_messages = [{"role": "user", "content": "Responda apenas 'OK'"}]
     try:
         response = call_llm(test_messages, model=model, max_retries=3)
-        print(f"Health check PASSED! Model '{model}' responded successfully: {response.strip()[:30]}\n")
+        logger.info("Health check PASSED! Model '%s' responded successfully: %s", model, response.strip()[:30])
     except AuthError as auth_err:
-        print("\n" + "=" * 70, file=sys.stderr)
-        print(f" [FATAL AUTHENTICATION ERROR] {auth_err}", file=sys.stderr)
-        print(" Please verify that GEMINI_API_KEY or GOOGLE_API_KEY is correctly set.", file=sys.stderr)
-        print("=" * 70 + "\n", file=sys.stderr)
-        sys.exit(1)
+        logger.critical("FATAL AUTHENTICATION ERROR: %s", auth_err)
+        logger.critical("Please verify that GEMINI_API_KEY or GOOGLE_API_KEY is correctly set.")
+        raise SystemExit(1)
     except QuotaExceededError as q_err:
-        print("\n" + "=" * 70, file=sys.stderr)
-        print(f" [FATAL QUOTA ERROR] {q_err}", file=sys.stderr)
-        print("=" * 70 + "\n", file=sys.stderr)
-        sys.exit(1)
+        logger.critical("FATAL QUOTA ERROR: %s", q_err)
+        raise SystemExit(1)
     except Exception as err:
-        print("\n" + "=" * 70, file=sys.stderr)
-        print(f" [FATAL HEALTH CHECK ERROR] Failed to connect to Gemini API: {err}", file=sys.stderr)
-        print(f" Verify internet connectivity and model name '{model}'.", file=sys.stderr)
-        print("=" * 70 + "\n", file=sys.stderr)
-        sys.exit(1)
+        logger.critical("FATAL HEALTH CHECK ERROR: Failed to connect to Gemini API: %s", err)
+        logger.critical("Verify internet connectivity and model name '%s'.", model)
+        raise SystemExit(1)
 
 
 def save_checkpoint(
@@ -121,11 +119,19 @@ def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, S
 
         return detailed_results, baseline_correct, cegis_correct, completed_task_ids
     except Exception as e:
-        print(f"[Warning] Failed to read checkpoint from '{output_path}': {e}. Starting fresh.")
+        logger.warning("Failed to read checkpoint from '%s': %s. Starting fresh.", output_path, e)
         return [], 0, 0, set()
 
 
 def main() -> None:
+    log_format = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+    file_handler = logging.FileHandler(config.LOG_FILE, mode="w", encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(log_format))
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(logging.Formatter(log_format))
+    logging.basicConfig(level=logging.DEBUG, handlers=[file_handler, console_handler], force=True)
     parser = argparse.ArgumentParser(
         description="ARC-AGI-1 Comparative Experiment: Baseline (1-shot) vs CEGIS with Free Tier Protections"
     )
@@ -188,7 +194,6 @@ def main() -> None:
         default=config.MAX_DAILY_REQUESTS,
         help=f"Maximum daily requests ceiling before safe pause (default: {config.MAX_DAILY_REQUESTS})",
     )
-
     args = parser.parse_args()
 
     # Update dynamic config overrides
@@ -197,11 +202,9 @@ def main() -> None:
 
     rpm_effective = int(60.0 / config.REQUEST_DELAY) if config.REQUEST_DELAY > 0 else 0
 
-    print("=" * 70)
-    print(" ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS (Google AI Studio / GenAI)")
-    print(f" Model: {args.model} | Max CEGIS Iters: {args.max_iters} | Timeout: {config.TIMEOUT_SECONDS}s")
-    print(f" Rate Delay: {config.REQUEST_DELAY}s (<= {rpm_effective} RPM) | Daily Quota Guard: {config.MAX_DAILY_REQUESTS} RPD")
-    print("=" * 70)
+    logger.info("ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS (Google AI Studio / GenAI)")
+    logger.info("Model: %s | Max CEGIS Iters: %s | Timeout: %ss", args.model, args.max_iters, config.TIMEOUT_SECONDS)
+    logger.info("Rate Delay: %ss (<= %s RPM) | Daily Quota Guard: %s RPD", config.REQUEST_DELAY, rpm_effective, config.MAX_DAILY_REQUESTS)
 
     # 1. Health check
     if not args.skip_health_check:
@@ -213,7 +216,7 @@ def main() -> None:
         tasks_dict = dict(list(tasks_dict.items())[:args.max_tasks])
 
     total_tasks = len(tasks_dict)
-    print(f"Loaded {total_tasks} task(s) in evaluation set.")
+    logger.info("Loaded %s task(s) in evaluation set.", total_tasks)
 
     # 3. Checkpoint / Resume recovery
     detailed_results: List[Dict[str, Any]] = []
@@ -224,96 +227,104 @@ def main() -> None:
     if args.resume and os.path.exists(args.output):
         detailed_results, baseline_correct, cegis_correct, completed_task_ids = load_checkpoint(args.output)
         if completed_task_ids:
-            print(
-                f"[Checkpoint Found] Resuming experiment from '{args.output}'.\n"
-                f" -> {len(completed_task_ids)}/{total_tasks} tasks already completed "
-                f"(Baseline: {baseline_correct}, CEGIS: {cegis_correct}).\n"
+            logger.info(
+                "Checkpoint found. Resuming from '%s': %s/%s tasks already completed "
+                "(Baseline: %s, CEGIS: %s).",
+                args.output, len(completed_task_ids), total_tasks, baseline_correct, cegis_correct,
             )
 
     consecutive_api_failures = 0
     CIRCUIT_BREAKER_THRESHOLD = 3
     quota_exhausted = False
+    auth_failed = False
+
+    def evaluate_task(task_id: str, task_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Run both strategies for one task in a worker thread."""
+        base_res = run_baseline(task_data, model=args.model)
+        cegis_res = run_cegis(task_data, max_iters=args.max_iters, model=args.model)
+        return {
+            "task_id": task_id,
+            "baseline": base_res,
+            "cegis": cegis_res,
+        }
 
     # 4. Run evaluations with Protections and Incremental Checkpointing
     try:
-        for i, (task_id, task_data) in enumerate(tasks_dict.items(), start=1):
-            if task_id in completed_task_ids:
-                continue
+        pending_tasks = [
+            (task_id, task_data)
+            for task_id, task_data in tasks_dict.items()
+            if task_id not in completed_task_ids
+        ]
+        worker_count = max(1, config.MAX_CONCURRENT_TASKS)
+        logger.info("Running %s task(s) with %s concurrent worker(s).", len(pending_tasks), worker_count)
 
-            print(f"[{i}/{total_tasks}] Task: {task_id} (API Requests: {get_request_count()}/{config.MAX_DAILY_REQUESTS})")
-            task_api_error = False
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            future_to_task = {
+                executor.submit(evaluate_task, task_id, task_data): task_id
+                for task_id, task_data in pending_tasks
+            }
 
-            try:
-                # Run Baseline
-                base_res = run_baseline(task_data, model=args.model)
-                if base_res.get("api_error"):
-                    task_api_error = True
+            for future in as_completed(future_to_task):
+                task_id = future_to_task[future]
+                try:
+                    result = future.result()
+                except AuthError as auth_err:
+                    auth_failed = True
+                    logger.error("AUTH ERROR: %s", auth_err)
+                    for pending in future_to_task:
+                        pending.cancel()
+                    continue
+                except QuotaExceededError as quota_err:
+                    quota_exhausted = True
+                    logger.error("SAFE PAUSE / DAILY QUOTA GUARD: %s", quota_err)
+                    for pending in future_to_task:
+                        pending.cancel()
+                    continue
+
+                base_res = result["baseline"]
+                cegis_res = result["cegis"]
+                task_api_error = base_res.get("api_error", False) or cegis_res.get("api_error", False)
                 if base_res["success"]:
                     baseline_correct += 1
-                print(f"   - Baseline: {'PASSED' if base_res['success'] else 'FAILED'} ({base_res['latency']:.2f}s)")
-
-                # Run CEGIS
-                cegis_res = run_cegis(task_data, max_iters=args.max_iters, model=args.model)
-                if cegis_res.get("api_error"):
-                    task_api_error = True
                 if cegis_res["success"]:
                     cegis_correct += 1
-                print(
-                    f"   - CEGIS:    {'PASSED' if cegis_res['success'] else 'FAILED'} "
-                    f"(Iters: {cegis_res.get('iterations_used', 0)}, "
-                    f"Train Converged: {cegis_res.get('converged_train', False)}, "
-                    f"{cegis_res['latency']:.2f}s)"
+                if task_api_error:
+                    consecutive_api_failures += 1
+                else:
+                    consecutive_api_failures = 0
+
+                detailed_results.append(result)
+                completed_task_ids.add(task_id)
+                logger.info(
+                    "[%s/%s] %s: Baseline=%s, CEGIS=%s (API Requests: %s/%s)",
+                    len(detailed_results), total_tasks, task_id,
+                    "PASSED" if base_res["success"] else "FAILED",
+                    "PASSED" if cegis_res["success"] else "FAILED",
+                    get_request_count(), config.MAX_DAILY_REQUESTS,
+                )
+                save_checkpoint(
+                    output_path=args.output,
+                    model=args.model,
+                    max_iters=args.max_iters,
+                    total_tasks=total_tasks,
+                    detailed_results=detailed_results,
+                    baseline_correct=baseline_correct,
+                    cegis_correct=cegis_correct,
                 )
 
-            except AuthError as auth_err:
-                print("\n" + "!" * 70, file=sys.stderr)
-                print(f" [CIRCUIT BREAKER / AUTH ERROR] {auth_err}", file=sys.stderr)
-                print(" Aborting experiment immediately to protect API credentials.", file=sys.stderr)
-                print("!" * 70 + "\n", file=sys.stderr)
-                break
-
-            except QuotaExceededError as quota_err:
-                quota_exhausted = True
-                print("\n" + "!" * 70, file=sys.stderr)
-                print(f" [SAFE PAUSE / DAILY QUOTA GUARD] {quota_err}", file=sys.stderr)
-                print(f" Progress safely saved to '{args.output}'.", file=sys.stderr)
-                print(" When your daily quota resets, simply re-run the same command to resume seamlessly:", file=sys.stderr)
-                print(f"   python3 main.py --tasks {args.tasks} --model {args.model} --output {args.output}", file=sys.stderr)
-                print("!" * 70 + "\n", file=sys.stderr)
-                break
-
-            if task_api_error:
-                consecutive_api_failures += 1
-                print(f"   [Warning] API error occurred ({consecutive_api_failures}/{CIRCUIT_BREAKER_THRESHOLD} consecutive).")
                 if consecutive_api_failures >= CIRCUIT_BREAKER_THRESHOLD:
-                    print("\n" + "!" * 70, file=sys.stderr)
-                    print(f" [CIRCUIT BREAKER TRIGGERED] {CIRCUIT_BREAKER_THRESHOLD} consecutive tasks failed with API errors.", file=sys.stderr)
-                    print(" Aborting experiment execution to prevent wasted calls.", file=sys.stderr)
-                    print("!" * 70 + "\n", file=sys.stderr)
+                    logger.error("CIRCUIT BREAKER: %s consecutive tasks had API errors.", CIRCUIT_BREAKER_THRESHOLD)
+                    for pending in future_to_task:
+                        pending.cancel()
                     break
-            else:
-                consecutive_api_failures = 0
 
-            detailed_results.append({
-                "task_id": task_id,
-                "baseline": base_res,
-                "cegis": cegis_res,
-            })
-            completed_task_ids.add(task_id)
-
-            # Incremental checkpoint save after every completed task
-            save_checkpoint(
-                output_path=args.output,
-                model=args.model,
-                max_iters=args.max_iters,
-                total_tasks=total_tasks,
-                detailed_results=detailed_results,
-                baseline_correct=baseline_correct,
-                cegis_correct=cegis_correct,
-            )
+        if auth_failed:
+            logger.error("Experiment stopped because API authentication failed.")
+        elif quota_exhausted:
+            logger.error("Progress safely saved to '%s'; rerun to resume after quota reset.", args.output)
 
     except KeyboardInterrupt:
-        print("\n\n[INTERRUPTED] Execution stopped by user. Saving current checkpoint...")
+        logger.warning("Interrupted. Saving current checkpoint...")
         save_checkpoint(
             output_path=args.output,
             model=args.model,
@@ -323,26 +334,24 @@ def main() -> None:
             baseline_correct=baseline_correct,
             cegis_correct=cegis_correct,
         )
-        print(f"Checkpoint safely saved to '{args.output}'. You can resume at any time.")
-        sys.exit(0)
+        logger.info("Checkpoint safely saved to '%s'. You can resume at any time.", args.output)
+        raise SystemExit(0)
 
     # 5. Print Summary
     evaluated_count = len(detailed_results)
     base_acc = (baseline_correct / evaluated_count) * 100 if evaluated_count > 0 else 0.0
     cegis_acc = (cegis_correct / evaluated_count) * 100 if evaluated_count > 0 else 0.0
 
-    print("\n" + "=" * 70)
-    print(" EXPERIMENT SUMMARY" + (" (PAUSED - DAILY QUOTA REACHED)" if quota_exhausted else ""))
-    print("=" * 70)
-    print(f"Total Tasks in Dataset : {total_tasks}")
-    print(f"Tasks Completed        : {evaluated_count}/{total_tasks} ({(evaluated_count / total_tasks * 100):.1f}%)" if total_tasks else "")
-    print(f"Total API Calls Used   : {get_request_count()}/{config.MAX_DAILY_REQUESTS}")
-    print(f"Baseline Accuracy      : {baseline_correct}/{evaluated_count} ({base_acc:.2f}%)" if evaluated_count else "Baseline Accuracy: N/A")
-    print(f"CEGIS Accuracy         : {cegis_correct}/{evaluated_count} ({cegis_acc:.2f}%)" if evaluated_count else "CEGIS Accuracy: N/A")
+    logger.info("EXPERIMENT SUMMARY%s", " (PAUSED - DAILY QUOTA REACHED)" if quota_exhausted else "")
+    logger.info("Total Tasks in Dataset: %s", total_tasks)
+    if total_tasks:
+        logger.info("Tasks Completed: %s/%s (%.1f%%)", evaluated_count, total_tasks, evaluated_count / total_tasks * 100)
+    logger.info("Total API Calls Used: %s/%s", get_request_count(), config.MAX_DAILY_REQUESTS)
+    logger.info("Baseline Accuracy: %s", f"{baseline_correct}/{evaluated_count} ({base_acc:.2f}%)" if evaluated_count else "N/A")
+    logger.info("CEGIS Accuracy: %s", f"{cegis_correct}/{evaluated_count} ({cegis_acc:.2f}%)" if evaluated_count else "N/A")
     if evaluated_count > 0:
-        print(f"Absolute Gain          : {cegis_acc - base_acc:+.2f}%")
-    print("=" * 70)
-    print(f"Results safely saved to: {args.output}\n")
+        logger.info("Absolute Gain: %+.2f%%", cegis_acc - base_acc)
+    logger.info("Results safely saved to: %s", args.output)
 
 
 if __name__ == "__main__":

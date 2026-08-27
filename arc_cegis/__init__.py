@@ -8,6 +8,7 @@ from .config import (
     TIMEOUT_SECONDS,
     REQUEST_DELAY,
     MAX_DAILY_REQUESTS,
+    MAX_CONCURRENT_TASKS,
     get_api_key,
 )
 from .data_loader import load_tasks
@@ -28,6 +29,7 @@ __all__ = [
     "TIMEOUT_SECONDS",
     "REQUEST_DELAY",
     "MAX_DAILY_REQUESTS",
+    "MAX_CONCURRENT_TASKS",
     "get_api_key",
     "load_tasks",
     "evaluate_on_test",

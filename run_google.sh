@@ -1,0 +1,1 @@
+DOTENV=.env:.env.secret:.env.google python3 main.py --tasks ./data --max-tasks 20 --output results_experiment.json

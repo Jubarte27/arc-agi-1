@@ -3,8 +3,12 @@ Data loading utilities for ARC-AGI JSON task benchmarks.
 """
 
 import json
+import logging
 import os
 from typing import Any, Dict
+
+
+logger = logging.getLogger(__name__)
 
 
 def load_tasks(data_path: str) -> Dict[str, Dict[str, Any]]:
@@ -36,9 +40,9 @@ def load_tasks(data_path: str) -> Dict[str, Dict[str, Any]]:
                             elif isinstance(content, dict) and not any(k in content for k in ("train", "test")):
                                 tasks.update(content)
                     except Exception as e:
-                        print(f"[Warning] Failed to load {fpath}: {e}")
+                        logger.warning("Failed to load %s: %s", fpath, e)
     else:
-        print(f"[Info] Path '{data_path}' not found. Using built-in sample ARC task.")
+        logger.info("Path '%s' not found. Using built-in sample ARC task.", data_path)
         tasks["sample_task_001"] = {
             "train": [
                 {"input": [[0, 1], [0, 0]], "output": [[1, 0], [0, 0]]},

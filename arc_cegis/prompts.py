@@ -13,7 +13,7 @@ ANTI_IMPORT_RULES = (
 
 ANTI_CHEAT_RULES = (
     "- DO NOT add conditional branches (if/else) targeting specific example indices, hardcoded coordinates, or specific row values of a single training case. The transformation must be a single, uniform mathematical/geometric rule that applies to ALL grids identically.\n"
-    "- Before writing the code, explicitly state the single abstract invariant that explains why the previous code failed on Example X and how the new logic naturally handles Examples 0, 1, and 2 without special cases.\n""
+    "- Before writing the code, explicitly state the single abstract invariant that explains why the previous code failed on Example X and how the new logic naturally handles Examples 0, 1, and 2 without special cases.\n"
 )
 
 def build_initial_prompt(task_train_pairs: List[Dict[str, List[List[int]]]]) -> str:
