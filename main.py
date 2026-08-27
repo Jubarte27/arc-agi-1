@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import logging
 import os
-import re
 from typing import Any, Dict, List, Set
+from util.parsing import compact_long_numeric_lists
 
 from arc_cegis import (
     AuthError,
@@ -38,16 +38,6 @@ _EMERGENCY_STATE: Dict[str, Any] = {
     "cegis_correct": 0,
     "faulty_task_ids": set(),
 }
-
-
-_LONG_NUMERIC_LIST_RE = re.compile(r"\[(?:\s+\d+,?)+\s*\]")
-_LONG_NUMERIC_LIST_ITEM_RE = re.compile(r"\s*(\d)(,?)\s*")
-def compact_long_numeric_lists(serialized: str) -> str:
-    """Keep long numeric JSON arrays on one line to reduce checkpoint size."""
-    def compact(match: re.Match[str]) -> str:
-        return _LONG_NUMERIC_LIST_ITEM_RE.sub(r"\1\2", match.group(0))
-
-    return _LONG_NUMERIC_LIST_RE.sub(compact, serialized)
 
 
 def perform_health_check(model: str | None) -> None:
