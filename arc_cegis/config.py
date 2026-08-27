@@ -3,8 +3,21 @@ Global configuration settings for the ARC-CEGIS experiment.
 """
 
 import os
+import threading
+from dataclasses import dataclass
 
 from dotenv import dotenv_values, find_dotenv
+
+
+@dataclass(frozen=True)
+class LLMConfig:
+    provider: str
+    model: str
+    request_delay: float
+    max_daily_requests: int
+    max_concurrent_tasks: int
+    api_key: str | None = None
+    pool_index: int | None = None
 
 
 def _dotenv_paths_from_env() -> list[str]:
@@ -34,13 +47,17 @@ MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.1-flash-lite")
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini").strip().lower()
 API_BASE_URLS = {
     "groq": "https://api.groq.com/openai/v1/",
-    "nvidia": "https://integrate.api.nvidia.com/v1"
+    "nvidia": "https://integrate.api.nvidia.com/v1",
+    "openrouter": "https://openrouter.ai/api/v1/",
+    "mistral": "https://api.mistral.ai/v1",
 }
 API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
 API_KEYS = {
     "gemini": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
     "groq": ("GROQ_API_KEY", "OPENAI_API_KEY"),
     "nvidia": ("NVIDIA_API_KEY", "OPENAI_API_KEY"),
+    "openrouter": ("OPENROUTER_API_KEY", "OPENAI_API_KEY"),
+    "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY")
 }
 
 
@@ -78,5 +95,51 @@ MAX_DAILY_REQUESTS = int(os.getenv("MAX_DAILY_REQUESTS", "1450"))
 # Maximum number of ARC tasks evaluated concurrently.
 MAX_CONCURRENT_TASKS = int(os.getenv("MAX_CONCURRENT_TASKS", "8"))
 
+
+def _load_llm_pool() -> list[LLMConfig]:
+    """Parse provider:model entries and let each entry override global limits."""
+    raw_pool = os.getenv("LLM_POOL", "")
+    if not raw_pool.strip():
+        return []
+
+    pool = []
+    for index, raw_entry in enumerate(raw_pool.split(","), start=1):
+        parts = [part.strip() for part in raw_entry.split(":", 2)]
+        if len(parts) != 2 or not parts[0] or not parts[1]:
+            raise ValueError(f"Invalid LLM_POOL entry {raw_entry!r}; expected provider:model")
+        provider, model = parts
+        pool.append(LLMConfig(
+            provider=provider.lower(),
+            model=model,
+            api_key=os.getenv(f"LLM_POOL_{index}_API_KEY"),
+            request_delay=float(os.getenv(f"LLM_POOL_{index}_REQUEST_DELAY", str(REQUEST_DELAY))),
+            max_daily_requests=int(os.getenv(
+                f"LLM_POOL_{index}_MAX_DAILY_REQUESTS", str(MAX_DAILY_REQUESTS)
+            )),
+            max_concurrent_tasks=int(os.getenv(
+                f"LLM_POOL_{index}_MAX_CONCURRENT_TASKS", str(MAX_CONCURRENT_TASKS)
+            )),
+            pool_index=index - 1,
+        ))
+    return pool
+
+
+LLM_POOL = _load_llm_pool()
+_POOL_INDEX = 0
+_POOL_LOCK = threading.Lock()
+
+
+def get_next_llm() -> LLMConfig:
+    """Return the next pool entry in round-robin order, or the global config."""
+    global _POOL_INDEX
+    with _POOL_LOCK:
+        if LLM_POOL:
+            selected = LLM_POOL[_POOL_INDEX % len(LLM_POOL)]
+            _POOL_INDEX += 1
+            return selected
+    return LLMConfig(LLM_PROVIDER, MODEL_NAME, REQUEST_DELAY, MAX_DAILY_REQUESTS, MAX_CONCURRENT_TASKS)
+
 # Log file is truncated whenever a new experiment process starts.
 LOG_FILE = os.getenv("LOG_FILE", "experiment.log")
+
+THINKING = os.getenv("THINKING", "")

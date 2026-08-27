@@ -33,6 +33,9 @@ class QuotaExceededError(Exception):
 # Global tracking for API calls and proactive rate limiting
 _REQUEST_COUNT: int = 0
 _LAST_REQUEST_TIME: float = 0.0
+_POOL_REQUEST_COUNTS: Dict[str, int] = {}
+_POOL_LAST_REQUEST_TIMES: Dict[str, float] = {}
+_POOL_SEMAPHORES: Dict[str, threading.BoundedSemaphore] = {}
 _CLIENT_CACHE: Dict[str, Any] = {}
 _REQUEST_LOCK = threading.Lock()
 
@@ -48,22 +51,36 @@ def reset_request_count(value: int = 0) -> None:
     global _REQUEST_COUNT
     with _REQUEST_LOCK:
         _REQUEST_COUNT = value
+        _POOL_REQUEST_COUNTS.clear()
+        _POOL_LAST_REQUEST_TIMES.clear()
+        _POOL_SEMAPHORES.clear()
 
 
-def _reserve_request_slot() -> None:
+def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
     """Serializes rate-limit waiting and quota accounting for concurrent workers."""
     global _REQUEST_COUNT, _LAST_REQUEST_TIME
 
+    pool_key = f"{llm_config.pool_index}:{llm_config.provider}:{llm_config.model}"
     with _REQUEST_LOCK:
-        if _REQUEST_COUNT >= config.MAX_DAILY_REQUESTS:
+        semaphore = _POOL_SEMAPHORES.setdefault(
+            pool_key, threading.BoundedSemaphore(max(1, llm_config.max_concurrent_tasks))
+        )
+    semaphore.acquire()
+
+    with _REQUEST_LOCK:
+        pool_count = _POOL_REQUEST_COUNTS.get(pool_key, 0)
+        if pool_count >= llm_config.max_daily_requests:
+            semaphore.release()
             raise QuotaExceededError(
-                f"Daily Free Tier request safety limit reached ({_REQUEST_COUNT}/{config.MAX_DAILY_REQUESTS} requests). "
+                f"Daily request safety limit reached for {pool_key} ({pool_count}/{llm_config.max_daily_requests} requests). "
                 "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
             )
 
-        _wait_for_rate_limit()
+        _wait_for_rate_limit(llm_config.request_delay, _POOL_LAST_REQUEST_TIMES.get(pool_key, 0.0))
         _LAST_REQUEST_TIME = time.time()
         _REQUEST_COUNT += 1
+        _POOL_REQUEST_COUNTS[pool_key] = pool_count + 1
+        _POOL_LAST_REQUEST_TIMES[pool_key] = _LAST_REQUEST_TIME
 
 
 def _extract_retry_delay(error: Exception) -> Optional[float]:
@@ -116,16 +133,22 @@ def _extract_retry_delay(error: Exception) -> Optional[float]:
     return None
 
 
-def _wait_for_rate_limit() -> None:
+def _wait_for_rate_limit(request_delay: float, last_request_time: float) -> None:
     """
     Enforces minimum delay between API calls to guarantee compliance with Free Tier RPM limits.
     """
-    global _LAST_REQUEST_TIME
-    if config.REQUEST_DELAY > 0 and _LAST_REQUEST_TIME > 0:
-        elapsed = time.time() - _LAST_REQUEST_TIME
-        if elapsed < config.REQUEST_DELAY:
-            sleep_needed = config.REQUEST_DELAY - elapsed
+    if request_delay > 0 and last_request_time > 0:
+        elapsed = time.time() - last_request_time
+        if elapsed < request_delay:
+            sleep_needed = request_delay - elapsed
             time.sleep(sleep_needed)
+
+
+def _release_request_slot(llm_config: config.LLMConfig) -> None:
+    pool_key = f"{llm_config.pool_index}:{llm_config.provider}:{llm_config.model}"
+    semaphore = _POOL_SEMAPHORES.get(pool_key)
+    if semaphore is not None:
+        semaphore.release()
 
 
 def get_gemini_client(api_key: Optional[str] = None) -> genai.Client:
@@ -177,31 +200,29 @@ def _call_openai_compatible(
     provider: str,
     api_key: Optional[str],
     max_retries: int,
+    llm_config: config.LLMConfig,
 ) -> str:
     """Calls an OpenAI-compatible chat-completions endpoint with retries."""
     client = get_openai_compatible_client(provider, api_key=api_key)
     base_delay = 2.0
 
     for attempt in range(1, max_retries + 1):
+        slot_reserved = False
         try:
-            _reserve_request_slot()
-            if provider == "nvidia":
-                kwargs = {
-                    "extra_body":{"chat_template_kwargs":{"enable_thinking":False},}
-                }
-            else:
-                kwargs = {
-                    "reasoning_effort":"none"
-                }
+            _reserve_request_slot(llm_config)
+            slot_reserved = True
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
                 temperature=config.TEMPERATURE,
-                **kwargs,
                 stream=False
             )
-            return response.choices[0].message.content or ""
+            result = response.choices[0].message.content or ""
+            _release_request_slot(llm_config)
+            return result
         except Exception as e:
+            if slot_reserved:
+                _release_request_slot(llm_config)
             status_code = getattr(e, "status_code", None) or getattr(e, "code", None)
             err_msg = str(e).lower()
 
@@ -269,7 +290,7 @@ def format_messages_for_gemini(
 
 def call_llm(
     messages: List[Dict[str, str]],
-    model: str = config.MODEL_NAME,
+    model: Optional[str] = None,
     api_key: Optional[str] = None,
     provider: Optional[str] = None,
     max_retries: int = 5,
@@ -294,20 +315,32 @@ def call_llm(
     """
     global _REQUEST_COUNT, _LAST_REQUEST_TIME
 
-    selected_provider = (provider or config.LLM_PROVIDER).strip().lower()
+    llm_config = config.get_next_llm() if provider is None and model is None else config.LLMConfig(
+        provider=(provider or config.LLM_PROVIDER).strip().lower(),
+        model=model or config.MODEL_NAME,
+        request_delay=config.REQUEST_DELAY,
+        max_daily_requests=config.MAX_DAILY_REQUESTS,
+        max_concurrent_tasks=config.MAX_CONCURRENT_TASKS,
+    )
+    selected_provider = llm_config.provider
+    model = llm_config.model
     if selected_provider not in ("gemini", "google"):
-        if config.API_KEY and config.API_BASE_URL:
-            return _call_openai_compatible(messages, model, selected_provider, api_key, max_retries)
+        if config.get_api_base_url(selected_provider):
+            if api_key or config.get_api_key(selected_provider):
+                return _call_openai_compatible(
+                    messages, model, selected_provider, api_key or llm_config.api_key, max_retries, llm_config
+                )
+            else:
+                raise ValueError(f"Empty API_KEY")
         else:
             raise ValueError(f"Unsupported LLM provider: '{selected_provider}'")
 
-    client = get_gemini_client(api_key=api_key)
+    client = get_gemini_client(api_key=api_key or llm_config.api_key)
     system_instruction, contents = format_messages_for_gemini(messages)
 
     gen_config = types.GenerateContentConfig(
         temperature=config.TEMPERATURE,
         system_instruction=system_instruction,
-        thinking_config=types.ThinkingConfig(include_thoughts=False,thinking_level=types.ThinkingLevel.MINIMAL), #TODO: definir por variaveis de ambiente ou direto na cli
     )
 
     if not contents:
@@ -323,9 +356,11 @@ def call_llm(
     base_delay = 4.0
 
     for attempt in range(1, max_retries + 1):
+        slot_reserved = False
         try:
             # Reserve the quota and rate-limit slot before making the request.
-            _reserve_request_slot()
+            _reserve_request_slot(llm_config)
+            slot_reserved = True
             logger.debug(
                 "Starting API request: model=%s attempt=%s request=%s/%s",
                 model,
@@ -335,9 +370,12 @@ def call_llm(
             )
 
             response = chat.send_message(latest_message)
+            _release_request_slot(llm_config)
             return response.text or ""
 
         except errors.APIError as e:
+            if slot_reserved:
+                _release_request_slot(llm_config)
             status_code = getattr(e, "code", None)
             err_msg = str(e).lower()
 
@@ -387,6 +425,8 @@ def call_llm(
             time.sleep(sleep_duration)
 
         except Exception as e:
+            if slot_reserved:
+                _release_request_slot(llm_config)
             err_msg = str(e).lower()
             if any(term in err_msg for term in ["401", "403", "unauthorized", "invalid api key", "unauthenticated"]):
                 raise AuthError(f"Fatal Gemini Authentication Error: {e}") from e

@@ -39,7 +39,7 @@ def evaluate_on_test(
     return all_passed, test_results
 
 
-def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> Dict[str, Any]:
+def run_baseline(task: Dict[str, Any], model: Optional[str] = None) -> Dict[str, Any]:
     """
     Baseline Strategy: Single-turn LLM generation and evaluation on test pairs.
     """
@@ -53,7 +53,7 @@ def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> Dict[s
 
     start_time = time.time()
     try:
-        response_text = call_llm(messages, model=model)
+        response_text = call_llm(messages, model=model) if model else call_llm(messages)
     except (AuthError, QuotaExceededError):
         raise
     except Exception as e:
@@ -84,7 +84,7 @@ def run_baseline(task: Dict[str, Any], model: str = config.MODEL_NAME) -> Dict[s
 def run_cegis(
     task: Dict[str, Any],
     max_iters: int = config.MAX_CEGIS_ITERS,
-    model: str = config.MODEL_NAME
+    model: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     CEGIS Strategy: Counterexample-Guided Inductive Synthesis with Semantic Feedback loop.
@@ -106,7 +106,7 @@ def run_cegis(
 
     for iteration in range(1, max_iters + 1):
         try:
-            response_text = call_llm(messages, model=model)
+            response_text = call_llm(messages, model=model) if model else call_llm(messages)
         except (AuthError, QuotaExceededError):
             raise
         except Exception as e:

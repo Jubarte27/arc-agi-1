@@ -1,0 +1,144 @@
+{
+  "config": {
+    "model": "labs-leanstral-1-5-1",
+    "max_cegis_iters": 5,
+    "timeout_seconds": 150.0,
+    "request_delay_seconds": 1.0,
+    "max_daily_requests": 10000,
+    "total_tasks_in_dataset": 800,
+    "completed_tasks": 1,
+    "faulty_tasks": 0,
+    "total_requests_used": 34
+  },
+  "summary": {
+    "baseline_accuracy": 0.0,
+    "cegis_accuracy": 0.0,
+    "baseline_correct": 0,
+    "cegis_correct": 0
+  },
+  "results": [
+    {
+      "task_id": "05f2a901",
+      "baseline": {
+        "strategy": "baseline",
+        "success": false,
+        "api_error": false,
+        "latency": 13.022430181503296,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find all non-zero elements and their positions\n    non_zero_positions = []\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] != 0:\n                non_zero_positions.append((r, c, grid[r][c]))\n\n    if not non_zero_positions:\n        return [row[:] for row in grid]\n\n    # Find the bounding box of all non-zero elements\n    min_r = min(p[0] for p in non_zero_positions)\n    max_r = max(p[0] for p in non_zero_positions)\n    min_c = min(p[1] for p in non_zero_positions)\n    max_c = max(p[1] for p in non_zero_positions)\n\n    # Determine the shape of the pattern (unique rows and columns)\n    # We need to find the pattern structure by looking at which rows/cols have non-zero elements\n\n    # Group by row to find row patterns\n    rows_with_data = {}\n    for r, c, v in non_zero_positions:\n        if r not in rows_with_data:\n            rows_with_data[r] = []\n        rows_with_data[r].append((c, v))\n\n    # Group by column to find column patterns\n    cols_with_data = {}\n    for r, c, v in non_zero_positions:\n        if c not in cols_with_data:\n            cols_with_data[c] = []\n        cols_with_data[c].append((r, v))\n\n    # Find the pattern: we need to shift all non-zero elements to the top-left\n    # The pattern is defined by the relative positions of non-zero elements\n\n    # Create a canonical representation: shift everything so min_r, min_c becomes (0,0)\n    # But we need to preserve the pattern structure\n\n    # Actually, looking at examples: the pattern stays the same, just shifted to top-left\n    # Example 0: pattern has 2s in a specific shape, 8s in a specific shape - they stay together\n    # Example 1: pattern shifts left and up\n    # Example 2: pattern shifts up\n\n    # The key insight: all non-zero elements maintain their relative positions\n    # We just need to shift them so the top-leftmost non-zero is at (0,0)\n\n    # But wait - in example 0, the 2s and 8s are separate patterns that don't overlap\n    # They maintain their relative positions to each other\n\n    # Let's verify: in example 0, 2s are at relative positions, 8s are at relative positions\n    # The 8s are below and to the right of 2s in input, and same in output\n\n    # So the rule is: preserve relative positions of all non-zero elements, shift to top-left\n\n    # Find new top-left position\n    new_min_r = 0\n    new_min_c = 0\n\n    # Create output grid with same dimensions\n    output = [row[:] for row in grid]\n\n    # Clear all non-zero elements\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] != 0:\n                output[r][c] = 0\n\n    # Place non-zero elements at their new positions (shifted to top-left)\n    for r, c, v in non_zero_positions:\n        new_r = r - min_r\n        new_c = c - min_c\n        output[new_r][new_c] = v\n\n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": false,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,2,0,0,0,0,0],
+              [0,0,0,0,2,2,0,0,0,0],
+              [8,8,0,0,2,2,0,0,0,0],
+              [8,8,0,0,0,2,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": false,
+        "api_error": false,
+        "converged_train": true,
+        "iterations_used": 5,
+        "latency": 49.39506554603577,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find positions of all non-zero cells\n    cells_2 = []  # positions of 2s\n    cells_8 = []  # positions of 8s\n\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] == 2:\n                cells_2.append((r, c))\n            elif grid[r][c] == 8:\n                cells_8.append((r, c))\n\n    # If no 2s or no 8s, return original\n    if not cells_2 or not cells_8:\n        return [row[:] for row in grid]\n\n    # Find bounding boxes\n    min_r_2, max_r_2 = min(r for r, c in cells_2), max(r for r, c in cells_2)\n    max_c_2 = max(c for r, c in cells_2)\n    min_r_8, max_r_8 = min(r for r, c in cells_8), max(r for r, c in cells_8)\n    min_c_8 = min(c for r, c in cells_8)\n\n    # Horizontal: 2s should end at min_c_8 - 1 (immediately left of 8s)\n    # Only shift if not already touching\n    if max_c_2 < min_c_8 - 1:\n        target_max_c_2 = min_c_8 - 1\n        shift_c = target_max_c_2 - max_c_2\n    else:\n        shift_c = 0\n\n    # Vertical: 2s should be immediately adjacent to 8s\n    # Check if already adjacent or overlapping\n    if max_r_2 < min_r_8 - 1:\n        # 2s are above 8s with gap, move 2s down to touch\n        target_max_r_2 = min_r_8 - 1\n        shift_r = target_max_r_2 - max_r_2\n    elif min_r_2 > max_r_8 + 1:\n        # 2s are below 8s with gap, move 2s up to touch\n        target_min_r_2 = max_r_8 + 1\n        shift_r = target_min_r_2 - min_r_2\n    else:\n        # Already adjacent or overlapping, no shift\n        shift_r = 0\n\n    # Create output grid\n    output = [row[:] for row in grid]\n\n    # Clear all 2s and 8s from output\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] == 2 or output[r][c] == 8:\n                output[r][c] = 0\n\n    # Place 8s at original positions\n    for r, c in cells_8:\n        output[r][c] = 8\n\n    # Place 2s at shifted positions\n    for r, c in cells_2:\n        output[r + shift_r][c + shift_c] = 2\n\n    return output",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "failed_train_example",
+            "failed_index": 0,
+            "error_msg": "",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find all non-zero cells in the input grid\n    non_zero_cells = []\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] != 0:\n                non_zero_cells.append((r, c, grid[r][c]))\n\n    if not non_zero_cells:\n        return [row[:] for row in grid]\n\n    # Find bounding box of non-zero cells\n    min_r = min(c[0] for c in non_zero_cells)\n    max_r = max(c[0] for c in non_zero_cells)\n    min_c = min(c[1] for c in non_zero_cells)\n    max_c = max(c[1] for c in non_zero_cells)\n\n    # Create a map from original positions to values\n    cell_map = {}\n    for r, c, v in non_zero_cells:\n        cell_map[(r, c)] = v\n\n    # Determine the new position: shift so that min_r, min_c becomes (0, 0)\n    # But we need to shift the entire shape, not just the bounding box\n    # Actually, looking at examples: the shape is moved to start at row 0, col 0\n    # relative to its original position\n\n    # Calculate shift needed to move top-left to (0, 0)\n    shift_r = -min_r\n    shift_c = -min_c\n\n    # Create output grid with same dimensions as input\n    output = [row[:] for row in grid]\n\n    # Clear all non-zero cells in output\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] != 0:\n                output[r][c] = 0\n\n    # Place cells at new positions\n    for (r, c), v in cell_map.items():\n        new_r = r + shift_r\n        new_c = c + shift_c\n        output[new_r][new_c] = v\n\n    return output"
+          },
+          {
+            "iteration": 2,
+            "status": "failed_train_example",
+            "failed_index": 1,
+            "error_msg": "",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find positions of all non-zero cells\n    cells_2 = []  # positions of 2s\n    cells_8 = []  # positions of 8s\n\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] == 2:\n                cells_2.append((r, c))\n            elif grid[r][c] == 8:\n                cells_8.append((r, c))\n\n    # If no 2s or no 8s, return original\n    if not cells_2 or not cells_8:\n        return [row[:] for row in grid]\n\n    # Find bounding boxes\n    min_r_2, max_r_2 = min(r for r, c in cells_2), max(r for r, c in cells_2)\n    min_r_8, max_r_8 = min(r for r, c in cells_8), max(r for r, c in cells_8)\n\n    # The target position for 2's bottom row is just above 8's top row\n    target_bottom_2 = min_r_8 - 1\n\n    # Current bottom row of 2 shape\n    current_bottom_2 = max_r_2\n\n    # Shift needed for 2 shape\n    shift_2 = target_bottom_2 - current_bottom_2\n\n    # Create output grid\n    output = [row[:] for row in grid]\n\n    # Clear all 2s and 8s from output\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] == 2 or output[r][c] == 8:\n                output[r][c] = 0\n\n    # Place 8s at original positions\n    for r, c in cells_8:\n        output[r][c] = 8\n\n    # Place 2s at shifted positions\n    for r, c in cells_2:\n        output[r + shift_2][c] = 2\n\n    return output"
+          },
+          {
+            "iteration": 3,
+            "status": "failed_train_example",
+            "failed_index": 0,
+            "error_msg": "",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find positions of all non-zero cells\n    cells_2 = []  # positions of 2s\n    cells_8 = []  # positions of 8s\n\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] == 2:\n                cells_2.append((r, c))\n            elif grid[r][c] == 8:\n                cells_8.append((r, c))\n\n    # If no 2s or no 8s, return original\n    if not cells_2 or not cells_8:\n        return [row[:] for row in grid]\n\n    # Find bounding boxes\n    min_r_2, max_r_2 = min(r for r, c in cells_2), max(r for r, c in cells_2)\n    max_c_2 = max(c for r, c in cells_2)\n    min_r_8, max_r_8 = min(r for r, c in cells_8), max(r for r, c in cells_8)\n    min_c_8 = min(c for r, c in cells_8)\n\n    # Horizontal: 2s should end at min_c_8 - 1 (immediately left of 8s)\n    target_max_c_2 = min_c_8 - 1\n    current_max_c_2 = max_c_2\n    shift_c = target_max_c_2 - current_max_c_2\n\n    # Vertical: 2s should be immediately adjacent to 8s\n    # If 2s were originally above 8s, put 2s just above (bottom of 2s = top of 8s - 1)\n    # If 2s were originally below 8s, put 2s just below (top of 2s = bottom of 8s + 1)\n    if max_r_2 < min_r_8:\n        # 2s were above 8s, keep them above\n        target_max_r_2 = min_r_8 - 1\n    else:\n        # 2s were below 8s, put them below\n        target_min_r_2 = max_r_8 + 1\n\n    if max_r_2 < min_r_8:\n        shift_r = target_max_r_2 - max_r_2\n    else:\n        shift_r = target_min_r_2 - min_r_2\n\n    # Create output grid\n    output = [row[:] for row in grid]\n\n    # Clear all 2s and 8s from output\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] == 2 or output[r][c] == 8:\n                output[r][c] = 0\n\n    # Place 8s at original positions\n    for r, c in cells_8:\n        output[r][c] = 8\n\n    # Place 2s at shifted positions\n    for r, c in cells_2:\n        output[r + shift_r][c + shift_c] = 2\n\n    return output"
+          },
+          {
+            "iteration": 4,
+            "status": "failed_train_example",
+            "failed_index": 1,
+            "error_msg": "IndexError: list index out of range",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find positions of all non-zero cells\n    cells_2 = []  # positions of 2s\n    cells_8 = []  # positions of 8s\n\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] == 2:\n                cells_2.append((r, c))\n            elif grid[r][c] == 8:\n                cells_8.append((r, c))\n\n    # If no 2s or no 8s, return original\n    if not cells_2 or not cells_8:\n        return [row[:] for row in grid]\n\n    # Find bounding boxes\n    min_r_2, max_r_2 = min(r for r, c in cells_2), max(r for r, c in cells_2)\n    max_c_2 = max(c for r, c in cells_2)\n    min_r_8, max_r_8 = min(r for r, c in cells_8), max(r for r, c in cells_8)\n    min_c_8 = min(c for r, c in cells_8)\n\n    # Horizontal: 2s should end at min_c_8 - 1 (immediately left of 8s)\n    # Only shift if not already touching\n    if max_c_2 < min_c_8 - 1:\n        target_max_c_2 = min_c_8 - 1\n        shift_c = target_max_c_2 - max_c_2\n    else:\n        shift_c = 0\n\n    # Vertical: 2s should be immediately adjacent to 8s\n    # If 2s were originally above 8s, put 2s just above (bottom of 2s = top of 8s - 1)\n    # If 2s were originally below 8s, put 2s just below (top of 2s = bottom of 8s + 1)\n    if max_r_2 < min_r_8:\n        # 2s were above 8s, keep them above\n        target_max_r_2 = min_r_8 - 1\n        shift_r = target_max_r_2 - max_r_2\n    else:\n        # 2s were below 8s, put them below\n        target_min_r_2 = max_r_8 + 1\n        shift_r = target_min_r_2 - min_r_2\n\n    # Create output grid\n    output = [row[:] for row in grid]\n\n    # Clear all 2s and 8s from output\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] == 2 or output[r][c] == 8:\n                output[r][c] = 0\n\n    # Place 8s at original positions\n    for r, c in cells_8:\n        output[r][c] = 8\n\n    # Place 2s at shifted positions\n    for r, c in cells_2:\n        output[r + shift_r][c + shift_c] = 2\n\n    return output"
+          },
+          {
+            "iteration": 5,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # Find positions of all non-zero cells\n    cells_2 = []  # positions of 2s\n    cells_8 = []  # positions of 8s\n\n    for r in range(len(grid)):\n        for c in range(len(grid[r])):\n            if grid[r][c] == 2:\n                cells_2.append((r, c))\n            elif grid[r][c] == 8:\n                cells_8.append((r, c))\n\n    # If no 2s or no 8s, return original\n    if not cells_2 or not cells_8:\n        return [row[:] for row in grid]\n\n    # Find bounding boxes\n    min_r_2, max_r_2 = min(r for r, c in cells_2), max(r for r, c in cells_2)\n    max_c_2 = max(c for r, c in cells_2)\n    min_r_8, max_r_8 = min(r for r, c in cells_8), max(r for r, c in cells_8)\n    min_c_8 = min(c for r, c in cells_8)\n\n    # Horizontal: 2s should end at min_c_8 - 1 (immediately left of 8s)\n    # Only shift if not already touching\n    if max_c_2 < min_c_8 - 1:\n        target_max_c_2 = min_c_8 - 1\n        shift_c = target_max_c_2 - max_c_2\n    else:\n        shift_c = 0\n\n    # Vertical: 2s should be immediately adjacent to 8s\n    # Check if already adjacent or overlapping\n    if max_r_2 < min_r_8 - 1:\n        # 2s are above 8s with gap, move 2s down to touch\n        target_max_r_2 = min_r_8 - 1\n        shift_r = target_max_r_2 - max_r_2\n    elif min_r_2 > max_r_8 + 1:\n        # 2s are below 8s with gap, move 2s up to touch\n        target_min_r_2 = max_r_8 + 1\n        shift_r = target_min_r_2 - min_r_2\n    else:\n        # Already adjacent or overlapping, no shift\n        shift_r = 0\n\n    # Create output grid\n    output = [row[:] for row in grid]\n\n    # Clear all 2s and 8s from output\n    for r in range(len(output)):\n        for c in range(len(output[r])):\n            if output[r][c] == 2 or output[r][c] == 8:\n                output[r][c] = 0\n\n    # Place 8s at original positions\n    for r, c in cells_8:\n        output[r][c] = 8\n\n    # Place 2s at shifted positions\n    for r, c in cells_2:\n        output[r + shift_r][c + shift_c] = 2\n\n    return output"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": false,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,2,0,0,0,0],
+              [0,0,0,0,0,2,2,0,0,0],
+              [0,8,8,0,0,2,2,0,0,0],
+              [0,8,8,0,0,0,2,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "faulty_task_ids": []
+}

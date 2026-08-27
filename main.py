@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import logging
 import os
+import re
 from typing import Any, Dict, List, Set
 
 from arc_cegis import (
@@ -24,6 +25,7 @@ from arc_cegis import (
 
 
 logger = logging.getLogger(__name__)
+PROGRESS_CHECKPOINT_INTERVAL = 5
 
 
 _EMERGENCY_STATE: Dict[str, Any] = {
@@ -38,7 +40,17 @@ _EMERGENCY_STATE: Dict[str, Any] = {
 }
 
 
-def perform_health_check(model: str) -> None:
+_LONG_NUMERIC_LIST_RE = re.compile(r"\[(?:\s+\d+,?)+\s*\]")
+_LONG_NUMERIC_LIST_ITEM_RE = re.compile(r"\s*(\d)(,?)\s*")
+def compact_long_numeric_lists(serialized: str) -> str:
+    """Keep long numeric JSON arrays on one line to reduce checkpoint size."""
+    def compact(match: re.Match[str]) -> str:
+        return _LONG_NUMERIC_LIST_ITEM_RE.sub(r"\1\2", match.group(0))
+
+    return _LONG_NUMERIC_LIST_RE.sub(compact, serialized)
+
+
+def perform_health_check(model: str | None) -> None:
     """
     Executes a fast test query to validate API key, connectivity, and model availability.
     Terminates execution immediately if the check fails.
@@ -46,7 +58,9 @@ def perform_health_check(model: str) -> None:
     logger.info("Performing initial %s API health check...", config.LLM_PROVIDER)
     test_messages = [{"role": "user", "content": "Responda apenas 'OK'"}]
     try:
-        response = call_llm(test_messages, model=model, max_retries=3)
+        response = call_llm(test_messages, model=model, max_retries=3) if model else call_llm(
+            test_messages, max_retries=3
+        )
         logger.info("Health check PASSED! Model '%s' responded successfully: %s", model, response.strip()[:30])
     except AuthError as auth_err:
         logger.critical("FATAL AUTHENTICATION ERROR: %s", auth_err)
@@ -105,8 +119,15 @@ def save_checkpoint(
 
     temp_path = f"{output_path}.tmp"
     with open(temp_path, "w", encoding="utf-8") as f:
-        json.dump(output_payload, f, indent=2)
+        serialized_payload = json.dumps(output_payload, indent=2)
+        f.write(compact_long_numeric_lists(serialized_payload))
     os.replace(temp_path, output_path)
+
+
+def progress_checkpoint_path(output_path: str, completed_count: int, total_tasks: int) -> str:
+    """Build a progress-labelled checkpoint path beside the main output file."""
+    output_root, extension = os.path.splitext(output_path)
+    return f"{output_root}_{completed_count}_{total_tasks}{extension}"
 
 
 def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, Set[str], Set[str]]:
@@ -177,6 +198,21 @@ def _run_main() -> None:
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(logging.Formatter(log_format))
     logging.basicConfig(level=logging.DEBUG, handlers=[file_handler, console_handler], force=True)
+    if config.LLM_POOL:
+        parsed_pool = [
+            {
+                "provider": llm_config.provider,
+                "model": llm_config.model,
+                "request_delay": llm_config.request_delay,
+                "max_daily_requests": llm_config.max_daily_requests,
+                "max_concurrent_tasks": llm_config.max_concurrent_tasks,
+                "pool_index": llm_config.pool_index,
+            }
+            for llm_config in config.LLM_POOL
+        ]
+        logger.info("Parsed LLM pool: %s", parsed_pool)
+    else:
+        logger.info("Parsed LLM pool: empty; using global configuration.")
     parser = argparse.ArgumentParser(
         description="ARC-AGI-1 Comparative Experiment: Baseline (1-shot) vs CEGIS with Free Tier Protections"
     )
@@ -268,7 +304,7 @@ def _run_main() -> None:
 
     # 1. Health check
     if not args.skip_health_check:
-        perform_health_check(args.model)
+        perform_health_check(None if config.LLM_POOL else args.model)
 
     # 2. Load tasks
     tasks_dict = load_tasks(args.tasks)
@@ -313,8 +349,9 @@ def _run_main() -> None:
 
     def evaluate_task(task_id: str, task_data: Dict[str, Any]) -> Dict[str, Any]:
         """Run both strategies for one task in a worker thread."""
-        base_res = run_baseline(task_data, model=args.model)
-        cegis_res = run_cegis(task_data, max_iters=args.max_iters, model=args.model)
+        selected_model = None if config.LLM_POOL else args.model
+        base_res = run_baseline(task_data, model=selected_model)
+        cegis_res = run_cegis(task_data, max_iters=args.max_iters, model=selected_model)
         return {
             "task_id": task_id,
             "baseline": base_res,
@@ -323,6 +360,7 @@ def _run_main() -> None:
 
     # 4. Run evaluations with Protections and Incremental Checkpointing
     current_task_id: str | None = None
+    previous_progress_path: str | None = None
     try:
         pending_tasks = [
             (task_id, task_data)
@@ -397,6 +435,23 @@ def _run_main() -> None:
                     cegis_correct=cegis_correct,
                     faulty_task_ids=faulty_task_ids,
                 )
+                completed_count = len(detailed_results)
+                if completed_count % PROGRESS_CHECKPOINT_INTERVAL == 0:
+                    progress_path = progress_checkpoint_path(args.output, completed_count, total_tasks)
+                    save_checkpoint(
+                        output_path=progress_path,
+                        model=args.model,
+                        max_iters=args.max_iters,
+                        total_tasks=total_tasks,
+                        detailed_results=detailed_results,
+                        baseline_correct=baseline_correct,
+                        cegis_correct=cegis_correct,
+                        faulty_task_ids=faulty_task_ids,
+                    )
+                    if previous_progress_path and os.path.exists(previous_progress_path):
+                        os.remove(previous_progress_path)
+                    previous_progress_path = progress_path
+                    logger.info("Progress checkpoint saved to '%s'.", progress_path)
 
                 if consecutive_api_failures >= CIRCUIT_BREAKER_THRESHOLD:
                     logger.error("CIRCUIT BREAKER: %s consecutive tasks had API errors.", CIRCUIT_BREAKER_THRESHOLD)

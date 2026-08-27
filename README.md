@@ -12,7 +12,7 @@ Comparative evaluation of Program Synthesis approaches on the **ARC-AGI-1** benc
 - **RPM Rate Limiter:** Enforces a minimum interval between requests to strictly respect the 15 RPM Free Tier limit.
 - **Tokens Per Minute Guard:** Compliant with the 250K TPM limit by transmitting concise grid and prompt representations.
 - **Daily Quota Guard (RPD Guard):** Tracks cumulative API calls with a hard safety ceiling of `1,450 requests` (Free Tier limit is 1,500 RPD). Pauses execution safely before reaching the hard lock.
-- **Incremental Checkpoint & Resume:** Progress is saved to disk after **every completed task**. If paused or interrupted (by quota limit, network, or Ctrl+C), re-running the script will seamlessly pick up exactly where it left off without re-executing completed tasks.
+- **Incremental Checkpoint & Resume:** Progress is saved to disk after **every completed task**. If paused or interrupted (by quota limit, network, or Ctrl+C), re-running the script will seamlessly pick up exactly where it left off without re-executing completed tasks. One progress-labelled backup is also written every 5 completed tasks, replacing the previous backup, such as `results_experiment_5_40.json` or `results_experiment_10_40.json`.
 - **Fail-Fast Health Check:** Verifies API key validity and model access before launching the benchmark.
 
 ## Setup & Execution
@@ -46,6 +46,23 @@ Optional environment variables:
 - `REQUEST_DELAY`: Delay in seconds between API requests (default: 4.2s for <= 14.3 RPM)
 - `MAX_DAILY_REQUESTS`: Daily quota safety ceiling (default: 1450)
 - `LOG_FILE`: Log output path; overwritten when the program starts (default: `experiment.log`)
+
+To distribute requests across providers, define `LLM_POOL` as comma-separated
+`provider:model` entries. Calls select entries in round-robin order. Each entry
+inherits the global limits unless its indexed variables are set:
+`LLM_POOL_1_REQUEST_DELAY`, `LLM_POOL_1_MAX_DAILY_REQUESTS`, and
+`LLM_POOL_1_MAX_CONCURRENT_TASKS` (then use `LLM_POOL_2_*`, and so on).
+`LLM_POOL_N_API_KEY` may be set to override the provider's global API key for
+that entry.
+The global `MAX_CONCURRENT_TASKS` remains the total worker ceiling, while the
+indexed value limits simultaneous requests for that pool entry.
+
+Example:
+```bash
+export LLM_POOL="groq:llama-3.3-70b-versatile,mistral:mistral-small-latest"
+export LLM_POOL_1_REQUEST_DELAY="4.2"
+export LLM_POOL_2_MAX_DAILY_REQUESTS="500"
+```
 
 ### 3. Run Experiments
 
