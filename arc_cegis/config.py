@@ -4,6 +4,30 @@ Global configuration settings for the ARC-CEGIS experiment.
 
 import os
 
+from dotenv import dotenv_values, find_dotenv
+
+
+def _dotenv_paths_from_env() -> list[str]:
+    raw = os.getenv("DOTENV", "").strip()
+    if not raw:
+        return [find_dotenv()]
+
+    return [path.strip() for path in raw.split(os.pathsep) if path.strip()]
+
+
+def _load_dotenv_values() -> None:
+    merged: dict[str, str | None] = {}
+    for dotenv_path in _dotenv_paths_from_env():
+        if dotenv_path:
+            merged.update(dotenv_values(dotenv_path))
+
+    for key, value in merged.items():
+        if value is not None and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_dotenv_values()
+
 # Model Definition (Official Google AI Studio / Gemini SDK)
 # Default: "gemini-3.1-flash-lite" (High quota Free Tier: 1500 RPD / 250K TPM / 15 RPM)
 MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.1-flash-lite")
