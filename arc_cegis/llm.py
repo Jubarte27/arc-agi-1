@@ -1,193 +1,308 @@
 """
-LLM Client Module for interacting with chat model endpoints (e.g., Gemma 31B IT).
+LLM Client Module for interacting strictly with the official Google Gemini API (google-genai SDK).
+Includes proactive Rate Limiting (RPM), Daily Quota Guard (RPD),
+and intelligent 429/RPM wait-and-retry protections.
 """
 
-import asyncio
-import logging
-from typing import Any, Dict, List
+import random
+import re
+import threading
 import time
+from typing import Any, Dict, List, Optional
+
+from google import genai
+from google.genai import errors, types
+
 from . import config
 
 
-logger = logging.getLogger(__name__)
+class AuthError(Exception):
+    """Raised when authentication with the Google Gemini API fails (e.g. 401, 403, invalid key)."""
+    pass
 
 
-_rate_limit_lock = asyncio.Lock()
-_last_request_start: float | None = None
-_adaptive_request_delay = config.REQUEST_DELAY
+class QuotaExceededError(Exception):
+    """Raised when the session/daily request count reaches the Free Tier safety limit."""
+    pass
 
 
-def _is_rate_limit_error(error: Exception) -> bool:
-    """Recognize provider rate-limit errors across SDKs and HTTP clients."""
-    error_text = str(error).lower()
-    return (
-        "out of rate" in error_text
-        or "rate limit" in error_text
-        or "too many requests" in error_text
-        or "429" in error_text
-    )
+# Global tracking for API calls and proactive rate limiting
+_REQUEST_COUNT: int = 0
+_LAST_REQUEST_TIME: float = 0.0
+_REQUEST_LOCK = threading.Lock()
+_CLIENT_CACHE: Dict[str, genai.Client] = {}
 
 
-def _increase_request_delay() -> float:
-    """Increase the delay after a rate-limit response, up to the configured cap."""
-    global _adaptive_request_delay
+def get_request_count() -> int:
+    """Returns the total number of API requests made in this session."""
+    with _REQUEST_LOCK:
+        return _REQUEST_COUNT
 
-    _adaptive_request_delay *= config.RATE_LIMIT_BACKOFF_FACTOR
-    if _adaptive_request_delay > config.MAX_REQUEST_DELAY:
-        raise SystemExit(
-            "Maximum request delay exceeded: "
-            f"{_adaptive_request_delay:.2f}s > "
-            f"configured limit of {config.MAX_REQUEST_DELAY:.2f}s."
+
+def reset_request_count(value: int = 0) -> None:
+    """Resets or initializes the session request counter."""
+    global _REQUEST_COUNT
+    with _REQUEST_LOCK:
+        _REQUEST_COUNT = value
+
+
+def _extract_retry_delay(error: Exception) -> Optional[float]:
+    """
+    Extracts retry delay in seconds from Gemini API errors if present.
+    Checks structured error details, dictionaries, and regex matches in the error message.
+    """
+    # 1. Check structured details or response dictionary if available
+    details = getattr(error, "details", None) or getattr(error, "errors", None)
+    if isinstance(details, list):
+        for item in details:
+            if isinstance(item, dict):
+                # Check for RetryInfo (e.g. {'@type': '...RetryInfo', 'retryDelay': '24s'})
+                delay_val = item.get("retryDelay") or item.get("retry_delay")
+                if delay_val:
+                    m = re.search(r"([0-9]+(?:\.[0-9]+)?)", str(delay_val))
+                    if m:
+                        try:
+                            return float(m.group(1))
+                        except ValueError:
+                            pass
+
+    # 2. Check regex patterns on string representation
+    err_str = str(error)
+
+    # Pattern: "Please retry in 24.367063794s" or "retry in 24s"
+    m = re.search(r"retry\s+in\s+([0-9]+(?:\.[0-9]+)?)\s*s", err_str, re.IGNORECASE)
+    if m:
+        try:
+            return float(m.group(1))
+        except ValueError:
+            pass
+
+    # Pattern: 'retryDelay': '24s' or "retry_delay": "24s"
+    m = re.search(r"retry_?delay['\"]\s*:\s*['\"]([0-9]+(?:\.[0-9]+)?)\s*s?['\"]", err_str, re.IGNORECASE)
+    if m:
+        try:
+            return float(m.group(1))
+        except ValueError:
+            pass
+
+    # Pattern: "retry after 24" / "retry-after: 24"
+    m = re.search(r"retry[-_\s]after[:\s]+([0-9]+(?:\.[0-9]+)?)", err_str, re.IGNORECASE)
+    if m:
+        try:
+            return float(m.group(1))
+        except ValueError:
+            pass
+
+    return None
+
+
+def _wait_for_rate_limit() -> None:
+    """
+    Enforces minimum delay between API calls to guarantee compliance with Free Tier RPM limits.
+    """
+    global _LAST_REQUEST_TIME
+    if config.REQUEST_DELAY > 0 and _LAST_REQUEST_TIME > 0:
+        elapsed = time.time() - _LAST_REQUEST_TIME
+        if elapsed < config.REQUEST_DELAY:
+            sleep_needed = config.REQUEST_DELAY - elapsed
+            time.sleep(sleep_needed)
+
+
+def get_gemini_client(api_key: Optional[str] = None) -> genai.Client:
+    """
+    Initializes and caches a Google GenAI Client instance to prevent repeated
+    initialization warnings and overhead on every request.
+    """
+    global _CLIENT_CACHE
+    key = api_key or config.get_api_key()
+    if not key:
+        raise AuthError(
+            "Google Gemini API Key is missing. "
+            "Please export GEMINI_API_KEY or GOOGLE_API_KEY in your environment."
         )
-    return _adaptive_request_delay
+    if key not in _CLIENT_CACHE:
+        _CLIENT_CACHE[key] = genai.Client(api_key=key)
+    return _CLIENT_CACHE[key]
 
 
-async def _wait_for_request_slot() -> None:
-    """Ensure API request starts are separated by the configured interval."""
-    global _last_request_start
+def format_messages_for_gemini(
+    messages: List[Dict[str, str]]
+) -> tuple[Optional[str], List[types.Content]]:
+    """
+    Separates system instructions and formats conversation history into Gemini Content objects.
+    """
+    system_parts: List[str] = []
+    contents: List[types.Content] = []
 
-    async with _rate_limit_lock:
-        now = time.monotonic()
-        if _last_request_start is not None:
-            wait_seconds = _adaptive_request_delay - (now - _last_request_start)
-            if wait_seconds > 0:
-                logger.debug("rate limiter waiting %.2fs", wait_seconds)
-                await asyncio.sleep(wait_seconds)
-        _last_request_start = time.monotonic()
-
-
-def _call_google(
-    messages: List[Dict[str, str]], model: str, api_key: str
-) -> str:
-    from google import genai
-    from google.genai import types
-
-    prompt_parts = []
     for msg in messages:
-        role = msg.get("role", "user")
-        content = msg.get("content", "")
-        prompt_parts.append(f"{role.capitalize()}:\n{content}\n")
-    full_prompt = "\n".join(prompt_parts) + "\nAssistant:\n"
+        role = msg.get("role", "user").lower()
+        content_text = msg.get("content", "")
 
-    client = genai.Client(
-        api_key=api_key,
-        http_options=types.HttpOptions(
-            timeout=120_000,
-            retry_options=types.HttpRetryOptions(attempts=0),
-        ),
-    )
-    try:
-        chat = client.chats.create(model=model)
-        response = chat.send_message(
-            full_prompt,
-            config=types.GenerateContentConfig(
-                max_output_tokens=4096,
-                temperature=0.2,
-            ),
-        )
-        return response.text or ""
-    finally:
-        client.close()
+        if role == "system":
+            if content_text:
+                system_parts.append(content_text)
+        elif role in ("assistant", "model"):
+            contents.append(
+                types.Content(
+                    role="model",
+                    parts=[types.Part.from_text(text=content_text)]
+                )
+            )
+        else:  # "user" or any other role
+            contents.append(
+                types.Content(
+                    role="user",
+                    parts=[types.Part.from_text(text=content_text)]
+                )
+            )
 
-
-def _call_openai(
-    messages: List[Dict[str, str]], model: str, api_key: str, api_base_url: str
-) -> str:
-    from openai import OpenAI
-
-    client_kwargs: dict[str,Any] = {"api_key": api_key}
-    if api_base_url:
-        client_kwargs["base_url"] = api_base_url
-    client = OpenAI(**client_kwargs)
-    try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=0.2,
-            top_p=0.95,
-            max_tokens=16384,
-            extra_body={"chat_template_kwargs":{"enable_thinking":False},"reasoning_budget":16384},
-            stream=False
-        )
-        return response.choices[0].message.content or ""
-    finally:
-        client.close()
+    system_instruction = "\n\n".join(system_parts) if system_parts else None
+    return system_instruction, contents
 
 
-def _call_http(
-    messages: List[Dict[str, str]], model: str, api_key: str, api_base_url: str
-) -> str:
-    import requests
-
-    base = api_base_url.rstrip("/") if api_base_url else "https://api.openai.com/v1"
-    with requests.post(
-        f"{base}/chat/completions",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        json={"model": model, "messages": messages, "temperature": 0.2},
-        timeout=120,
-    ) as res:
-        res.raise_for_status()
-        return res.json()["choices"][0]["message"]["content"]
-
-
-async def call_llm(
+def call_llm(
     messages: List[Dict[str, str]],
     model: str = config.MODEL_NAME,
-    api_key: str = config.API_KEY,
-    api_base_url: str = config.API_BASE_URL,
+    api_key: Optional[str] = None,
+    max_retries: int = 5,
 ) -> str:
     """
-    Sends chat messages to the LLM API and returns the generated text response.
-    Uses the provider selected by config.API_PROVIDER.
+    Sends chat messages to the Google Gemini API with proactive rate limiting,
+    daily quota guard, and intelligent 429/RPM wait-and-retry.
+
+    Args:
+        messages: List of message dicts with 'role' and 'content'.
+        model: Target Gemini model identifier (e.g. 'gemini-3.1-flash-lite').
+        api_key: Optional Gemini API key override.
+        max_retries: Maximum retry attempts for transient errors (429, 503, timeouts).
+
+    Returns:
+        Generated text response from the model.
+
+    Raises:
+        QuotaExceededError: If the daily request ceiling (e.g. 1450) is reached or hard quota lock.
+        AuthError: If authentication fails (401/403 or missing API key).
+        RuntimeError: If all retries are exhausted.
     """
-    call_start = time.perf_counter()
-    logger.debug(
-        "request started: model=%s, messages=%d, chars=%d",
-        model,
-        len(messages),
-        sum(len(msg.get("content", "")) for msg in messages),
+    global _REQUEST_COUNT, _LAST_REQUEST_TIME
+
+    client = get_gemini_client(api_key=api_key)
+    system_instruction, contents = format_messages_for_gemini(messages)
+
+    gen_config = types.GenerateContentConfig(
+        temperature=config.TEMPERATURE,
+        system_instruction=system_instruction,
     )
 
-    await _wait_for_request_slot()
-    provider = config.API_PROVIDER
-    provider_start = time.perf_counter()
-    try:
-        logger.debug("selected provider: %s", provider)
-        if provider == "google":
-            provider_call = _call_google
-            response_text = await asyncio.to_thread(provider_call, messages, model, api_key)
-        elif provider == "openai":
-            response_text = await asyncio.to_thread(
-                _call_openai, messages, model, api_key, api_base_url
+    base_delay = 4.0
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            # Reserve the request atomically so parallel tasks share one RPM/RPD budget.
+            with _REQUEST_LOCK:
+                if _REQUEST_COUNT >= config.MAX_DAILY_REQUESTS:
+                    raise QuotaExceededError(
+                        f"Daily Free Tier request safety limit reached ({_REQUEST_COUNT}/{config.MAX_DAILY_REQUESTS} requests). "
+                        "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
+                    )
+                _wait_for_rate_limit()
+                _LAST_REQUEST_TIME = time.time()
+                _REQUEST_COUNT += 1
+
+            response = client.models.generate_content(
+                model=model,
+                contents=contents,
+                config=gen_config,
             )
-        else:
-            response_text = await asyncio.to_thread(
-                _call_http, messages, model, api_key, api_base_url
-            )
-        logger.debug(
-            "%s request completed in %.2fs; total=%.2fs",
-            provider,
-            time.perf_counter() - provider_start,
-            time.perf_counter() - call_start,
-        )
-        return response_text
-    except Exception as e:
-        if _is_rate_limit_error(e):
-            new_delay = _increase_request_delay()
-            logger.warning(
-                "Rate limit detected; increasing request delay to %.2fs",
-                new_delay,
-            )
-        logger.error(
-            "%s request failed after %.2fs: %s",
-            provider,
-            time.perf_counter() - provider_start,
-            e,
-        )
-        raise RuntimeError(
-            f"Failed to communicate with the configured {provider} API. "
-            f"Please verify its key, model, and endpoint. Error: {e}"
-        ) from e
+            return response.text or ""
+
+        except errors.APIError as e:
+            status_code = getattr(e, "code", None)
+            err_msg = str(e).lower()
+
+            # Immediate fail-fast for authentication errors
+            if status_code in (401, 403) or any(
+                term in err_msg for term in ["unauthenticated", "permission_denied", "api key not valid", "invalid api key"]
+            ):
+                raise AuthError(f"Fatal Gemini Authentication Error ({status_code}): {e}") from e
+
+            # Immediate fail-fast for 404 (Model not found / deprecated)
+            if status_code == 404 or "not_found" in err_msg or "no longer available" in err_msg:
+                raise RuntimeError(
+                    f"Fatal Gemini Model Error (404 NOT_FOUND): Model '{model}' was not found or is no longer available.\n{e}"
+                ) from e
+
+            # Handle 429 / Rate Limiting / Resource Exhausted
+            if status_code == 429 or "resource_exhausted" in err_msg or "429" in err_msg:
+                retry_delay = _extract_retry_delay(e)
+
+                # Hard stop only if the API explicitly demands a multi-hour wait (true daily reset)
+                if retry_delay is not None and retry_delay > 1800:
+                    raise QuotaExceededError(
+                        f"Google AI Studio Daily Quota Exceeded (Reset in {retry_delay:.0f}s): {e}"
+                    ) from e
+
+                if attempt == max_retries:
+                    raise QuotaExceededError(
+                        f"Google AI Studio Quota/Rate Limit Exceeded after {max_retries} retries: {e}"
+                    ) from e
+
+                # Determine sleep duration: use the API requested delay + buffer, or default 35s RPM buffer
+                if retry_delay is not None:
+                    sleep_duration = retry_delay + 3.0
+                else:
+                    sleep_duration = max(35.0, base_delay * (2 ** (attempt - 1))) + random.uniform(1.0, 3.0)
+
+                time.sleep(sleep_duration)
+                _LAST_REQUEST_TIME = time.time()
+                continue
+
+            # Retry other transient errors (500, 503, etc.)
+            if attempt == max_retries:
+                raise RuntimeError(
+                    f"Gemini API call failed after {max_retries} attempts (Status: {status_code}): {e}"
+                ) from e
+
+            sleep_duration = base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5)
+            time.sleep(sleep_duration)
+            _LAST_REQUEST_TIME = time.time()
+
+        except Exception as e:
+            if isinstance(e, QuotaExceededError):
+                raise
+            err_msg = str(e).lower()
+            if any(term in err_msg for term in ["401", "403", "unauthorized", "invalid api key", "unauthenticated"]):
+                raise AuthError(f"Fatal Gemini Authentication Error: {e}") from e
+
+            if "404" in err_msg or "not_found" in err_msg or "no longer available" in err_msg:
+                raise RuntimeError(
+                    f"Fatal Gemini Model Error (404 NOT_FOUND): Model '{model}' was not found or is no longer available.\n{e}"
+                ) from e
+
+            if "429" in err_msg or "resource_exhausted" in err_msg:
+                retry_delay = _extract_retry_delay(e)
+                if retry_delay is not None and retry_delay > 1800:
+                    raise QuotaExceededError(
+                        f"Google AI Studio Daily Quota Exceeded (Reset in {retry_delay:.0f}s): {e}"
+                    ) from e
+
+                if attempt == max_retries:
+                    raise QuotaExceededError(
+                        f"Google AI Studio Quota/Rate Limit Exceeded after {max_retries} retries: {e}"
+                    ) from e
+
+                sleep_duration = (retry_delay + 3.0) if retry_delay is not None else (max(35.0, base_delay * (2 ** (attempt - 1))) + random.uniform(1.0, 3.0))
+                time.sleep(sleep_duration)
+                _LAST_REQUEST_TIME = time.time()
+                continue
+
+            if attempt == max_retries:
+                raise RuntimeError(
+                    f"Gemini API call failed after {max_retries} attempts: {e}"
+                ) from e
+
+            sleep_duration = base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5)
+            time.sleep(sleep_duration)
+            _LAST_REQUEST_TIME = time.time()
+
+    return ""

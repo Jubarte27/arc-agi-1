@@ -17,8 +17,11 @@ ENV/
 # Experiment outputs & logs
 results_*.json
 *.log
+results_experiment.json
 
 # IDE & OS
 .DS_Store
 .vscode/
 .idea/
+
+resultados_brutos/
