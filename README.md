@@ -1,6 +1,6 @@
 # ARC-AGI-1: Baseline vs CEGIS Comparative Experiment
 
-Comparative evaluation of Program Synthesis approaches on the **ARC-AGI-1** benchmark using the official **Google Gemini API** (`google-genai` SDK) with **Free Tier Protections**.
+Comparative evaluation of Program Synthesis approaches on the **ARC-AGI-1** benchmark using Google Gemini or the Groq OpenAI-compatible API with **Free Tier Protections**.
 
 ## Approaches
 
@@ -23,15 +23,24 @@ pip install -r requirements.txt
 ```
 
 ### 2. Configure Environment and API Key
-Set your Gemini / AI Studio API key:
+Set your provider and API key:
 ```bash
 export GEMINI_API_KEY="your_api_key_here"
 # or
 export GOOGLE_API_KEY="your_api_key_here"
 ```
 
+For Groq:
+```bash
+export LLM_PROVIDER="groq"
+export GROQ_API_KEY="your_groq_api_key_here"
+export MODEL_NAME="llama-3.3-70b-versatile"
+```
+
 Optional environment variables:
 - `MODEL_NAME`: Target model (default: gemini-3.1-flash-lite)
+- `LLM_PROVIDER`: `gemini` or `groq` (default: `gemini`)
+- `API_BASE_URL`: Optional OpenAI-compatible API base URL; otherwise the default for `LLM_PROVIDER` is used
 - `MAX_CEGIS_ITERS`: Maximum refinement iterations (default: 5)
 - `TIMEOUT_SECONDS`: Python execution timeout per test (default: 2.0)
 - `REQUEST_DELAY`: Delay in seconds between API requests (default: 4.2s for <= 14.3 RPM)
@@ -46,6 +55,9 @@ python3 main.py --tasks ./data/sample_tasks.json
 
 # Run on training dataset with automatic checkpoint resume
 python3 main.py --tasks ./data/training --max-tasks 400 --max-iters 5 --model gemini-3.1-flash-lite --output results_experiment.json
+
+# Run with Groq
+python3 main.py --provider groq --model llama-3.3-70b-versatile --tasks ./data/training --output results_experiment.json
 
 # Restart from scratch (ignoring existing checkpoint)
 python3 main.py --tasks ./data/training --no-resume --output results_experiment.json

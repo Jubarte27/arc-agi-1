@@ -1,5 +1,5 @@
 """
-LLM Client Module for interacting strictly with the official Google Gemini API (google-genai SDK).
+LLM Client Module for interacting with Google Gemini or OpenAI-compatible APIs such as Groq.
 Includes proactive Rate Limiting (RPM), Daily Quota Guard (RPD),
 and intelligent 429/RPM wait-and-retry protections.
 """
@@ -33,7 +33,7 @@ class QuotaExceededError(Exception):
 # Global tracking for API calls and proactive rate limiting
 _REQUEST_COUNT: int = 0
 _LAST_REQUEST_TIME: float = 0.0
-_CLIENT_CACHE: Dict[str, genai.Client] = {}
+_CLIENT_CACHE: Dict[str, Any] = {}
 _REQUEST_LOCK = threading.Lock()
 
 
@@ -134,7 +134,7 @@ def get_gemini_client(api_key: Optional[str] = None) -> genai.Client:
     initialization warnings and overhead on every request.
     """
     global _CLIENT_CACHE
-    key = api_key or config.get_api_key()
+    key = api_key or config.get_api_key("gemini")
     if not key:
         raise AuthError(
             "Google Gemini API Key is missing. "
@@ -143,6 +143,93 @@ def get_gemini_client(api_key: Optional[str] = None) -> genai.Client:
     if key not in _CLIENT_CACHE:
         _CLIENT_CACHE[key] = genai.Client(api_key=key)
     return _CLIENT_CACHE[key]
+
+
+def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -> Any:
+    """Initializes and caches an OpenAI-compatible client, including Groq."""
+    try:
+        from openai import OpenAI
+    except ImportError as e:
+        raise RuntimeError(
+            "The OpenAI SDK is required for OpenAI-compatible providers. "
+            "Install dependencies with: pip install -r requirements.txt"
+        ) from e
+
+    key = api_key or config.get_api_key(provider)
+    if not key:
+        raise AuthError(
+            f"{provider.title()} API key is missing. Please export {provider.upper()}_API_KEY."
+        )
+
+    base_url = config.get_api_base_url(provider)
+    cache_key = f"{provider}:{key}:{base_url}"
+    if cache_key not in _CLIENT_CACHE:
+        client_kwargs: Dict[str, str] = {"api_key": key}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+        _CLIENT_CACHE[cache_key] = OpenAI(**client_kwargs)
+    return _CLIENT_CACHE[cache_key]
+
+
+def _call_openai_compatible(
+    messages: List[Dict[str, str]],
+    model: str,
+    provider: str,
+    api_key: Optional[str],
+    max_retries: int,
+) -> str:
+    """Calls an OpenAI-compatible chat-completions endpoint with retries."""
+    client = get_openai_compatible_client(provider, api_key=api_key)
+    base_delay = 2.0
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            _reserve_request_slot()
+            if provider == "nvidia":
+                kwargs = {
+                    "extra_body":{"chat_template_kwargs":{"enable_thinking":False},}
+                }
+            else:
+                kwargs = {
+                    "reasoning_effort":"none"
+                }
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=config.TEMPERATURE,
+                **kwargs,
+                stream=False
+            )
+            return response.choices[0].message.content or ""
+        except Exception as e:
+            status_code = getattr(e, "status_code", None) or getattr(e, "code", None)
+            err_msg = str(e).lower()
+
+            if status_code in (401, 403) or any(
+                term in err_msg for term in ["unauthorized", "invalid api key", "authentication"]
+            ):
+                raise AuthError(f"Fatal {provider.title()} authentication error: {e}") from e
+
+            if status_code == 404 or "model not found" in err_msg or "not_found" in err_msg:
+                raise RuntimeError(
+                    f"Fatal {provider.title()} model error: model '{model}' was not found.\n{e}"
+                ) from e
+
+            if status_code == 429 or "rate limit" in err_msg or "too many requests" in err_msg:
+                if attempt == max_retries:
+                    raise QuotaExceededError(
+                        f"{provider.title()} rate limit exceeded after {max_retries} retries: {e}"
+                    ) from e
+                time.sleep(base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5))
+                continue
+
+            if attempt == max_retries:
+                raise RuntimeError(
+                    f"{provider.title()} API call failed after {max_retries} attempts: {e}"
+                ) from e
+            time.sleep(base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5))
+
+    return ""
 
 
 def format_messages_for_gemini(
@@ -184,6 +271,7 @@ def call_llm(
     messages: List[Dict[str, str]],
     model: str = config.MODEL_NAME,
     api_key: Optional[str] = None,
+    provider: Optional[str] = None,
     max_retries: int = 5,
 ) -> str:
     """
@@ -206,12 +294,20 @@ def call_llm(
     """
     global _REQUEST_COUNT, _LAST_REQUEST_TIME
 
+    selected_provider = (provider or config.LLM_PROVIDER).strip().lower()
+    if selected_provider not in ("gemini", "google"):
+        if config.API_KEY and config.API_BASE_URL:
+            return _call_openai_compatible(messages, model, selected_provider, api_key, max_retries)
+        else:
+            raise ValueError(f"Unsupported LLM provider: '{selected_provider}'")
+
     client = get_gemini_client(api_key=api_key)
     system_instruction, contents = format_messages_for_gemini(messages)
 
     gen_config = types.GenerateContentConfig(
         temperature=config.TEMPERATURE,
         system_instruction=system_instruction,
+        thinking_config=types.ThinkingConfig(include_thoughts=False,thinking_level=types.ThinkingLevel.MINIMAL), #TODO: definir por variaveis de ambiente ou direto na cli
     )
 
     if not contents:

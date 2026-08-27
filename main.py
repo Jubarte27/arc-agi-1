@@ -1,6 +1,6 @@
 """
 Main entry point for running comparative ARC-AGI-1 experiments (Baseline vs CEGIS).
-Strictly integrated with the official Google Gemini API (google-genai SDK).
+Supports Google Gemini and OpenAI-compatible providers such as Groq.
 Includes Proactive Rate Limiter (RPM), Daily Quota Guard (RPD), and Checkpoint / Resume.
 """
 
@@ -31,20 +31,20 @@ def perform_health_check(model: str) -> None:
     Executes a fast test query to validate API key, connectivity, and model availability.
     Terminates execution immediately if the check fails.
     """
-    logger.info("Performing initial Gemini API health check...")
+    logger.info("Performing initial %s API health check...", config.LLM_PROVIDER)
     test_messages = [{"role": "user", "content": "Responda apenas 'OK'"}]
     try:
         response = call_llm(test_messages, model=model, max_retries=3)
         logger.info("Health check PASSED! Model '%s' responded successfully: %s", model, response.strip()[:30])
     except AuthError as auth_err:
         logger.critical("FATAL AUTHENTICATION ERROR: %s", auth_err)
-        logger.critical("Please verify that GEMINI_API_KEY or GOOGLE_API_KEY is correctly set.")
+        logger.critical("Please verify the API key for provider '%s' is correctly set.", config.LLM_PROVIDER)
         raise SystemExit(1)
     except QuotaExceededError as q_err:
         logger.critical("FATAL QUOTA ERROR: %s", q_err)
         raise SystemExit(1)
     except Exception as err:
-        logger.critical("FATAL HEALTH CHECK ERROR: Failed to connect to Gemini API: %s", err)
+        logger.critical("FATAL HEALTH CHECK ERROR: Failed to connect to %s API: %s", config.LLM_PROVIDER, err)
         logger.critical("Verify internet connectivity and model name '%s'.", model)
         raise SystemExit(1)
 
@@ -154,6 +154,13 @@ def main() -> None:
         help=f"Maximum CEGIS refinement iterations per task (default: {config.MAX_CEGIS_ITERS})",
     )
     parser.add_argument(
+        "--provider",
+        type=str,
+        choices=("gemini", "groq"),
+        default=config.LLM_PROVIDER,
+        help=f"LLM provider (default: {config.LLM_PROVIDER})",
+    )
+    parser.add_argument(
         "--model",
         type=str,
         default=config.MODEL_NAME,
@@ -180,7 +187,7 @@ def main() -> None:
     parser.add_argument(
         "--skip-health-check",
         action="store_true",
-        help="Skip the initial Gemini API connectivity check (not recommended)",
+        help="Skip the initial provider API connectivity check (not recommended)",
     )
     parser.add_argument(
         "--request-delay",
@@ -199,10 +206,12 @@ def main() -> None:
     # Update dynamic config overrides
     config.REQUEST_DELAY = args.request_delay
     config.MAX_DAILY_REQUESTS = args.max_daily_requests
+    config.LLM_PROVIDER = args.provider
+    config.API_BASE_URL = config.get_api_base_url(args.provider)
 
     rpm_effective = int(60.0 / config.REQUEST_DELAY) if config.REQUEST_DELAY > 0 else 0
 
-    logger.info("ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS (Google AI Studio / GenAI)")
+    logger.info("ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS (%s)", config.LLM_PROVIDER)
     logger.info("Model: %s | Max CEGIS Iters: %s | Timeout: %ss", args.model, args.max_iters, config.TIMEOUT_SECONDS)
     logger.info("Rate Delay: %ss (<= %s RPM) | Daily Quota Guard: %s RPD", config.REQUEST_DELAY, rpm_effective, config.MAX_DAILY_REQUESTS)
 

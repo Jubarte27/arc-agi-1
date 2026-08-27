@@ -31,14 +31,32 @@ _load_dotenv_values()
 # Model Definition (Official Google AI Studio / Gemini SDK)
 # Default: "gemini-3.1-flash-lite" (High quota Free Tier: 1500 RPD / 250K TPM / 15 RPM)
 MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.1-flash-lite")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini").strip().lower()
+API_BASE_URLS = {
+    "groq": "https://api.groq.com/openai/v1/",
+    "nvidia": "https://integrate.api.nvidia.com/v1"
+}
+API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
+API_KEYS = {
+    "gemini": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
+    "groq": ("GROQ_API_KEY", "OPENAI_API_KEY"),
+    "nvidia": ("NVIDIA_API_KEY", "OPENAI_API_KEY"),
+}
 
 
-def get_api_key() -> str:
+def get_api_base_url(provider: str | None = None) -> str | None:
+    """Returns an explicit API base URL or the default for the selected provider."""
+    selected_provider = (provider or LLM_PROVIDER).strip().lower()
+    return os.getenv("API_BASE_URL") or API_BASE_URLS.get(selected_provider)
+
+
+def get_api_key(provider: str | None = None) -> str:
     """
-    Returns the resolved Gemini API key from environment variables silently,
-    checking GEMINI_API_KEY then GOOGLE_API_KEY without redundant console warnings.
+    Returns the resolved API key for the selected provider.
     """
-    return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
+    selected_provider = (provider or LLM_PROVIDER).strip().lower()
+    key_names = API_KEYS.get(selected_provider, ())
+    return next((key for name in key_names if (key:=os.getenv(name))), "")
 
 
 # Backward-compatible API_KEY resolution

@@ -13,6 +13,7 @@ ENV/
 .env
 .env.local
 .env.*
+envs
 
 # Experiment outputs & logs
 results_*.json
