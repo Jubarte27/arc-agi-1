@@ -26,6 +26,18 @@ from arc_cegis import (
 logger = logging.getLogger(__name__)
 
 
+_EMERGENCY_STATE: Dict[str, Any] = {
+    "output_path": "results_experiment.json",
+    "model": config.MODEL_NAME,
+    "max_iters": config.MAX_CEGIS_ITERS,
+    "total_tasks": 0,
+    "detailed_results": [],
+    "baseline_correct": 0,
+    "cegis_correct": 0,
+    "faulty_task_ids": set(),
+}
+
+
 def perform_health_check(model: str) -> None:
     """
     Executes a fast test query to validate API key, connectivity, and model availability.
@@ -57,6 +69,8 @@ def save_checkpoint(
     detailed_results: List[Dict[str, Any]],
     baseline_correct: int,
     cegis_correct: int,
+    faulty_task_ids: Set[str],
+    checkpoint_error: str = "",
 ) -> None:
     """
     Safely writes current experiment state and results to JSON disk.
@@ -74,6 +88,7 @@ def save_checkpoint(
             "max_daily_requests": config.MAX_DAILY_REQUESTS,
             "total_tasks_in_dataset": total_tasks,
             "completed_tasks": completed_count,
+            "faulty_tasks": len(faulty_task_ids),
             "total_requests_used": get_request_count(),
         },
         "summary": {
@@ -83,7 +98,10 @@ def save_checkpoint(
             "cegis_correct": cegis_correct,
         },
         "results": detailed_results,
+        "faulty_task_ids": sorted(faulty_task_ids),
     }
+    if checkpoint_error:
+        output_payload["emergency_error"] = checkpoint_error
 
     temp_path = f"{output_path}.tmp"
     with open(temp_path, "w", encoding="utf-8") as f:
@@ -91,13 +109,13 @@ def save_checkpoint(
     os.replace(temp_path, output_path)
 
 
-def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, Set[str]]:
+def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, Set[str], Set[str]]:
     """
     Loads completed task results from an existing checkpoint file.
-    Returns (detailed_results, baseline_correct, cegis_correct, completed_task_ids).
+    Returns (detailed_results, baseline_correct, cegis_correct, completed_task_ids, faulty_task_ids).
     """
     if not os.path.exists(output_path):
-        return [], 0, 0, set()
+        return [], 0, 0, set(), set()
 
     try:
         with open(output_path, "r", encoding="utf-8") as f:
@@ -107,6 +125,7 @@ def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, S
         baseline_correct = 0
         cegis_correct = 0
         completed_task_ids = set()
+        faulty_task_ids = set(data.get("faulty_task_ids", []))
 
         for item in detailed_results:
             task_id = item.get("task_id")
@@ -117,13 +136,39 @@ def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, S
             if item.get("cegis", {}).get("success"):
                 cegis_correct += 1
 
-        return detailed_results, baseline_correct, cegis_correct, completed_task_ids
+        return detailed_results, baseline_correct, cegis_correct, completed_task_ids, faulty_task_ids
     except Exception as e:
         logger.warning("Failed to read checkpoint from '%s': %s. Starting fresh.", output_path, e)
-        return [], 0, 0, set()
+        return [], 0, 0, set(), set()
 
 
-def main() -> None:
+def save_emergency_checkpoint(error: BaseException) -> None:
+    """Best-effort save to a separate file when main exits unexpectedly."""
+    state = _EMERGENCY_STATE
+    emergency_path = f"{state['output_path']}.emergency.json"
+    error_message = f"{type(error).__name__}: {error}"
+    try:
+        save_checkpoint(
+            output_path=emergency_path,
+            model=state["model"],
+            max_iters=state["max_iters"],
+            total_tasks=state["total_tasks"],
+            detailed_results=state["detailed_results"],
+            baseline_correct=state["baseline_correct"],
+            cegis_correct=state["cegis_correct"],
+            faulty_task_ids=state["faulty_task_ids"],
+            checkpoint_error=error_message,
+        )
+        logger.critical("Emergency checkpoint saved to '%s'.", emergency_path)
+    except Exception:
+        logger.exception("Emergency checkpoint failed; attempting raw fallback.")
+        try:
+            with open(f"{emergency_path}.raw", "w", encoding="utf-8") as file:
+                json.dump({"error": error_message, "state": state}, file, default=str, indent=2)
+        except Exception:
+            logger.exception("Raw emergency checkpoint also failed.")
+
+def _run_main() -> None:
     log_format = "%(asctime)s %(levelname)s %(name)s: %(message)s"
     file_handler = logging.FileHandler(config.LOG_FILE, mode="w", encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
@@ -203,6 +248,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    _EMERGENCY_STATE.update({
+        "output_path": args.output,
+        "model": args.model,
+        "max_iters": args.max_iters,
+    })
+
     # Update dynamic config overrides
     config.REQUEST_DELAY = args.request_delay
     config.MAX_DAILY_REQUESTS = args.max_daily_requests
@@ -226,20 +277,33 @@ def main() -> None:
 
     total_tasks = len(tasks_dict)
     logger.info("Loaded %s task(s) in evaluation set.", total_tasks)
+    _EMERGENCY_STATE["total_tasks"] = total_tasks
 
     # 3. Checkpoint / Resume recovery
     detailed_results: List[Dict[str, Any]] = []
     baseline_correct = 0
     cegis_correct = 0
     completed_task_ids: Set[str] = set()
+    faulty_task_ids: Set[str] = set()
+    _EMERGENCY_STATE.update({
+        "detailed_results": detailed_results,
+        "faulty_task_ids": faulty_task_ids,
+    })
 
     if args.resume and os.path.exists(args.output):
-        detailed_results, baseline_correct, cegis_correct, completed_task_ids = load_checkpoint(args.output)
-        if completed_task_ids:
+        detailed_results, baseline_correct, cegis_correct, completed_task_ids, faulty_task_ids = load_checkpoint(args.output)
+        _EMERGENCY_STATE.update({
+            "detailed_results": detailed_results,
+            "baseline_correct": baseline_correct,
+            "cegis_correct": cegis_correct,
+            "faulty_task_ids": faulty_task_ids,
+        })
+        if completed_task_ids or faulty_task_ids:
             logger.info(
-                "Checkpoint found. Resuming from '%s': %s/%s tasks already completed "
+                "Checkpoint found. Resuming from '%s': %s completed, %s faulty, %s/%s tasks accounted for "
                 "(Baseline: %s, CEGIS: %s).",
-                args.output, len(completed_task_ids), total_tasks, baseline_correct, cegis_correct,
+                args.output, len(completed_task_ids), len(faulty_task_ids),
+                len(completed_task_ids | faulty_task_ids), total_tasks, baseline_correct, cegis_correct,
             )
 
     consecutive_api_failures = 0
@@ -258,11 +322,12 @@ def main() -> None:
         }
 
     # 4. Run evaluations with Protections and Incremental Checkpointing
+    current_task_id: str | None = None
     try:
         pending_tasks = [
             (task_id, task_data)
             for task_id, task_data in tasks_dict.items()
-            if task_id not in completed_task_ids
+            if task_id not in completed_task_ids and task_id not in faulty_task_ids
         ]
         worker_count = max(1, config.MAX_CONCURRENT_TASKS)
         logger.info("Running %s task(s) with %s concurrent worker(s).", len(pending_tasks), worker_count)
@@ -275,6 +340,9 @@ def main() -> None:
 
             for future in as_completed(future_to_task):
                 task_id = future_to_task[future]
+                current_task_id = task_id
+                if future.cancelled():
+                    continue
                 try:
                     result = future.result()
                 except AuthError as auth_err:
@@ -288,6 +356,10 @@ def main() -> None:
                     logger.error("SAFE PAUSE / DAILY QUOTA GUARD: %s", quota_err)
                     for pending in future_to_task:
                         pending.cancel()
+                    continue
+                except Exception as err:
+                    faulty_task_ids.add(task_id)
+                    logger.exception("TASK ERROR: %s failed and will not be added to results: %s", task_id, err)
                     continue
 
                 base_res = result["baseline"]
@@ -304,6 +376,10 @@ def main() -> None:
 
                 detailed_results.append(result)
                 completed_task_ids.add(task_id)
+                _EMERGENCY_STATE.update({
+                    "baseline_correct": baseline_correct,
+                    "cegis_correct": cegis_correct,
+                })
                 logger.info(
                     "[%s/%s] %s: Baseline=%s, CEGIS=%s (API Requests: %s/%s)",
                     len(detailed_results), total_tasks, task_id,
@@ -319,6 +395,7 @@ def main() -> None:
                     detailed_results=detailed_results,
                     baseline_correct=baseline_correct,
                     cegis_correct=cegis_correct,
+                    faulty_task_ids=faulty_task_ids,
                 )
 
                 if consecutive_api_failures >= CIRCUIT_BREAKER_THRESHOLD:
@@ -334,17 +411,27 @@ def main() -> None:
 
     except KeyboardInterrupt:
         logger.warning("Interrupted. Saving current checkpoint...")
-        save_checkpoint(
-            output_path=args.output,
-            model=args.model,
-            max_iters=args.max_iters,
-            total_tasks=total_tasks,
-            detailed_results=detailed_results,
-            baseline_correct=baseline_correct,
-            cegis_correct=cegis_correct,
-        )
-        logger.info("Checkpoint safely saved to '%s'. You can resume at any time.", args.output)
         raise SystemExit(0)
+    except Exception as err:
+        if current_task_id is not None:
+            faulty_task_ids.add(current_task_id)
+        logger.exception("EXPERIMENT ERROR: %s", err)
+        raise
+    finally:
+        try:
+            save_checkpoint(
+                output_path=args.output,
+                model=args.model,
+                max_iters=args.max_iters,
+                total_tasks=total_tasks,
+                detailed_results=detailed_results,
+                baseline_correct=baseline_correct,
+                cegis_correct=cegis_correct,
+                faulty_task_ids=faulty_task_ids,
+            )
+            logger.info("Checkpoint safely saved to '%s'. You can resume at any time.", args.output)
+        except Exception:
+            logger.exception("Failed to save checkpoint to '%s'.", args.output)
 
     # 5. Print Summary
     evaluated_count = len(detailed_results)
@@ -361,6 +448,15 @@ def main() -> None:
     if evaluated_count > 0:
         logger.info("Absolute Gain: %+.2f%%", cegis_acc - base_acc)
     logger.info("Results safely saved to: %s", args.output)
+
+
+def main() -> None:
+    """Run the experiment and preserve state if any failure escapes handling."""
+    try:
+        _run_main()
+    except BaseException as error:
+        save_emergency_checkpoint(error)
+        raise
 
 
 if __name__ == "__main__":
