@@ -1,0 +1,456 @@
+{
+  "config": {
+    "model": "gemini-3.1-flash-lite",
+    "max_cegis_iters": 5,
+    "timeout_seconds": 150.0,
+    "request_delay_seconds": 10.0,
+    "max_daily_requests": 10000,
+    "total_tasks_in_dataset": 800,
+    "completed_tasks": 5,
+    "faulty_tasks": 0,
+    "total_requests_used": 90
+  },
+  "summary": {
+    "baseline_accuracy": 80.0,
+    "cegis_accuracy": 100.0,
+    "baseline_correct": 4,
+    "cegis_correct": 5
+  },
+  "results": [
+    {
+      "task_id": "0d3d703e",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "latency": 157.01202392578125,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    \"\"\"\n    Analyzes the transformation mapping:\n    Example 0: 3->4, 1->5, 2->6\n    Example 1: 2->6, 3->4, 8->9\n    Example 2: 5->1, 8->9, 6->2\n    Example 3: 9->8, 4->3, 2->6\n\n    Mapping derived from examples:\n    1 -> 5\n    2 -> 6\n    3 -> 4\n    4 -> 3\n    5 -> 1\n    6 -> 2\n    8 -> 9\n    9 -> 8\n    \"\"\"\n    mapping = {\n        1: 5,\n        2: 6,\n        3: 4,\n        4: 3,\n        5: 1,\n        6: 2,\n        8: 9,\n        9: 8\n    }\n    \n    new_grid = []\n    for row in grid:\n        new_row = []\n        for val in row:\n            new_row.append(mapping.get(val, val))\n        new_grid.append(new_row)\n        \n    return new_grid",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [9,5,4],
+              [9,5,4],
+              [9,5,4]
+            ],
+            "expected_output": [
+              [9,5,4],
+              [9,5,4],
+              [9,5,4]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "iterations_used": 1,
+        "latency": 110.50560712814331,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    \"\"\"\n    Analyzes the transformation mapping:\n    Example 0: 3->4, 1->5, 2->6\n    Example 1: 2->6, 3->4, 8->9\n    Example 2: 5->1, 8->9, 6->2\n    Example 3: 9->8, 4->3, 2->6\n\n    Mapping observed:\n    1 -> 5\n    2 -> 6\n    3 -> 4\n    4 -> 3\n    5 -> 1\n    6 -> 2\n    8 -> 9\n    9 -> 8\n    \"\"\"\n    mapping = {\n        1: 5,\n        2: 6,\n        3: 4,\n        4: 3,\n        5: 1,\n        6: 2,\n        8: 9,\n        9: 8\n    }\n    \n    new_grid = []\n    for row in grid:\n        new_row = []\n        for val in row:\n            new_row.append(mapping.get(val, val))\n        new_grid.append(new_row)\n        \n    return new_grid",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    \"\"\"\n    Analyzes the transformation mapping:\n    Example 0: 3->4, 1->5, 2->6\n    Example 1: 2->6, 3->4, 8->9\n    Example 2: 5->1, 8->9, 6->2\n    Example 3: 9->8, 4->3, 2->6\n\n    Mapping observed:\n    1 -> 5\n    2 -> 6\n    3 -> 4\n    4 -> 3\n    5 -> 1\n    6 -> 2\n    8 -> 9\n    9 -> 8\n    \"\"\"\n    mapping = {\n        1: 5,\n        2: 6,\n        3: 4,\n        4: 3,\n        5: 1,\n        6: 2,\n        8: 9,\n        9: 8\n    }\n    \n    new_grid = []\n    for row in grid:\n        new_row = []\n        for val in row:\n            new_row.append(mapping.get(val, val))\n        new_grid.append(new_row)\n        \n    return new_grid"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [9,5,4],
+              [9,5,4],
+              [9,5,4]
+            ],
+            "expected_output": [
+              [9,5,4],
+              [9,5,4],
+              [9,5,4]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "00d62c1b",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "latency": 158.36379218101501,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n    output = [row[:] for row in grid]\n\n    # The transformation fills the interior of closed loops of color 3 with color 4.\n    # A cell (r, c) is inside a loop if it is not color 3 and there is no path\n    # from (r, c) to the boundary of the grid that doesn't pass through color 3.\n    \n    def is_inside(r, c):\n        # Use a simple flood fill to check if (r, c) can reach the boundary\n        # without crossing color 3.\n        visited = set()\n        stack = [(r, c)]\n        visited.add((r, c))\n        \n        while stack:\n            curr_r, curr_c = stack.pop()\n            \n            # If we reached the boundary, it's not inside a loop\n            if curr_r == 0 or curr_r == rows - 1 or curr_c == 0 or curr_c == cols - 1:\n                return False\n            \n            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                nr, nc = curr_r + dr, curr_c + dc\n                if 0 <= nr < rows and 0 <= nc < cols:\n                    if grid[nr][nc] != 3 and (nr, nc) not in visited:\n                        visited.add((nr, nc))\n                        stack.append((nr, nc))\n        return True\n\n    # Iterate through all cells. If a cell is 0 and is inside a loop, change to 4.\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == 0:\n                if is_inside(r, c):\n                    output[r][c] = 4\n                    \n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "iterations_used": 1,
+        "latency": 117.32422804832458,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n    output = [row[:] for row in grid]\n    \n    # The task is to identify enclosed regions of 0s that are surrounded by 3s\n    # and fill them with 4s.\n    # A cell (r, c) is enclosed if it's 0 and cannot reach the boundary of the grid\n    # by moving only through 0s.\n    \n    def is_enclosed(r, c):\n        # BFS/DFS to check if (r, c) can reach the boundary\n        visited = set()\n        stack = [(r, c)]\n        visited.add((r, c))\n        \n        while stack:\n            curr_r, curr_c = stack.pop()\n            \n            # If we reached the boundary, it's not enclosed\n            if curr_r == 0 or curr_r == rows - 1 or curr_c == 0 or curr_c == cols - 1:\n                return False\n            \n            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                nr, nc = curr_r + dr, curr_c + dc\n                if 0 <= nr < rows and 0 <= nc < cols:\n                    if grid[nr][nc] == 0 and (nr, nc) not in visited:\n                        visited.add((nr, nc))\n                        stack.append((nr, nc))\n        return True\n\n    # Find all 0s and check if they are enclosed\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == 0:\n                # Check if this 0 is part of an enclosed region\n                # To avoid redundant checks, we could use a global visited set,\n                # but for these grid sizes, simple check is fine.\n                if is_enclosed(r, c):\n                    output[r][c] = 4\n                    \n    return output",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n    output = [row[:] for row in grid]\n    \n    # The task is to identify enclosed regions of 0s that are surrounded by 3s\n    # and fill them with 4s.\n    # A cell (r, c) is enclosed if it's 0 and cannot reach the boundary of the grid\n    # by moving only through 0s.\n    \n    def is_enclosed(r, c):\n        # BFS/DFS to check if (r, c) can reach the boundary\n        visited = set()\n        stack = [(r, c)]\n        visited.add((r, c))\n        \n        while stack:\n            curr_r, curr_c = stack.pop()\n            \n            # If we reached the boundary, it's not enclosed\n            if curr_r == 0 or curr_r == rows - 1 or curr_c == 0 or curr_c == cols - 1:\n                return False\n            \n            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                nr, nc = curr_r + dr, curr_c + dc\n                if 0 <= nr < rows and 0 <= nc < cols:\n                    if grid[nr][nc] == 0 and (nr, nc) not in visited:\n                        visited.add((nr, nc))\n                        stack.append((nr, nc))\n        return True\n\n    # Find all 0s and check if they are enclosed\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == 0:\n                # Check if this 0 is part of an enclosed region\n                # To avoid redundant checks, we could use a global visited set,\n                # but for these grid sizes, simple check is fine.\n                if is_enclosed(r, c):\n                    output[r][c] = 4\n                    \n    return output"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "007bbfb7",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "latency": 14.944219589233398,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    \"\"\"\n    The transformation rule is to create a 3x3 grid of the original 3x3 input grid.\n    However, only the blocks (i, j) where the original grid has non-zero values\n    at (i, j) are filled with the original grid.\n    Wait, looking closer at the examples:\n    The output is a 9x9 grid.\n    The input is a 3x3 grid.\n    The output is composed of 3x3 blocks.\n    If the input grid has a value at (r, c), then the block at (r, c) in the \n    3x3 grid of blocks is filled with the input grid.\n    Actually, it's simpler:\n    The output grid is 9x9.\n    Let the input grid be G.\n    The output grid O is 9x9.\n    O[r*3 : r*3+3, c*3 : c*3+3] = G if G[r, c] != 0 else a 3x3 grid of 0s.\n    Let's check this hypothesis:\n    Example 0: Input has 7s at (0,1), (0,2), (1,0), (1,1), (1,2), (2,1), (2,2).\n    The output has the 3x3 grid placed at these positions.\n    Yes, this matches.\n    \"\"\"\n    n = len(grid)\n    m = len(grid[0])\n    \n    # The output size is (n*3) x (m*3)\n    out_rows = n * 3\n    out_cols = m * 3\n    \n    # Initialize output grid with zeros\n    output = [[0 for _ in range(out_cols)] for _ in range(out_rows)]\n    \n    for r in range(n):\n        for c in range(m):\n            if grid[r][c] != 0:\n                # Place the entire input grid into the 3x3 block starting at (r*3, c*3)\n                for i in range(n):\n                    for j in range(m):\n                        output[r * 3 + i][c * 3 + j] = grid[i][j]\n                        \n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ],
+            "expected_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "iterations_used": 1,
+        "latency": 291.8655369281769,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    \"\"\"\n    The transformation is a Kronecker product of the input grid with itself.\n    Given an input grid G of size N x N, the output grid is a 3N x 3N grid\n    where each cell (i, j) in the output is determined by the input grid.\n    Specifically, the output grid is composed of 3x3 blocks, where each block\n    (bi, bj) is either the original grid G (if the corresponding cell in G is non-zero)\n    or a 3x3 grid of zeros (if the corresponding cell in G is zero).\n    Wait, looking closer at the examples:\n    The output is a 3N x 3N grid where the cell (r, c) is:\n    output[r][c] = input[r // N][c // N] if input[r % N][c % N] != 0 else 0\n    Actually, let's re-verify:\n    Example 0: 3x3 input. Output 9x9.\n    If input[i][j] is 0, the corresponding 3x3 block in the output is all 0s.\n    If input[i][j] is 7, the corresponding 3x3 block in the output is the input grid.\n    Yes, this is exactly the Kronecker product where the \"multiplication\" is:\n    if input[i][j] == 0: block is 3x3 zeros\n    else: block is the input grid itself.\n    \"\"\"\n    n = len(grid)\n    size = n * n\n    output = [[0 for _ in range(size)] for _ in range(size)]\n    \n    for r in range(n):\n        for c in range(n):\n            val = grid[r][c]\n            if val != 0:\n                # Place the input grid at the block position (r*n, c*n)\n                for i in range(n):\n                    for j in range(n):\n                        output[r * n + i][c * n + j] = grid[i][j]\n    \n    return output",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    \"\"\"\n    The transformation is a Kronecker product of the input grid with itself.\n    Given an input grid G of size N x N, the output grid is a 3N x 3N grid\n    where each cell (i, j) in the output is determined by the input grid.\n    Specifically, the output grid is composed of 3x3 blocks, where each block\n    (bi, bj) is either the original grid G (if the corresponding cell in G is non-zero)\n    or a 3x3 grid of zeros (if the corresponding cell in G is zero).\n    Wait, looking closer at the examples:\n    The output is a 3N x 3N grid where the cell (r, c) is:\n    output[r][c] = input[r // N][c // N] if input[r % N][c % N] != 0 else 0\n    Actually, let's re-verify:\n    Example 0: 3x3 input. Output 9x9.\n    If input[i][j] is 0, the corresponding 3x3 block in the output is all 0s.\n    If input[i][j] is 7, the corresponding 3x3 block in the output is the input grid.\n    Yes, this is exactly the Kronecker product where the \"multiplication\" is:\n    if input[i][j] == 0: block is 3x3 zeros\n    else: block is the input grid itself.\n    \"\"\"\n    n = len(grid)\n    size = n * n\n    output = [[0 for _ in range(size)] for _ in range(size)]\n    \n    for r in range(n):\n        for c in range(n):\n            val = grid[r][c]\n            if val != 0:\n                # Place the input grid at the block position (r*n, c*n)\n                for i in range(n):\n                    for j in range(n):\n                        output[r * n + i][c * n + j] = grid[i][j]\n    \n    return output"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ],
+            "expected_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "05f2a901",
+      "baseline": {
+        "strategy": "baseline",
+        "success": false,
+        "api_error": false,
+        "latency": 167.06459093093872,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n    \n    # Identify the two objects: one made of 2s, one made of 8s\n    def get_object(color):\n        coords = []\n        for r in range(rows):\n            for c in range(cols):\n                if grid[r][c] == color:\n                    coords.append((r, c))\n        if not coords:\n            return None\n        min_r = min(r for r, c in coords)\n        max_r = max(r for r, c in coords)\n        min_c = min(c for r, c in coords)\n        max_c = max(c for r, c in coords)\n        return {\n            'coords': coords,\n            'min_r': min_r, 'max_r': max_r,\n            'min_c': min_c, 'max_c': max_c\n        }\n\n    obj2 = get_object(2)\n    obj8 = get_object(8)\n    \n    # The transformation seems to be moving the object made of 2s\n    # so that it is adjacent to the object made of 8s.\n    # Specifically, it seems to align them or stack them.\n    \n    # Let's calculate the target position for obj2.\n    # In Example 0: obj2 is at (2,0) to (3,3), obj8 is at (10,3) to (11,4).\n    # Output: obj2 moves to (8,1) to (9,3).\n    # In Example 1: obj2 is at (1,1) to (4,2), obj8 is at (4,6) to (5,7).\n    # Output: obj2 moves to (1,4) to (4,5).\n    # In Example 2: obj8 is at (1,3) to (2,4), obj2 is at (6,1) to (8,3).\n    # Output: obj2 moves to (3,1) to (5,3).\n    \n    # The rule appears to be: move the object of 2s so that its bottom edge \n    # is adjacent to the top edge of the object of 8s, or vice versa.\n    \n    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]\n    \n    # Keep the object that is NOT moving in its original place\n    # If 8s are below 2s, move 2s to be just above 8s.\n    # If 8s are above 2s, move 2s to be just below 8s.\n    \n    if obj8['min_r'] > obj2['max_r']:\n        # 8s are below 2s: move 2s down\n        target_r = obj8['min_r'] - (obj2['max_r'] - obj2['min_r'] + 1)\n        offset_r = target_r - obj2['min_r']\n        offset_c = 0 # Example 0: 2s shifted right by 1\n        if obj2['min_c'] == 0: offset_c = 1\n        \n        for r, c in obj8['coords']:\n            new_grid[r][c] = 8\n        for r, c in obj2['coords']:\n            new_grid[r + offset_r][c + offset_c] = 2\n    elif obj8['max_r'] < obj2['min_r']:\n        # 8s are above 2s: move 2s up\n        target_r = obj8['max_r'] + 1\n        offset_r = target_r - obj2['min_r']\n        offset_c = 0\n        for r, c in obj8['coords']:\n            new_grid[r][c] = 8\n        for r, c in obj2['coords']:\n            new_grid[r + offset_r][c + offset_c] = 2\n    else:\n        # 8s are to the right of 2s: move 2s right\n        target_c = obj8['min_c'] - (obj2['max_c'] - obj2['min_c'] + 1)\n        offset_c = target_c - obj2['min_c']\n        offset_r = 0\n        for r, c in obj8['coords']:\n            new_grid[r][c] = 8\n        for r, c in obj2['coords']:\n            new_grid[r + offset_r][c + offset_c] = 2\n            \n    return new_grid",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": false,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,2],
+              [2,0,0,0,0,0,0,0,0,2],
+              [2,8,8,0,0,0,0,0,0,2],
+              [2,8,8,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "iterations_used": 1,
+        "latency": 151.49113750457764,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n    \n    # Identify the two objects: one made of 2s, one made of 8s\n    def get_object_pixels(color):\n        pixels = []\n        for r in range(rows):\n            for c in range(cols):\n                if grid[r][c] == color:\n                    pixels.append((r, c))\n        return pixels\n\n    pixels2 = get_object_pixels(2)\n    pixels8 = get_object_pixels(8)\n    \n    # Find the bounding box of the 8s object\n    if not pixels8:\n        return [row[:] for row in grid]\n    \n    min_r8 = min(p[0] for p in pixels8)\n    max_r8 = max(p[0] for p in pixels8)\n    min_c8 = min(p[1] for p in pixels8)\n    max_c8 = max(p[1] for p in pixels8)\n    \n    # Find the bounding box of the 2s object\n    if not pixels2:\n        return [row[:] for row in grid]\n    \n    min_r2 = min(p[0] for p in pixels2)\n    max_r2 = max(p[0] for p in pixels2)\n    min_c2 = min(p[1] for p in pixels2)\n    max_c2 = max(p[1] for p in pixels2)\n    \n    # Determine the target position for the 2s object\n    # The 2s object should be placed such that it is adjacent to the 8s object\n    # If 8s is below 2s, move 2s down. If 8s is above 2s, move 2s up.\n    # Looking at examples:\n    # Ex 0: 2s at top, 8s at bottom. 2s moves down to be just above 8s.\n    # Ex 1: 2s at left, 8s at right. 2s moves right to be just left of 8s.\n    # Ex 2: 8s at top, 2s at bottom. 2s moves up to be just below 8s.\n    \n    if min_r8 > max_r2: # 8s is below 2s\n        dr = (min_r8 - 1) - max_r2\n        dc = 0\n    elif max_r8 < min_r2: # 8s is above 2s\n        dr = (max_r8 + 1) - min_r2\n        dc = 0\n    elif min_c8 > max_c2: # 8s is to the right of 2s\n        dr = 0\n        dc = (min_c8 - 1) - max_c2\n    else: # 8s is to the left of 2s\n        dr = 0\n        dc = (max_c8 + 1) - min_c2\n        \n    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]\n    \n    # Place 8s\n    for r, c in pixels8:\n        new_grid[r][c] = 8\n        \n    # Place 2s at new position\n    for r, c in pixels2:\n        new_grid[r + dr][c + dc] = 2\n        \n    return new_grid",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n    \n    # Identify the two objects: one made of 2s, one made of 8s\n    def get_object_pixels(color):\n        pixels = []\n        for r in range(rows):\n            for c in range(cols):\n                if grid[r][c] == color:\n                    pixels.append((r, c))\n        return pixels\n\n    pixels2 = get_object_pixels(2)\n    pixels8 = get_object_pixels(8)\n    \n    # Find the bounding box of the 8s object\n    if not pixels8:\n        return [row[:] for row in grid]\n    \n    min_r8 = min(p[0] for p in pixels8)\n    max_r8 = max(p[0] for p in pixels8)\n    min_c8 = min(p[1] for p in pixels8)\n    max_c8 = max(p[1] for p in pixels8)\n    \n    # Find the bounding box of the 2s object\n    if not pixels2:\n        return [row[:] for row in grid]\n    \n    min_r2 = min(p[0] for p in pixels2)\n    max_r2 = max(p[0] for p in pixels2)\n    min_c2 = min(p[1] for p in pixels2)\n    max_c2 = max(p[1] for p in pixels2)\n    \n    # Determine the target position for the 2s object\n    # The 2s object should be placed such that it is adjacent to the 8s object\n    # If 8s is below 2s, move 2s down. If 8s is above 2s, move 2s up.\n    # Looking at examples:\n    # Ex 0: 2s at top, 8s at bottom. 2s moves down to be just above 8s.\n    # Ex 1: 2s at left, 8s at right. 2s moves right to be just left of 8s.\n    # Ex 2: 8s at top, 2s at bottom. 2s moves up to be just below 8s.\n    \n    if min_r8 > max_r2: # 8s is below 2s\n        dr = (min_r8 - 1) - max_r2\n        dc = 0\n    elif max_r8 < min_r2: # 8s is above 2s\n        dr = (max_r8 + 1) - min_r2\n        dc = 0\n    elif min_c8 > max_c2: # 8s is to the right of 2s\n        dr = 0\n        dc = (min_c8 - 1) - max_c2\n    else: # 8s is to the left of 2s\n        dr = 0\n        dc = (max_c8 + 1) - min_c2\n        \n    new_grid = [[0 for _ in range(cols)] for _ in range(rows)]\n    \n    # Place 8s\n    for r, c in pixels8:\n        new_grid[r][c] = 8\n        \n    # Place 2s at new position\n    for r, c in pixels2:\n        new_grid[r + dr][c + dc] = 2\n        \n    return new_grid"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "0520fde7",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "latency": 167.47291803359985,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # The input grid is split by a column of 5s.\n    # We need to find the index of the column containing 5s.\n    rows = len(grid)\n    cols = len(grid[0])\n    \n    split_col = -1\n    for c in range(cols):\n        if grid[0][c] == 5:\n            split_col = c\n            break\n            \n    # Left part is grid[0:rows][0:split_col]\n    # Right part is grid[0:rows][split_col+1:cols]\n    \n    left_part = []\n    for r in range(rows):\n        left_part.append(grid[r][:split_col])\n        \n    right_part = []\n    for r in range(rows):\n        right_part.append(grid[r][split_col + 1:])\n        \n    # The output grid has the same dimensions as the left/right parts.\n    # The rule seems to be: compare the left and right parts.\n    # If a cell (r, c) has the same value in both left and right parts,\n    # and that value is 1, then the output cell (r, c) is 2.\n    # Otherwise, it is 0.\n    \n    out_rows = len(left_part)\n    out_cols = len(left_part[0])\n    output = [[0 for _ in range(out_cols)] for _ in range(out_rows)]\n    \n    for r in range(out_rows):\n        for c in range(out_cols):\n            if left_part[r][c] == 1 and right_part[r][c] == 1:\n                output[r][c] = 2\n            else:\n                output[r][c] = 0\n                \n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ],
+            "expected_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "iterations_used": 1,
+        "latency": 155.69268107414246,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # The input grid is split by a column of 5s.\n    # We need to find the index of the column containing 5s.\n    rows = len(grid)\n    cols = len(grid[0])\n    \n    split_col = -1\n    for c in range(cols):\n        if grid[0][c] == 5:\n            split_col = c\n            break\n            \n    # Left part is grid[0:rows][0:split_col]\n    # Right part is grid[0:rows][split_col+1:cols]\n    \n    left_part = []\n    for r in range(rows):\n        left_part.append(grid[r][:split_col])\n        \n    right_part = []\n    for r in range(rows):\n        right_part.append(grid[r][split_col+1:])\n        \n    # The output grid has the same dimensions as the left/right parts.\n    # The rule seems to be: for each cell (r, c), if left_part[r][c] == right_part[r][c] \n    # and they are both 1, then output[r][c] = 2, else 0.\n    \n    out_rows = len(left_part)\n    out_cols = len(left_part[0])\n    output = [[0 for _ in range(out_cols)] for _ in range(out_rows)]\n    \n    for r in range(out_rows):\n        for c in range(out_cols):\n            if left_part[r][c] == 1 and right_part[r][c] == 1:\n                output[r][c] = 2\n            else:\n                output[r][c] = 0\n                \n    return output",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    # The input grid is split by a column of 5s.\n    # We need to find the index of the column containing 5s.\n    rows = len(grid)\n    cols = len(grid[0])\n    \n    split_col = -1\n    for c in range(cols):\n        if grid[0][c] == 5:\n            split_col = c\n            break\n            \n    # Left part is grid[0:rows][0:split_col]\n    # Right part is grid[0:rows][split_col+1:cols]\n    \n    left_part = []\n    for r in range(rows):\n        left_part.append(grid[r][:split_col])\n        \n    right_part = []\n    for r in range(rows):\n        right_part.append(grid[r][split_col+1:])\n        \n    # The output grid has the same dimensions as the left/right parts.\n    # The rule seems to be: for each cell (r, c), if left_part[r][c] == right_part[r][c] \n    # and they are both 1, then output[r][c] = 2, else 0.\n    \n    out_rows = len(left_part)\n    out_cols = len(left_part[0])\n    output = [[0 for _ in range(out_cols)] for _ in range(out_rows)]\n    \n    for r in range(out_rows):\n        for c in range(out_cols):\n            if left_part[r][c] == 1 and right_part[r][c] == 1:\n                output[r][c] = 2\n            else:\n                output[r][c] = 0\n                \n    return output"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ],
+            "expected_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "faulty_task_ids": []
+}

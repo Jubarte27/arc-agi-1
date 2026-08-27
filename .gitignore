@@ -13,11 +13,12 @@ ENV/
 .env
 .env.local
 .env.*
+envs
 
 # Experiment outputs & logs
 results_*.json
 *.log
-results_experiment.json
+!experiments/**/results_*.json
 
 # IDE & OS
 .DS_Store
