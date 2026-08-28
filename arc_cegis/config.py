@@ -54,18 +54,18 @@ API_BASE_URLS = {
 API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
 API_KEYS = {
     "gemini": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
+    "google": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
     "groq": ("GROQ_API_KEY", "OPENAI_API_KEY"),
     "nvidia": ("NVIDIA_API_KEY", "OPENAI_API_KEY"),
     "openrouter": ("OPENROUTER_API_KEY", "OPENAI_API_KEY"),
-    "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY")
+    "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY"),
 }
 
 
 def get_api_base_url(provider: str | None = None) -> str | None:
     """Returns an explicit API base URL or the default for the selected provider."""
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
-    return os.getenv("API_BASE_URL") or API_BASE_URLS.get(selected_provider)
-
+    provider_env_url = os.getenv(f"{selected_provider.upper()}_BASE_URL") or os.getenv(f"{selected_provider.upper()}_API_BASE_URL")
 
 def get_api_key(provider: str | None = None) -> str:
     """
@@ -104,8 +104,8 @@ def _load_llm_pool() -> list[LLMConfig]:
 
     pool = []
     for index, raw_entry in enumerate(raw_pool.split(","), start=1):
-        parts = [part.strip() for part in raw_entry.split(":", 2)]
-        if len(parts) != 2 or not parts[0] or not parts[1]:
+        parts = [part.strip() for part in raw_entry.split(":", 1)]
+        if len(parts) != 2:
             raise ValueError(f"Invalid LLM_POOL entry {raw_entry!r}; expected provider:model")
         provider, model = parts
         pool.append(LLMConfig(

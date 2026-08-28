@@ -24,7 +24,7 @@ def load_tasks(data_path: str) -> Dict[str, Dict[str, Any]]:
             if isinstance(content, dict) and "train" in content and "test" in content:
                 task_id = os.path.splitext(os.path.basename(data_path))[0]
                 tasks[task_id] = content
-            elif isinstance(content, dict):
+            elif isinstance(content, dict) and not any(k in content for k in ("train", "test")):
                 tasks = content
     elif os.path.isdir(data_path):
         for root, _, files in os.walk(data_path):

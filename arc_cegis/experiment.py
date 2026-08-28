@@ -156,10 +156,13 @@ def run_cegis(
             feedback_msg = build_counterexample_feedback(idx, inp, expected, actual, error_msg)
             messages.append({"role": "user", "content": feedback_msg})
 
-    all_train_passed, train_results = evaluate_on_pairs(current_code, train_pairs) if current_code else (False, [])
-
     test_pairs = task.get("test", [])
-    all_test_passed, test_results = evaluate_on_pairs(current_code, test_pairs) if current_code else (False, [])
+    if had_api_error and not current_code:
+        all_train_passed, train_results = False, []
+        all_test_passed, test_results = False, []
+    else:
+        all_train_passed, train_results = evaluate_on_pairs(current_code, train_pairs)
+        all_test_passed, test_results = evaluate_on_pairs(current_code, test_pairs)
     latency = time.time() - start_time
 
     return {

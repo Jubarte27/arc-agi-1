@@ -2,6 +2,7 @@
 ARC-AGI-1 Comparative Experiment Package.
 """
 
+from . import config
 from .config import (
     API_BASE_URL,
     API_BASE_URLS,
@@ -32,6 +33,7 @@ from .prompts import build_counterexample_feedback, build_initial_prompt
 from .sandbox import extract_python_code, run_transform
 
 __all__ = [
+    "config",
     "API_BASE_URL",
     "API_BASE_URLS",
     "API_KEYS",

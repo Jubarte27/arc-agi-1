@@ -32,11 +32,11 @@ class QuotaExceededError(Exception):
 
 # Global tracking for API calls and proactive rate limiting
 _REQUEST_COUNT: int = 0
-_LAST_REQUEST_TIME: float = 0.0
 _POOL_REQUEST_COUNTS: Dict[str, int] = {}
 _POOL_LAST_REQUEST_TIMES: Dict[str, float] = {}
 _POOL_SEMAPHORES: Dict[str, threading.BoundedSemaphore] = {}
 _CLIENT_CACHE: Dict[str, Any] = {}
+_CLIENT_CACHE_LOCK = threading.Lock()
 _REQUEST_LOCK = threading.Lock()
 
 
@@ -57,9 +57,8 @@ def reset_request_count(value: int = 0) -> None:
 
 
 def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
-    """Serializes rate-limit waiting and quota accounting for concurrent workers."""
-    global _REQUEST_COUNT, _LAST_REQUEST_TIME
-
+    """Serializes quota accounting and schedules rate-limit dispatch for concurrent workers."""
+    global _REQUEST_COUNT
     pool_key = f"{llm_config.pool_index}:{llm_config.provider}:{llm_config.model}"
     with _REQUEST_LOCK:
         semaphore = _POOL_SEMAPHORES.setdefault(
@@ -67,6 +66,7 @@ def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
         )
     semaphore.acquire()
 
+    sleep_needed = 0.0
     with _REQUEST_LOCK:
         pool_count = _POOL_REQUEST_COUNTS.get(pool_key, 0)
         if pool_count >= llm_config.max_daily_requests:
@@ -76,11 +76,18 @@ def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
                 "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
             )
 
-        _wait_for_rate_limit(llm_config.request_delay, _POOL_LAST_REQUEST_TIMES.get(pool_key, 0.0))
-        _LAST_REQUEST_TIME = time.time()
+        now = time.time()
+        last_time = _POOL_LAST_REQUEST_TIMES.get(pool_key, 0.0)
+        delay = llm_config.request_delay
+        target_time = max(now, last_time + delay) if (delay > 0 and last_time > 0) else now
+        sleep_needed = max(0.0, target_time - now)
+
+        _POOL_LAST_REQUEST_TIMES[pool_key] = target_time
         _REQUEST_COUNT += 1
         _POOL_REQUEST_COUNTS[pool_key] = pool_count + 1
-        _POOL_LAST_REQUEST_TIMES[pool_key] = _LAST_REQUEST_TIME
+
+    if sleep_needed > 0:
+        time.sleep(sleep_needed)
 
 
 def _extract_retry_delay(error: Exception) -> Optional[float]:
@@ -133,17 +140,6 @@ def _extract_retry_delay(error: Exception) -> Optional[float]:
     return None
 
 
-def _wait_for_rate_limit(request_delay: float, last_request_time: float) -> None:
-    """
-    Enforces minimum delay between API calls to guarantee compliance with Free Tier RPM limits.
-    """
-    if request_delay > 0 and last_request_time > 0:
-        elapsed = time.time() - last_request_time
-        if elapsed < request_delay:
-            sleep_needed = request_delay - elapsed
-            time.sleep(sleep_needed)
-
-
 def _release_request_slot(llm_config: config.LLMConfig) -> None:
     pool_key = f"{llm_config.pool_index}:{llm_config.provider}:{llm_config.model}"
     semaphore = _POOL_SEMAPHORES.get(pool_key)
@@ -163,9 +159,10 @@ def get_gemini_client(api_key: Optional[str] = None) -> genai.Client:
             "Google Gemini API Key is missing. "
             "Please export GEMINI_API_KEY or GOOGLE_API_KEY in your environment."
         )
-    if key not in _CLIENT_CACHE:
-        _CLIENT_CACHE[key] = genai.Client(api_key=key)
-    return _CLIENT_CACHE[key]
+    with _CLIENT_CACHE_LOCK:
+        if key not in _CLIENT_CACHE:
+            _CLIENT_CACHE[key] = genai.Client(api_key=key)
+        return _CLIENT_CACHE[key]
 
 
 def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -> Any:
@@ -186,12 +183,13 @@ def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -
 
     base_url = config.get_api_base_url(provider)
     cache_key = f"{provider}:{key}:{base_url}"
-    if cache_key not in _CLIENT_CACHE:
-        client_kwargs: Dict[str, str] = {"api_key": key}
-        if base_url:
-            client_kwargs["base_url"] = base_url
-        _CLIENT_CACHE[cache_key] = OpenAI(**client_kwargs)
-    return _CLIENT_CACHE[cache_key]
+    with _CLIENT_CACHE_LOCK:
+        if cache_key not in _CLIENT_CACHE:
+            client_kwargs: Dict[str, str] = {"api_key": key}
+            if base_url:
+                client_kwargs["base_url"] = base_url
+            _CLIENT_CACHE[cache_key] = OpenAI(**client_kwargs)
+        return _CLIENT_CACHE[cache_key]
 
 
 def _call_openai_compatible(
@@ -313,7 +311,6 @@ def call_llm(
         AuthError: If authentication fails (401/403 or missing API key).
         RuntimeError: If all retries are exhausted.
     """
-    global _REQUEST_COUNT, _LAST_REQUEST_TIME
 
     llm_config = config.get_next_llm() if provider is None and model is None else config.LLMConfig(
         provider=(provider or config.LLM_PROVIDER).strip().lower(),
@@ -324,34 +321,28 @@ def call_llm(
     )
     selected_provider = llm_config.provider
     model = llm_config.model
+    resolved_key = api_key or llm_config.api_key or config.get_api_key(selected_provider)
     if selected_provider not in ("gemini", "google"):
-        if config.get_api_base_url(selected_provider):
-            if api_key or config.get_api_key(selected_provider):
-                return _call_openai_compatible(
-                    messages, model, selected_provider, api_key or llm_config.api_key, max_retries, llm_config
-                )
-            else:
-                raise ValueError(f"Empty API_KEY")
-        else:
+        base_url = config.get_api_base_url(selected_provider)
+        if not base_url:
             raise ValueError(f"Unsupported LLM provider: '{selected_provider}'")
+        if not resolved_key:
+            raise AuthError(f"Missing API key for provider '{selected_provider}'.")
+        return _call_openai_compatible(
+            messages, model, selected_provider, resolved_key, max_retries, llm_config,
+        )
 
-    client = get_gemini_client(api_key=api_key or llm_config.api_key)
+    client = get_gemini_client(api_key=resolved_key)
     system_instruction, contents = format_messages_for_gemini(messages)
 
     gen_config = types.GenerateContentConfig(
         temperature=config.TEMPERATURE,
         system_instruction=system_instruction,
+        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
 
     if not contents:
         raise ValueError("At least one user message is required")
-
-    chat = client.chats.create(
-        model=model,
-        config=gen_config,
-        history=contents[:-1],
-    )
-    latest_message = contents[-1].parts
 
     base_delay = 4.0
 
@@ -369,30 +360,38 @@ def call_llm(
                 config.MAX_DAILY_REQUESTS,
             )
 
-            response = chat.send_message(latest_message)
+            response = client.models.generate_content(
+                model=model,
+                contents=contents,
+                config=gen_config,
+            )
             _release_request_slot(llm_config)
             return response.text or ""
 
-        except errors.APIError as e:
+        except Exception as e:
             if slot_reserved:
                 _release_request_slot(llm_config)
-            status_code = getattr(e, "code", None)
+            status_code = getattr(e, "status_code", None) or getattr(e, "code", None)
             err_msg = str(e).lower()
 
             # Immediate fail-fast for authentication errors
             if status_code in (401, 403) or any(
-                term in err_msg for term in ["unauthenticated", "permission_denied", "api key not valid", "invalid api key"]
+                term in err_msg for term in ["unauthenticated", "permission_denied", "api key not valid", "invalid api key", "unauthorized", "authentication"]
             ):
                 raise AuthError(f"Fatal Gemini Authentication Error ({status_code}): {e}") from e
 
             # Immediate fail-fast for 404 (Model not found / deprecated)
-            if status_code == 404 or "not_found" in err_msg or "no longer available" in err_msg:
+            if status_code == 404 or any(
+                term in err_msg for term in ["not_found", "no longer available", "model not found"]
+            ):
                 raise RuntimeError(
                     f"Fatal Gemini Model Error (404 NOT_FOUND): Model '{model}' was not found or is no longer available.\n{e}"
                 ) from e
 
             # Handle 429 / Rate Limiting / Resource Exhausted
-            if status_code == 429 or "resource_exhausted" in err_msg or "429" in err_msg:
+            if status_code == 429 or any(
+                term in err_msg for term in ["resource_exhausted", "429", "rate limit", "too many requests"]
+            ):
                 retry_delay = _extract_retry_delay(e)
 
                 # Hard stop only if the API explicitly demands a multi-hour wait (true daily reset)
@@ -415,46 +414,10 @@ def call_llm(
                 time.sleep(sleep_duration)
                 continue
 
-            # Retry other transient errors (500, 503, etc.)
+            # Retry other transient errors (500, 503, connection errors, etc.)
             if attempt == max_retries:
                 raise RuntimeError(
                     f"Gemini API call failed after {max_retries} attempts (Status: {status_code}): {e}"
-                ) from e
-
-            sleep_duration = base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5)
-            time.sleep(sleep_duration)
-
-        except Exception as e:
-            if slot_reserved:
-                _release_request_slot(llm_config)
-            err_msg = str(e).lower()
-            if any(term in err_msg for term in ["401", "403", "unauthorized", "invalid api key", "unauthenticated"]):
-                raise AuthError(f"Fatal Gemini Authentication Error: {e}") from e
-
-            if "404" in err_msg or "not_found" in err_msg or "no longer available" in err_msg:
-                raise RuntimeError(
-                    f"Fatal Gemini Model Error (404 NOT_FOUND): Model '{model}' was not found or is no longer available.\n{e}"
-                ) from e
-
-            if "429" in err_msg or "resource_exhausted" in err_msg:
-                retry_delay = _extract_retry_delay(e)
-                if retry_delay is not None and retry_delay > 1800:
-                    raise QuotaExceededError(
-                        f"Google AI Studio Daily Quota Exceeded (Reset in {retry_delay:.0f}s): {e}"
-                    ) from e
-
-                if attempt == max_retries:
-                    raise QuotaExceededError(
-                        f"Google AI Studio Quota/Rate Limit Exceeded after {max_retries} retries: {e}"
-                    ) from e
-
-                sleep_duration = (retry_delay + 3.0) if retry_delay is not None else (max(35.0, base_delay * (2 ** (attempt - 1))) + random.uniform(1.0, 3.0))
-                time.sleep(sleep_duration)
-                continue
-
-            if attempt == max_retries:
-                raise RuntimeError(
-                    f"Gemini API call failed after {max_retries} attempts: {e}"
                 ) from e
 
             sleep_duration = base_delay * (2 ** (attempt - 1)) + random.uniform(0.5, 1.5)

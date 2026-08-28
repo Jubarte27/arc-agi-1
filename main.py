@@ -296,7 +296,6 @@ def _run_main() -> None:
     parser.add_argument(
         "--provider",
         type=str,
-        choices=("gemini", "groq"),
         default=config.LLM_PROVIDER,
         help=f"LLM provider (default: {config.LLM_PROVIDER})",
     )
@@ -472,13 +471,13 @@ def _run_main() -> None:
                     logger.error("AUTH ERROR: %s", auth_err)
                     for pending in future_to_task:
                         pending.cancel()
-                    continue
+                    break
                 except QuotaExceededError as quota_err:
                     quota_exhausted = True
                     logger.error("SAFE PAUSE / DAILY QUOTA GUARD: %s", quota_err)
                     for pending in future_to_task:
                         pending.cancel()
-                    continue
+                    break
                 except Exception as err:
                     faulty_task_ids.add(task_id)
                     logger.exception("TASK ERROR: %s failed and will not be added to results: %s", task_id, err)
