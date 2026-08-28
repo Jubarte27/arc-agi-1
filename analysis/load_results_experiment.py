@@ -78,13 +78,12 @@ def main() -> None:
         description="Load experiment results and print the resulting DataFrame."
     )
     parser.add_argument("input", type=Path)
-    parser.add_argument("output", type=Path, default=None)
+    parser.add_argument("output", type=Path, nargs="?", default=None)
     args = parser.parse_args()
 
     dataframe = load_results(args.input)
     print(dataframe.to_string(index=False))
     dataframe_to_json(dataframe, args.output)
-        
 
 
 if __name__ == "__main__":
