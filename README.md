@@ -4,8 +4,8 @@ Comparative evaluation of Program Synthesis approaches on the **ARC-AGI-1** benc
 
 ## Approaches
 
-1. **Baseline (1-Shot):** The model receives the training demonstration pairs, directly writes a transform(grid) Python function, and is evaluated once on the hidden test set.
-2. **CEGIS (Counterexample-Guided Inductive Synthesis with Semantic Feedback):** The model generates an initial program. If the program fails on any training demonstration, a semantic counterexample (Input, Expected Output, Actual Output/Execution Error) is fed back into the chat context in a loop up to `MAX_CEGIS_ITERS` before final evaluation on the test set.
+1. **Baseline (1-Shot):** The model receives the training demonstration pairs, directly writes a transform(grid) Python function, and is evaluated once on both the training demonstrations and hidden test set. The final result requires both splits to pass.
+2. **CEGIS (Counterexample-Guided Inductive Synthesis with Semantic Feedback):** The model generates an initial program. If the program fails on any training demonstration, a semantic counterexample (Input, Expected Output, Actual Output/Execution Error) is fed back into the chat context in a loop up to `MAX_CEGIS_ITERS` before final evaluation on both the training demonstrations and test set. The official result requires both to pass.
 
 ## Free Tier Protections & Robustness (Gemini 3.1 Flash Lite / Google AI Studio)
 

@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import logging
 import os
-import re
 from typing import Any, Dict, List, Set
+from util.parsing import compact_long_numeric_lists
 
 from arc_cegis import (
     AuthError,
@@ -40,14 +40,73 @@ _EMERGENCY_STATE: Dict[str, Any] = {
 }
 
 
-_LONG_NUMERIC_LIST_RE = re.compile(r"\[(?:\s+\d+,?)+\s*\]")
-_LONG_NUMERIC_LIST_ITEM_RE = re.compile(r"\s*(\d)(,?)\s*")
-def compact_long_numeric_lists(serialized: str) -> str:
-    """Keep long numeric JSON arrays on one line to reduce checkpoint size."""
-    def compact(match: re.Match[str]) -> str:
-        return _LONG_NUMERIC_LIST_ITEM_RE.sub(r"\1\2", match.group(0))
+def extract_first_n_runs(input_path: str, output_path: str, n: int) -> None:
+    """Write a result file containing only its first ``n`` runs."""
+    if n < 0:
+        raise ValueError("n must be non-negative")
 
-    return _LONG_NUMERIC_LIST_RE.sub(compact, serialized)
+    with open(input_path, "r", encoding="utf-8") as results_file:
+        payload = json.load(results_file)
+
+    results = payload.get("results")
+    if not isinstance(results, list):
+        raise ValueError("The result file must contain a 'results' list.")
+
+    selected_results = results[:n]
+    baseline_correct = sum(
+        bool(item.get("baseline", {}).get("success"))
+        for item in selected_results
+        if isinstance(item, dict)
+    )
+    cegis_correct = sum(
+        bool(item.get("cegis", {}).get("success"))
+        for item in selected_results
+        if isinstance(item, dict)
+    )
+    selected_count = len(selected_results)
+
+    output_payload = dict(payload)
+    output_payload["results"] = selected_results
+    output_payload["summary"] = {
+        "baseline_accuracy": baseline_correct / selected_count * 100 if selected_count else 0.0,
+        "cegis_accuracy": cegis_correct / selected_count * 100 if selected_count else 0.0,
+        "baseline_correct": baseline_correct,
+        "cegis_correct": cegis_correct,
+    }
+    if isinstance(output_payload.get("config"), dict):
+        output_payload["config"] = dict(output_payload["config"])
+        output_payload["config"]["completed_tasks"] = selected_count
+        request_count = 0
+        has_iteration_history = False
+        for item in selected_results:
+            if not isinstance(item, dict):
+                continue
+            if isinstance(item.get("baseline"), dict) and item["baseline"]:
+                request_count += 1
+            cegis_result = item.get("cegis")
+            if isinstance(cegis_result, dict) and isinstance(
+                cegis_result.get("iteration_history"), list
+            ):
+                has_iteration_history = True
+                request_count += len(cegis_result["iteration_history"])
+        if has_iteration_history:
+            output_payload["config"]["total_requests_used"] = request_count
+    if isinstance(output_payload.get("faulty_task_ids"), list):
+        selected_ids = {
+            item.get("task_id") for item in selected_results if isinstance(item, dict)
+        }
+        output_payload["faulty_task_ids"] = [
+            task_id
+            for task_id in output_payload["faulty_task_ids"]
+            if task_id in selected_ids
+        ]
+
+    output_directory = os.path.dirname(output_path)
+    if output_directory:
+        os.makedirs(output_directory, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as results_file:
+        serialized_payload = json.dumps(output_payload, indent=2)
+        results_file.write(compact_long_numeric_lists(serialized_payload))
 
 
 def perform_health_check(model: str | None) -> None:
@@ -271,6 +330,24 @@ def _run_main() -> None:
         help="Skip the initial provider API connectivity check (not recommended)",
     )
     parser.add_argument(
+        "--extract-first-n",
+        type=int,
+        default=None,
+        help="Extract the first N runs from --extract-input and write them to --extract-output",
+    )
+    parser.add_argument(
+        "--extract-input",
+        type=str,
+        default=None,
+        help="Input results JSON for --extract-first-n",
+    )
+    parser.add_argument(
+        "--extract-output",
+        type=str,
+        default=None,
+        help="Output results JSON for --extract-first-n",
+    )
+    parser.add_argument(
         "--request-delay",
         type=float,
         default=config.REQUEST_DELAY,
@@ -283,6 +360,13 @@ def _run_main() -> None:
         help=f"Maximum daily requests ceiling before safe pause (default: {config.MAX_DAILY_REQUESTS})",
     )
     args = parser.parse_args()
+
+    if args.extract_first_n is not None:
+        if not args.extract_input or not args.extract_output:
+            parser.error("--extract-first-n requires --extract-input and --extract-output")
+        extract_first_n_runs(args.extract_input, args.extract_output, args.extract_first_n)
+        logger.info("Extracted first %s run(s) to '%s'.", args.extract_first_n, args.extract_output)
+        return
 
     _EMERGENCY_STATE.update({
         "output_path": args.output,

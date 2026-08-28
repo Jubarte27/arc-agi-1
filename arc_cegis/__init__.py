@@ -20,7 +20,7 @@ from .config import (
     get_api_base_url,
 )
 from .data_loader import load_tasks
-from .experiment import evaluate_on_test, run_baseline, run_cegis
+from .experiment import evaluate_on_pairs, run_baseline, run_cegis
 from .llm import (
     AuthError,
     QuotaExceededError,
@@ -48,7 +48,7 @@ __all__ = [
     "get_api_key",
     "get_api_base_url",
     "load_tasks",
-    "evaluate_on_test",
+    "evaluate_on_pairs",
     "run_baseline",
     "run_cegis",
     "call_llm",
