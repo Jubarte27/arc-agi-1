@@ -52,6 +52,7 @@ API_BASE_URLS = {
     "mistral": "https://api.mistral.ai/v1",
     "ollama": os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
     "local": os.getenv("LOCAL_BASE_URL", "http://127.0.0.1:11434/v1"),
+    "vllm": os.getenv("VLLM_BASE_URL", "http://127.0.0.1:8000/v1"),
 }
 API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
 API_KEYS = {
@@ -63,6 +64,7 @@ API_KEYS = {
     "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY"),
     "ollama": ("OLLAMA_API_KEY", "OPENAI_API_KEY"),
     "local": ("LOCAL_API_KEY", "OPENAI_API_KEY"),
+    "vllm": ("VLLM_API_KEY", "OPENAI_API_KEY"),
 }
 
 
@@ -79,8 +81,8 @@ def get_api_key(provider: str | None = None) -> str:
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
     key_names = API_KEYS.get(selected_provider, ())
     key = next((key for name in key_names if (key:=os.getenv(name))), "")
-    if not key and selected_provider in ("ollama", "local"):
-        return "ollama"
+    if not key and selected_provider in ("ollama", "local", "vllm"):
+        return "vllm"
     return key
 
 

@@ -177,8 +177,8 @@ def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -
 
     key = api_key or config.get_api_key(provider)
     if not key:
-        if provider in ("ollama", "local"):
-            key = "ollama"
+        if provider in ("ollama", "local", "vllm"):
+            key = "vllm"
         else:
             raise AuthError(
                 f"{provider.title()} API key is missing. Please export {provider.upper()}_API_KEY."
@@ -330,8 +330,8 @@ def call_llm(
         if not base_url:
             raise ValueError(f"Unsupported LLM provider: '{selected_provider}'")
         if not resolved_key:
-            if selected_provider in ("ollama", "local"):
-                resolved_key = "ollama"
+            if selected_provider in ("ollama", "local", "vllm"):
+                resolved_key = "vllm"
             else:
                 raise AuthError(f"Missing API key for provider '{selected_provider}'.")
         return _call_openai_compatible(

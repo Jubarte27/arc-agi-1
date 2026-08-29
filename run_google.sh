@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-SCRIPT_DIR=$(dirname $(readlink -e "${BASH_SOURCE[0]}"))
+SCRIPT_DIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
 
 # MODEL_NAME=gemini-3.5-flash-lite
 # MODEL_NAME=gemini-3.1-flash-lite

@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-SCRIPT_DIR=$(dirname $(readlink -e "${BASH_SOURCE[0]}"))
+SCRIPT_DIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
 source "$SCRIPT_DIR/.venv/bin/activate"
 
 # MODEL_NAME=qwen2.5-coder:7b
