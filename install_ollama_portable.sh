@@ -116,20 +116,20 @@ fi
 
 # Determine download URL
 if [[ "$VERSION" == "latest" ]]; then
-    DOWNLOAD_URL="https://ollama.com/download/ollama-linux-${OLLAMA_ARCH}.tar.gz"
+    DOWNLOAD_URL="https://ollama.com/download/ollama-linux-${OLLAMA_ARCH}.tar.zst"
 else
     # Normalize version tag to include 'v' prefix if omitted
     if [[ ! "$VERSION" =~ ^v ]]; then
         VERSION="v${VERSION}"
     fi
-    DOWNLOAD_URL="https://github.com/ollama/ollama/releases/download/${VERSION}/ollama-linux-${OLLAMA_ARCH}.tar.gz"
+    DOWNLOAD_URL="https://github.com/ollama/ollama/releases/download/${VERSION}/ollama-linux-${OLLAMA_ARCH}.tar.zst"
 fi
 
 echo "Download URL:      ${DOWNLOAD_URL}"
 echo "Creating directory: ${INSTALL_DIR} ..."
 mkdir -p "${INSTALL_DIR}"
 
-TMP_TAR="$(mktemp "${TMPDIR:-/tmp}/ollama-portable-XXXXXX.tar.gz")"
+TMP_TAR="$(mktemp "${TMPDIR:-/tmp}/ollama-portable-XXXXXX.tar.zst")"
 cleanup() {
     rm -f "${TMP_TAR}"
 }
@@ -146,7 +146,7 @@ else
 fi
 
 echo "Extracting package into '${INSTALL_DIR}'..."
-tar -xzf "${TMP_TAR}" -C "${INSTALL_DIR}"
+tar -xaf "${TMP_TAR}" -C "${INSTALL_DIR}"
 
 # Ensure executable permissions on binaries and libraries
 if [[ -f "${OLLAMA_BIN}" ]]; then

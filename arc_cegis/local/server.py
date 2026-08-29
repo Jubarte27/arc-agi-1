@@ -137,6 +137,7 @@ class OllamaServer:
             if log_dir:
                 os.makedirs(log_dir, exist_ok=True)
             log_f = open(self.log_file, "a", encoding="utf-8")
+            self._log_fh = log_f
             stdout_dest = log_f
             stderr_dest = log_f
 
@@ -192,6 +193,9 @@ class OllamaServer:
 
         self.process = None
         self._owned_process = False
+
+        if hasattr(self, "_log_fh"):
+            self._log_fh.close()
 
     def restart(self, timeout: float = 30.0) -> None:
         """
