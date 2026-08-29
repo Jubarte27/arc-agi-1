@@ -1,0 +1,9 @@
+# List of local models for ARC-AGI CEGIS experiment
+# Format: one model tag per line
+#
+# High-performance lightweight coding models
+qwen2.5-coder:7b
+qwen2.5-coder:1.5b
+llama3.2:3b
+deepseek-coder:6.7b
+

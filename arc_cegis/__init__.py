@@ -31,9 +31,18 @@ from .llm import (
 )
 from .prompts import build_counterexample_feedback, build_initial_prompt
 from .sandbox import extract_python_code, run_transform
+from . import local
+from .local import (
+    OllamaClient,
+    OllamaServer,
+    ensure_server_running,
+    setup_local_ollama,
+    get_local_openai_client,
+)
 
 __all__ = [
     "config",
+    "local",
     "API_BASE_URL",
     "API_BASE_URLS",
     "API_KEYS",
@@ -62,4 +71,9 @@ __all__ = [
     "build_initial_prompt",
     "extract_python_code",
     "run_transform",
+    "OllamaClient",
+    "OllamaServer",
+    "ensure_server_running",
+    "setup_local_ollama",
+    "get_local_openai_client",
 ]

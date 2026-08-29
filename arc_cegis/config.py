@@ -50,6 +50,8 @@ API_BASE_URLS = {
     "nvidia": "https://integrate.api.nvidia.com/v1",
     "openrouter": "https://openrouter.ai/api/v1/",
     "mistral": "https://api.mistral.ai/v1",
+    "ollama": os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
+    "local": os.getenv("LOCAL_BASE_URL", "http://127.0.0.1:11434/v1"),
 }
 API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
 API_KEYS = {
@@ -59,6 +61,8 @@ API_KEYS = {
     "nvidia": ("NVIDIA_API_KEY", "OPENAI_API_KEY"),
     "openrouter": ("OPENROUTER_API_KEY", "OPENAI_API_KEY"),
     "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY"),
+    "ollama": ("OLLAMA_API_KEY", "OPENAI_API_KEY"),
+    "local": ("LOCAL_API_KEY", "OPENAI_API_KEY"),
 }
 
 
@@ -74,7 +78,10 @@ def get_api_key(provider: str | None = None) -> str:
     """
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
     key_names = API_KEYS.get(selected_provider, ())
-    return next((key for name in key_names if (key:=os.getenv(name))), "")
+    key = next((key for name in key_names if (key:=os.getenv(name))), "")
+    if not key and selected_provider in ("ollama", "local"):
+        return "ollama"
+    return key
 
 
 # Backward-compatible API_KEY resolution
