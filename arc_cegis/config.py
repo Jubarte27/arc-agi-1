@@ -66,6 +66,7 @@ def get_api_base_url(provider: str | None = None) -> str | None:
     """Returns an explicit API base URL or the default for the selected provider."""
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
     provider_env_url = os.getenv(f"{selected_provider.upper()}_BASE_URL") or os.getenv(f"{selected_provider.upper()}_API_BASE_URL")
+    return provider_env_url or API_BASE_URLS.get(selected_provider)
 
 def get_api_key(provider: str | None = None) -> str:
     """
