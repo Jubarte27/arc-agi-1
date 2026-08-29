@@ -445,6 +445,20 @@ def _run_main() -> None:
     logger.info("Model: %s | Max CEGIS Iters: %s | Timeout: %ss", model, args.max_iters, config.TIMEOUT_SECONDS)
     logger.info("Rate Delay: %ss (<= %s RPM) | Daily Quota Guard: %s RPD", config.REQUEST_DELAY, rpm_effective, config.MAX_DAILY_REQUESTS)
 
+    # 0. Auto-start local Ollama server when provider is ollama/local
+    _ollama_server = None
+    effective_provider = config.LLM_PROVIDER.strip().lower()
+    if effective_provider in ("ollama", "local"):
+        from arc_cegis.local import setup_local_ollama
+        logger.info("Provider '%s' detected — ensuring local Ollama server is running...", effective_provider)
+        _ollama_server, _ollama_client = setup_local_ollama(
+            model=args.model,
+            auto_start=True,
+            auto_pull=True,
+            set_global_config=True,
+        )
+        _EMERGENCY_STATE["_ollama_server"] = _ollama_server
+
     # 1. Health check
     if not args.skip_health_check:
         if config.LLM_POOL:
@@ -635,6 +649,10 @@ def _run_main() -> None:
             logger.info("Checkpoint safely saved to '%s'. You can resume at any time.", args.output)
         except Exception:
             logger.exception("Failed to save checkpoint to '%s'.", args.output)
+        finally:
+            if _ollama_server is not None:
+                logger.info("Stopping local Ollama server...")
+                _ollama_server.stop()
 
     # 5. Print Summary
     evaluated_count = len(detailed_results)
@@ -653,12 +671,23 @@ def _run_main() -> None:
     logger.info("Results safely saved to: %s", args.output)
 
 
+def _stop_ollama_server() -> None:
+    """Best-effort shutdown of any locally managed Ollama server."""
+    server = _EMERGENCY_STATE.get("_ollama_server")
+    if server is not None:
+        try:
+            server.stop()
+        except Exception:
+            logger.exception("Failed to stop Ollama server during emergency shutdown.")
+
+
 def main() -> None:
     """Run the experiment and preserve state if any failure escapes handling."""
     try:
         _run_main()
     except BaseException as error:
         save_emergency_checkpoint(error)
+        _stop_ollama_server()
         raise
 
 
