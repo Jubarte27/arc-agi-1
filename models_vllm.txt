@@ -1,9 +1,0 @@
-# List of Hugging Face model IDs for vLLM
-# Format: one HF model repo ID per line
-#
-# High-performance lightweight coding models
-#Qwen/Qwen3-Coder-30B-A3B-Instruct
-#meta-llama/Llama-3.3-70B-Instruct
-deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct
-#google/gemma-4-26b-a4b-it
-

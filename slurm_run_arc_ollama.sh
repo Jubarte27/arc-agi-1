@@ -12,6 +12,12 @@
 
 set -euo pipefail
 
+report_end() {
+    local exit_code=$? 
+    echo "Something made me finnish. Last exit code was: $exit_code"
+}
+trap report_end EXIT
+
 cd "$SCRATCH/arc-agi-1"
 SCRIPT_DIR="$(pwd)"
 cd "$SCRIPT_DIR"
