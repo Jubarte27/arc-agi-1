@@ -1,0 +1,15 @@
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+
+\bibitem[{Chollet(2019)}]{chollet2019measure}
+Chollet, F. 2019.
+\newblock On the Measure of Intelligence.
+\newblock \emph{arXiv preprint arXiv:1911.01547}.
+
+\bibitem[{da~Costa~Cieslak, de~Oliveira, and Machado(2026)}]{arcagi1repo}
+da~Costa~Cieslak, F.~L.; de~Oliveira, I.~C.; and Machado, M. 2026.
+\newblock ARC-AGI-1: Baseline vs CEGIS Comparative Experiment.
+\newblock \url{https://github.com/Jubarte27/arc-agi-1}.
+\newblock Acessado: 2026-08-29.
+
+\end{thebibliography}

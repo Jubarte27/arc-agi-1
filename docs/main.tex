@@ -1,0 +1,83 @@
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage{aaai2027} % DO NOT CHANGE THIS
+\usepackage[hyphens]{url} % DO NOT CHANGE THIS
+\usepackage{graphicx} % DO NOT CHANGE THIS
+\urlstyle{rm} % DO NOT CHANGE THIS
+\def\UrlFont{\rm} % DO NOT CHANGE THIS
+\usepackage{natbib} % DO NOT CHANGE THIS
+\usepackage{caption} % DO NOT CHANGE THIS
+\frenchspacing % DO NOT CHANGE THIS
+\pdfinfo{
+/TemplateVersion (2027.1)
+}
+
+% Optional: Set counter for section numbers if needed (0 means no numbers, 1 means section numbers, 2 means sections and subsections)
+\setcounter{secnumdepth}{2}
+
+\title{ARC-AGI-1: Estudo Comparativo entre Abordagem Baseline e Program Synthesis via CEGIS com Feedback Sem{\^a}ntico}
+
+\author{
+    Fabio Luiz da Costa Cieslak\equalcontrib,
+    Izadora Candotti de Oliveira\equalcontrib,
+    Matheus Machado\equalcontrib
+}
+\affiliations{
+    Reposit{\'o}rio GitHub: Jubarte27/arc-agi-1\\
+    \url{https://github.com/Jubarte27/arc-agi-1}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este artigo apresenta uma an{\'a}lise resumida do reposit{\'o}rio \texttt{arc-agi-1}, que realiza uma avalia{\c{c}}{\~a}o comparativa de abordagens de s{\'i}ntese de programas (Program Synthesis) no benchmark ARC-AGI-1. Investigamos duas metodologias principais utilizando modelos de linguagem de grande porte (LLMs) via APIs do Google Gemini (usando o modelo \texttt{gemini-3.1-flash-lite} por padr{\~a}o) e Groq: a abordagem Baseline (1-Shot) e a abordagem baseada em S{\'i}ntese Indutiva Guiada por Contraexemplos (CEGIS) com feedback sem{\^a}ntico. Al{\'e}m disso, o reposit{\'o}rio destaca-se pela implementa{\c{c}}{\~a}o de prote{\c{c}}{\~o}es robustas para contas de n{\'i}vel gratuito (Free Tier Protections), garantindo a resili{\^e}ncia dos experimentos frente a limita{\c{c}}{\~o}es de taxa (RPM/TPM), cotas di{\'a}rias e falhas de rede.
+\end{abstract}
+
+\begin{links}
+\link{C{\'o}digo}{https://github.com/Jubarte27/arc-agi-1}
+\end{links}
+
+\section{Introdu{\c{c}}{\~a}o}
+O benchmark Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019measure} prop{\~o}e o desafio de desenvolver sistemas de intelig{\^e}ncia artificial capazes de adquirir novas habilidades de forma r{\'a}pida e generaliz{\'a}vel, simulando o racioc{\'i}nio indutivo humano. No contexto de s{\'i}ntese de programas (Program Synthesis), o objetivo consiste em gerar um algoritmo capaz de mapear grades de entrada (grids) para suas respectivas grades de sa{\'i}da com base em poucos exemplos demonstrativos de treino.
+
+O reposit{\'o}rio \texttt{arc-agi-1} \cite{arcagi1repo} fornece um framework robusto para comparar duas estrat{\'e}gias distintas de s{\'i}ntese de programas utilizando modelos de linguagem avan{\c{c}}ados, com suporte nativo a restri{\c{c}}{\~o}es de APIs comerciais gratuitas.
+
+\section{Metodologia}
+O framework compara duas abordagens principais para a resolu{\c{c}}{\~a}o das tarefas do ARC-AGI-1:
+
+\subsection{Abordagem Baseline (1-Shot)}
+Na estrat{\'e}gia Baseline (1-Shot), o modelo de linguagem de grande porte recebe os pares de demonstra{\c{c}}{\~o}em de treinamento de uma determinada tarefa diretamente no prompt. O modelo deve escrever diretamente uma fun{\c{c}}{\~o}o Python aut{\^o}noma chamada \texttt{transform(grid)}. Essa fun{\c{c}}{\~o}o {\'e} executada uma {\'u}nica vez e avaliada tanto no conjunto de demonstra{\c{c}}{\~o}es de treinamento quanto na grade de teste oculta. Para que a tarefa seja considerada resolvida com sucesso, a fun{\c{c}}{\~a}o gerada deve passar em ambos os conjuntos (treino e teste).
+
+\subsection{Abordagem CEGIS}
+A abordagem CEGIS (\textit{Counterexample-Guided Inductive Synthesis} com Feedback Sem{\^a}ntico) introduz um ciclo iterativo de refinamento de c{\'o}digo. Inicialmente, o modelo gera um programa preliminar. Caso este programa falhe em qualquer uma das demonstra{\c{c}}{\~o}es de treinamento, o sistema captura um contraexemplo sem{\^a}ntico contendo:
+\begin{itemize}
+    \item A grade de entrada correspondente;
+    \item A sa{\'i}da esperada pela tarefa;
+    \item A sa{\'i}da realmente gerada ou o erro de execu{\c{c}}{\~a}o em tempo de execu{\c{c}}{\~a}o.
+\end{itemize}
+Este contraexemplo {\'e} formatado e realimentado no contexto do chat, solicitando ao modelo a corre{\c{c}}{\~a}o do c{\'o}digo. Esse loop de feedback se repete at{\'e} que o programa passe em todas as demonstra{\c{c}}{\~o}es ou atinja o limite m{\'a}ximo de itera{\c{c}}{\~o}es configurado pelo par{\^a}metro \texttt{MAX\_CEGIS\_ITERS} (padr{\~a}o de 5 itera{\c{c}}{\~o}es). Ap{\'o}s a converg{\^e}ncia ou esgotamento de tentativas, o programa final {\'e} avaliado no teste oculto.
+
+\section{Robustez e Prote{\c{c}}{\~o}es para N{\'i}vel Gratuito}
+Uma contribui{\c{c}}{\~a}o t{\'e}cnica relevante do reposit{\'o}rio {\'e} a sua engenharia de robustez contra as limita{\c{c}}{\~o}es estritas de uso da API gratuita do Google AI Studio (especialmente com o modelo \texttt{gemini-3.1-flash-lite}):
+\begin{itemize}
+    \item \textbf{Limitador de Taxa RPM:} Garante um intervalo m{\'i}nimo entre requisi{\c{c}}{\~o}es para respeitar o limite de 15 requisi{\c{c}}{\~o}es por minuto (RPM).
+    \item \textbf{Guarda de Tokens por Minuto (TPM):} Minimiza a transmiss{\~a}o de dados utilizando representa{\c{c}}{\~o}es compactas para as grades e prompts, mantendo o tr{\'a}fego abaixo de 250K TPM.
+    \item \textbf{Guarda de Cota Di{\'a}ria (RPD):} Rastreia as chamadas acumuladas com um limite estrito de seguran{\c{c}}a de 1.450 requisi{\c{c}}{\~o}es di{\'a}rias (evitando o bloqueio r{\'i}gido de 1.500 RPD).
+    \item \textbf{Salvamento Incremental (Checkpoint \& Resume):} O progresso do experimento {\'e} salvo no disco ap{\'o}s cada tarefa individual conclu{\'i}da. Se houver interrup{\c{c}}{\~o}es por falta de cota ou falha de conex{\~a}o, a execu{\c{c}}{\~a}o pode ser retomada sem perda de trabalho. Backups de seguran{\c{c}}a s{\~a}o gerados a cada 5 tarefas.
+\end{itemize}
+
+\section{Configura{\c{c}}{\~a}o Experimental}
+A execu{\c{c}}{\~a}o de testes e benchmark {\'e} parametrizada de maneira flex{\'i}vel. O arquivo principal \texttt{main.py} permite definir o provedor de LLM (\texttt{gemini} ou \texttt{groq}), o modelo de destino (\texttt{MODEL\_NAME}), o limite de tempo (\texttt{TIMEOUT\_SECONDS}) e o atraso entre requisi{\c{c}}{\~o}es. 
+
+O reposit{\'o}rio suporta a cria{\c{c}}{\~a}o de um pool de modelos distribu{\'i}dos (\texttt{LLM\_POOL}) para alternar requisi{\c{c}}{\~o}es em \textit{round-robin} entre diferentes provedores e chaves de API, distribuindo a carga de forma eficiente e contornando limites individuais de taxa.
+
+\section{Conclus{\~a}o}
+O reposit{\'o}rio \texttt{arc-agi-1} fornece uma infraestrutura experimental s{\'o}lida para o estudo de s{\'i}ntese indutiva de programas sob restri{\c{c}}{\~o}es realistas de recursos. Ao formalizar a compara{\c{c}}{\~a}o entre o aprendizado 1-Shot simples e o refinamento estruturado guiado por feedback sem{\^a}ntico (CEGIS), o framework pavimenta o caminho para investiga{\c{c}}{\~o}es mais detalhadas sobre as capacidades de racioc{\'i}nio de LLMs compactos.
+
+\section*{Agradecimentos}
+Agradecemos aos contribuidores Matheus Machado Cezar e Izadora Candotti pelo desenvolvimento do reposit{\'o}rio e disponibiliza{\c{c}}{\~a}o p{\'u}blica do c{\'o}digo sob licen{\c{c}}a aberta para fins de pesquisa.
+
+\bibliography{references}
+
+\end{document}
