@@ -109,29 +109,87 @@ def extract_first_n_runs(input_path: str, output_path: str, n: int) -> None:
         results_file.write(compact_long_numeric_lists(serialized_payload))
 
 
-def perform_health_check(model: str | None) -> None:
+def perform_health_check(
+    model: str | None = None,
+    provider: str | None = None,
+    api_key: str | None = None,
+) -> None:
     """
     Executes a fast test query to validate API key, connectivity, and model availability.
     Terminates execution immediately if the check fails.
     """
-    logger.info("Performing initial %s API health check...", config.LLM_PROVIDER)
+    target_provider = provider or config.LLM_PROVIDER
+    target_model = model or config.MODEL_NAME
+    logger.info("Performing initial %s API health check...", target_provider)
     test_messages = [{"role": "user", "content": "Responda apenas 'OK'"}]
     try:
-        response = call_llm(test_messages, model=model, max_retries=3) if model else call_llm(
-            test_messages, max_retries=3
+        response = call_llm(
+            test_messages,
+            model=target_model,
+            provider=target_provider,
+            api_key=api_key,
+            max_retries=3,
         )
-        logger.info("Health check PASSED! Model '%s' responded successfully: %s", model, response.strip()[:30])
+        logger.info(
+            "Health check PASSED! Model '%s' (Provider: %s) responded successfully: %s",
+            target_model,
+            target_provider,
+            response.strip()[:30],
+        )
     except AuthError as auth_err:
         logger.critical("FATAL AUTHENTICATION ERROR: %s", auth_err)
-        logger.critical("Please verify the API key for provider '%s' is correctly set.", config.LLM_PROVIDER)
+        logger.critical("Please verify the API key for provider '%s' is correctly set.", target_provider)
         raise SystemExit(1)
     except QuotaExceededError as q_err:
         logger.critical("FATAL QUOTA ERROR: %s", q_err)
         raise SystemExit(1)
     except Exception as err:
-        logger.critical("FATAL HEALTH CHECK ERROR: Failed to connect to %s API: %s", config.LLM_PROVIDER, err)
-        logger.critical("Verify internet connectivity and model name '%s'.", model)
+        logger.critical("FATAL HEALTH CHECK ERROR: Failed to connect to %s API: %s", target_provider, err)
+        logger.critical("Verify internet connectivity and model name '%s'.", target_model)
         raise SystemExit(1)
+
+
+def perform_pool_health_check(pool: list[config.LLMConfig] | None = None) -> None:
+    """
+    Executes health checks across all LLM configurations in the pool.
+    Terminates execution immediately if any pool entry fails.
+    """
+    target_pool = pool if pool is not None else config.LLM_POOL
+    if not target_pool:
+        logger.warning("LLM pool is empty; running single provider health check.")
+        perform_health_check()
+        return
+
+    logger.info("Performing initial LLM pool health check across %s entries...", len(target_pool))
+    for idx, llm_cfg in enumerate(target_pool, start=1):
+        logger.info(
+            "Checking pool entry [%s/%s]: provider=%s, model=%s (pool_index=%s)...",
+            idx,
+            len(target_pool),
+            llm_cfg.provider,
+            llm_cfg.model,
+            llm_cfg.pool_index,
+        )
+        try:
+            perform_health_check(
+                model=llm_cfg.model,
+                provider=llm_cfg.provider,
+                api_key=llm_cfg.api_key,
+            )
+        except SystemExit:
+            logger.critical(
+                "Pool health check FAILED on entry [%s/%s]: provider=%s, model=%s.",
+                idx,
+                len(target_pool),
+                llm_cfg.provider,
+                llm_cfg.model,
+            )
+            raise
+
+    logger.info("Pool health check PASSED for all %s entries!", len(target_pool))
+
+
+perform_pool_heath_check = perform_pool_health_check
 
 
 def save_checkpoint(
@@ -296,7 +354,6 @@ def _run_main() -> None:
     parser.add_argument(
         "--provider",
         type=str,
-        choices=("gemini", "groq"),
         default=config.LLM_PROVIDER,
         help=f"LLM provider (default: {config.LLM_PROVIDER})",
     )
@@ -381,14 +438,35 @@ def _run_main() -> None:
     config.API_BASE_URL = config.get_api_base_url(args.provider)
 
     rpm_effective = int(60.0 / config.REQUEST_DELAY) if config.REQUEST_DELAY > 0 else 0
+    
+    model = config.LLM_POOL[0].model if config.LLM_POOL else args.model
 
     logger.info("ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS (%s)", config.LLM_PROVIDER)
-    logger.info("Model: %s | Max CEGIS Iters: %s | Timeout: %ss", args.model, args.max_iters, config.TIMEOUT_SECONDS)
+    logger.info("Model: %s | Max CEGIS Iters: %s | Timeout: %ss", model, args.max_iters, config.TIMEOUT_SECONDS)
     logger.info("Rate Delay: %ss (<= %s RPM) | Daily Quota Guard: %s RPD", config.REQUEST_DELAY, rpm_effective, config.MAX_DAILY_REQUESTS)
+
+    # 0. Auto-start local Ollama server when provider is ollama/local
+    _ollama_server = None
+    effective_provider = config.LLM_PROVIDER.strip().lower()
+    if effective_provider in ("ollama", "local"):
+        from arc_cegis.local import setup_local_ollama
+        logger.info("Provider '%s' detected — ensuring local Ollama server is running...", effective_provider)
+        _ollama_server, _ollama_client = setup_local_ollama(
+            model=args.model,
+            auto_start=True,
+            auto_pull=True,
+            set_global_config=True,
+        )
+        _EMERGENCY_STATE["_ollama_server"] = _ollama_server
 
     # 1. Health check
     if not args.skip_health_check:
-        perform_health_check(None if config.LLM_POOL else args.model)
+        if config.LLM_POOL:
+            perform_pool_health_check()
+        else:
+            perform_health_check(args.model)
+
+
 
     # 2. Load tasks
     tasks_dict = load_tasks(args.tasks)
@@ -472,13 +550,13 @@ def _run_main() -> None:
                     logger.error("AUTH ERROR: %s", auth_err)
                     for pending in future_to_task:
                         pending.cancel()
-                    continue
+                    break
                 except QuotaExceededError as quota_err:
                     quota_exhausted = True
                     logger.error("SAFE PAUSE / DAILY QUOTA GUARD: %s", quota_err)
                     for pending in future_to_task:
                         pending.cancel()
-                    continue
+                    break
                 except Exception as err:
                     faulty_task_ids.add(task_id)
                     logger.exception("TASK ERROR: %s failed and will not be added to results: %s", task_id, err)
@@ -571,6 +649,10 @@ def _run_main() -> None:
             logger.info("Checkpoint safely saved to '%s'. You can resume at any time.", args.output)
         except Exception:
             logger.exception("Failed to save checkpoint to '%s'.", args.output)
+        finally:
+            if _ollama_server is not None:
+                logger.info("Stopping local Ollama server...")
+                _ollama_server.stop()
 
     # 5. Print Summary
     evaluated_count = len(detailed_results)
@@ -589,12 +671,23 @@ def _run_main() -> None:
     logger.info("Results safely saved to: %s", args.output)
 
 
+def _stop_ollama_server() -> None:
+    """Best-effort shutdown of any locally managed Ollama server."""
+    server = _EMERGENCY_STATE.get("_ollama_server")
+    if server is not None:
+        try:
+            server.stop()
+        except Exception:
+            logger.exception("Failed to stop Ollama server during emergency shutdown.")
+
+
 def main() -> None:
     """Run the experiment and preserve state if any failure escapes handling."""
     try:
         _run_main()
     except BaseException as error:
         save_emergency_checkpoint(error)
+        _stop_ollama_server()
         raise
 
 

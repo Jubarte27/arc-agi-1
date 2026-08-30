@@ -50,22 +50,29 @@ API_BASE_URLS = {
     "nvidia": "https://integrate.api.nvidia.com/v1",
     "openrouter": "https://openrouter.ai/api/v1/",
     "mistral": "https://api.mistral.ai/v1",
+    "ollama": os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
+    "local": os.getenv("LOCAL_BASE_URL", "http://127.0.0.1:11434/v1"),
+    "vllm": os.getenv("VLLM_BASE_URL", "http://127.0.0.1:8000/v1"),
 }
 API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
 API_KEYS = {
     "gemini": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
+    "google": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
     "groq": ("GROQ_API_KEY", "OPENAI_API_KEY"),
     "nvidia": ("NVIDIA_API_KEY", "OPENAI_API_KEY"),
     "openrouter": ("OPENROUTER_API_KEY", "OPENAI_API_KEY"),
-    "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY")
+    "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY"),
+    "ollama": ("OLLAMA_API_KEY", "OPENAI_API_KEY"),
+    "local": ("LOCAL_API_KEY", "OPENAI_API_KEY"),
+    "vllm": ("VLLM_API_KEY", "OPENAI_API_KEY"),
 }
 
 
 def get_api_base_url(provider: str | None = None) -> str | None:
     """Returns an explicit API base URL or the default for the selected provider."""
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
-    return os.getenv("API_BASE_URL") or API_BASE_URLS.get(selected_provider)
-
+    provider_env_url = os.getenv(f"{selected_provider.upper()}_BASE_URL") or os.getenv(f"{selected_provider.upper()}_API_BASE_URL")
+    return provider_env_url or API_BASE_URLS.get(selected_provider)
 
 def get_api_key(provider: str | None = None) -> str:
     """
@@ -73,7 +80,10 @@ def get_api_key(provider: str | None = None) -> str:
     """
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
     key_names = API_KEYS.get(selected_provider, ())
-    return next((key for name in key_names if (key:=os.getenv(name))), "")
+    key = next((key for name in key_names if (key:=os.getenv(name))), "")
+    if not key and selected_provider in ("ollama", "local", "vllm"):
+        return "vllm"
+    return key
 
 
 # Backward-compatible API_KEY resolution
@@ -104,8 +114,8 @@ def _load_llm_pool() -> list[LLMConfig]:
 
     pool = []
     for index, raw_entry in enumerate(raw_pool.split(","), start=1):
-        parts = [part.strip() for part in raw_entry.split(":", 2)]
-        if len(parts) != 2 or not parts[0] or not parts[1]:
+        parts = [part.strip() for part in raw_entry.split(":", 1)]
+        if len(parts) != 2:
             raise ValueError(f"Invalid LLM_POOL entry {raw_entry!r}; expected provider:model")
         provider, model = parts
         pool.append(LLMConfig(

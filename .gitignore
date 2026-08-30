@@ -26,3 +26,6 @@ results_*.json
 .idea/
 
 resultados_brutos/
+
+
+.ollama
