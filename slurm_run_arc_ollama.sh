@@ -19,7 +19,7 @@ source .venv/bin/activate
 
 mkdir -p "$SCRIPT_DIR/logs"
 
-MODEL_NAME="${MODEL_NAME:-"hf.co/unsloth/gemma-4-E4B-it-GGUF:UD-Q4_K_XL"}"
+MODEL_NAME="${MODEL_NAME:-"gemma4:31b-it-q4_K_M"}"
 export MODEL_NAME
 export LLM_PROVIDER="ollama"
 export OLLAMA_HOST="${OLLAMA_HOST:-127.0.0.1:11434}"
