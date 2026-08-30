@@ -3,12 +3,12 @@
     "model": "ministral-14b-2512",
     "max_cegis_iters": 5,
     "timeout_seconds": 150.0,
-    "request_delay_seconds": 2.0,
+    "request_delay_seconds": 1.5,
     "max_daily_requests": 10000,
     "total_tasks_in_dataset": 800,
     "completed_tasks": 376,
     "faulty_tasks": 0,
-    "total_requests_used": 2442
+    "total_requests_used": 115
   },
   "summary": {
     "baseline_accuracy": 4.25531914893617,
@@ -44594,5 +44594,6 @@
       }
     }
   ],
-  "faulty_task_ids": []
+  "faulty_task_ids": [],
+  "emergency_error": "SystemExit: 0"
 }

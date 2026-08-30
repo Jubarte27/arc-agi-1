@@ -1,14 +1,14 @@
 {
   "config": {
-    "model": "deepseek-ai/deepseek-v4-flash-0731",
+    "model": "devstral-2512",
     "max_cegis_iters": 5,
     "timeout_seconds": 150.0,
-    "request_delay_seconds": 10.0,
+    "request_delay_seconds": 1.5,
     "max_daily_requests": 10000,
     "total_tasks_in_dataset": 0,
     "completed_tasks": 0,
     "faulty_tasks": 0,
-    "total_requests_used": 1
+    "total_requests_used": 2
   },
   "summary": {
     "baseline_accuracy": 0.0,
