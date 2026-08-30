@@ -1,6 +1,6 @@
 {
   "config": {
-    "model": "gemini-3.7-flash",
+    "model": "gemma-4-31b-it",
     "max_cegis_iters": 5,
     "timeout_seconds": 150.0,
     "request_delay_seconds": 5.0,

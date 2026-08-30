@@ -8,7 +8,7 @@
     "total_tasks_in_dataset": 800,
     "completed_tasks": 437,
     "faulty_tasks": 0,
-    "total_requests_used": 492
+    "total_requests_used": 503
   },
   "summary": {
     "baseline_accuracy": 37.986270022883296,
