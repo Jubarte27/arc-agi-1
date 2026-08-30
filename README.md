@@ -76,6 +76,34 @@ python3 main.py --tasks ./data/training --max-tasks 400 --max-iters 5 --model ge
 # Run with Groq
 python3 main.py --provider groq --model llama-3.3-70b-versatile --tasks ./data/training --output results_experiment.json
 
+# Run with Local Ollama (CUDA or AMD ROCm)
+./install_ollama_portable.sh --rocm   # For AMD ROCm GPU acceleration
+./download_models.sh models.txt
+./run_ollama.sh
+
 # Restart from scratch (ignoring existing checkpoint)
 python3 main.py --tasks ./data/training --no-resume --output results_experiment.json
+```
+
+## Running Local Ollama on AMD ROCm GPUs
+
+The portable installer supports rootless installation with AMD ROCm GPU acceleration:
+
+```bash
+# Install portable Ollama with ROCm support (auto-detects or explicitly specify --rocm)
+./install_ollama_portable.sh --rocm
+
+# (Optional) For GPUs requiring HSA GFX version override (e.g. RX 6000 / 7000 series):
+export HSA_OVERRIDE_GFX_VERSION=10.3.0  # RX 6000 series (gfx1030/gfx1032)
+# export HSA_OVERRIDE_GFX_VERSION=11.0.0  # RX 7000 series (gfx1100/gfx1102)
+
+# Download configured models
+./download_models.sh models.txt
+
+# Run ARC experiment with Ollama
+./run_ollama.sh
+
+# Or submit via Slurm
+sbatch slurm_install_ollama.sh
+sbatch slurm_run_arc_ollama.sh
 ```

@@ -6,7 +6,27 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-source "$SCRIPT_DIR/.venv/bin/activate"
+if [[ -f "$SCRIPT_DIR/.venv/bin/activate" ]]; then
+    source "$SCRIPT_DIR/.venv/bin/activate"
+fi
+
+# ── ROCm / Portable Ollama Environment ──────────────────────────────────────
+export ROCM_PATH="${ROCM_PATH:-/opt/rocm}"
+if [[ -d "${ROCM_PATH}/bin" ]]; then
+    export PATH="${ROCM_PATH}/bin:$SCRIPT_DIR/.ollama/bin:$PATH"
+elif [[ -d "$SCRIPT_DIR/.ollama/bin" ]]; then
+    export PATH="$SCRIPT_DIR/.ollama/bin:$PATH"
+fi
+
+if [[ -d "${ROCM_PATH}/lib" ]]; then
+    export LD_LIBRARY_PATH="${ROCM_PATH}/lib:${SCRIPT_DIR}/.ollama/lib/ollama:${LD_LIBRARY_PATH:-}"
+elif [[ -d "${SCRIPT_DIR}/.ollama/lib/ollama" ]]; then
+    export LD_LIBRARY_PATH="${SCRIPT_DIR}/.ollama/lib/ollama:${LD_LIBRARY_PATH:-}"
+fi
+
+if [[ -n "${HSA_OVERRIDE_GFX_VERSION:-}" ]]; then
+    export HSA_OVERRIDE_GFX_VERSION
+fi
 
 # MODEL_NAME=qwen2.5-coder:7b
 # MODEL_NAME=qwen2.5-coder:1.5b
