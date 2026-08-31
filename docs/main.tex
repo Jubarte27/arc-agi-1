@@ -7,6 +7,8 @@
 \usepackage{natbib} % DO NOT CHANGE THIS
 \usepackage{caption} % DO NOT CHANGE THIS
 \frenchspacing % DO NOT CHANGE THIS
+\usepackage{amsmath}
+\usepackage{amssymb}
 \pdfinfo{
 /TemplateVersion (2027.1)
 }
@@ -14,16 +16,17 @@
 % Optional: Set counter for section numbers if needed (0 means no numbers, 1 means section numbers, 2 means sections and subsections)
 \setcounter{secnumdepth}{2}
 
-\title{ARC-AGI-1: Estudo Comparativo entre Abordagem Baseline e Program Synthesis via CEGIS com Feedback Sem{\^a}ntico}
+\input{diacritics.tex}
+
+\title{\Analise{} do Impacto de \Variacoes{} de Prompting e Feedback \Semantico{} no ARC-AGI-1: \Fundamentacao{} \Estatistica{}}
 
 \author{
-    Fabio Luiz da Costa Cieslak\equalcontrib,
-    Izadora Candotti de Oliveira\equalcontrib,
-    Matheus Machado\equalcontrib
+    Fabio Luiz da Costa Cieslak\equalcontrib\textsuperscript{1},
+    Izadora Candotti de Oliveira\equalcontrib\textsuperscript{1},
+    Matheus Machado\equalcontrib\textsuperscript{1}
 }
 \affiliations{
-    Reposit{\'o}rio GitHub: Jubarte27/arc-agi-1\\
-    \url{https://github.com/Jubarte27/arc-agi-1}
+    Universidade Federal do Rio Grande do Sul\textsuperscript{1}
 }
 
 \begin{document}
@@ -31,52 +34,136 @@
 \maketitle
 
 \begin{abstract}
-Este artigo apresenta uma an{\'a}lise resumida do reposit{\'o}rio \texttt{arc-agi-1}, que realiza uma avalia{\c{c}}{\~a}o comparativa de abordagens de s{\'i}ntese de programas (Program Synthesis) no benchmark ARC-AGI-1. Investigamos duas metodologias principais utilizando modelos de linguagem de grande porte (LLMs) via APIs do Google Gemini (usando o modelo \texttt{gemini-3.1-flash-lite} por padr{\~a}o) e Groq: a abordagem Baseline (1-Shot) e a abordagem baseada em S{\'i}ntese Indutiva Guiada por Contraexemplos (CEGIS) com feedback sem{\^a}ntico. Al{\'e}m disso, o reposit{\'o}rio destaca-se pela implementa{\c{c}}{\~a}o de prote{\c{c}}{\~o}es robustas para contas de n{\'i}vel gratuito (Free Tier Protections), garantindo a resili{\^e}ncia dos experimentos frente a limita{\c{c}}{\~o}es de taxa (RPM/TPM), cotas di{\'a}rias e falhas de rede.
+O benchmark Abstraction and Reasoning Corpus (ARC-AGI-1) avalia o \raciocinio{} indutivo e a \generalizacao{} em \inteligencia{} artificial. Investigamos como \variacoes{} na estrutura de prompts afetam o desempenho de modelos de linguagem (LLMs) na \sintese{} de programas Python. Comparamos a \geracao{} direta (\textit{1-Shot}) \a{} \sintese{} indutiva guiada por contraexemplos (CEGIS), aplicando \restricoes{} \sintaticas{} e \elicitacao{} de invariantes abstratos. Formalizamos um protocolo \estatistico{} rigoroso com teste exato de McNemar, bootstrap pareado (intervalos de \confianca{} de 95\%) e uma taxonomia de falhas (\recuperacao{} \semantica{}, \regressao{}, sobreajuste \espurio{} e teto de \representacao{}). Esse \arcabouco{} permite mensurar ganhos reais de desempenho frente ao \ruido{} \estocastico{} dos modelos.
 \end{abstract}
 
 \begin{links}
-\link{C{\'o}digo}{https://github.com/Jubarte27/arc-agi-1}
+\link{\Codigo{} e Dados}{https://github.com/Jubarte27/arc-agi-1}
 \end{links}
 
-\section{Introdu{\c{c}}{\~a}o}
-O benchmark Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019measure} prop{\~o}e o desafio de desenvolver sistemas de intelig{\^e}ncia artificial capazes de adquirir novas habilidades de forma r{\'a}pida e generaliz{\'a}vel, simulando o racioc{\'i}nio indutivo humano. No contexto de s{\'i}ntese de programas (Program Synthesis), o objetivo consiste em gerar um algoritmo capaz de mapear grades de entrada (grids) para suas respectivas grades de sa{\'i}da com base em poucos exemplos demonstrativos de treino.
+\section{\Introducao{}}
+O Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019measure} avalia a \aquisicao{} de habilidades e o \raciocinio{} indutivo amplo, priorizando a \generalizacao{} sobre a \memorizacao{}. Cada tarefa \e{} composta por 2 a 5 pares de matrizes de treino e grades de teste cujas \saidas{} devem ser inferidas.
 
-O reposit{\'o}rio \texttt{arc-agi-1} \cite{arcagi1repo} fornece um framework robusto para comparar duas estrat{\'e}gias distintas de s{\'i}ntese de programas utilizando modelos de linguagem avan{\c{c}}ados, com suporte nativo a restri{\c{c}}{\~o}es de APIs comerciais gratuitas.
+Uma abordagem comum converte o problema em \sintese{} de programas (\textit{Program Synthesis}) \cite{solar2008program}, instruindo LLMs a gerar a \funcao{} \texttt{transform(grid)}. O desempenho dessa abordagem depende da estrutura do prompt \cite{wei2022chain}, de \restricoes{} no \espaco{} de busca e de mecanismos de \correcao{} via \execucao{}.
 
-\section{Metodologia}
-O framework compara duas abordagens principais para a resolu{\c{c}}{\~a}o das tarefas do ARC-AGI-1:
+Este trabalho investiga o impacto de \variacoes{} estruturadas de prompt no ARC-AGI-1, contrastando a \geracao{} direta com ciclos iterativos de feedback \semantico{} (CEGIS). \Alem{} disso, formalizamos uma metodologia \estatistica{} pareada para guiar experimentos no benchmark e mitigar falsos positivos decorrentes da variabilidade amostral.
 
-\subsection{Abordagem Baseline (1-Shot)}
-Na estrat{\'e}gia Baseline (1-Shot), o modelo de linguagem de grande porte recebe os pares de demonstra{\c{c}}{\~o}em de treinamento de uma determinada tarefa diretamente no prompt. O modelo deve escrever diretamente uma fun{\c{c}}{\~o}o Python aut{\^o}noma chamada \texttt{transform(grid)}. Essa fun{\c{c}}{\~o}o {\'e} executada uma {\'u}nica vez e avaliada tanto no conjunto de demonstra{\c{c}}{\~o}es de treinamento quanto na grade de teste oculta. Para que a tarefa seja considerada resolvida com sucesso, a fun{\c{c}}{\~a}o gerada deve passar em ambos os conjuntos (treino e teste).
+\section{\Variacoes{} de Prompting e \Sintese{} de Programas}
+O \arcabouco{} experimental compara \variacoes{} estruturadas de prompts projetadas para induzir diferentes regimes de busca e \raciocinio{} no LLM.
 
-\subsection{Abordagem CEGIS}
-A abordagem CEGIS (\textit{Counterexample-Guided Inductive Synthesis} com Feedback Sem{\^a}ntico) introduz um ciclo iterativo de refinamento de c{\'o}digo. Inicialmente, o modelo gera um programa preliminar. Caso este programa falhe em qualquer uma das demonstra{\c{c}}{\~o}es de treinamento, o sistema captura um contraexemplo sem{\^a}ntico contendo:
+\subsection{\Sintese{} Direta 1-Shot (Baseline)}
+No \textit{baseline} (1-Shot), o modelo recebe a tarefa e as \demonstracoes{} de treino em formato JSON em uma \unica{} \requisicao{}, produzindo apenas o bloco da \funcao{} \texttt{transform(grid)}.
+
+O prompt inclui regras de \restricao{} de bibliotecas (\texttt{ANTI\_IMPORT\_RULES}):
 \begin{itemize}
-    \item A grade de entrada correspondente;
-    \item A sa{\'i}da esperada pela tarefa;
-    \item A sa{\'i}da realmente gerada ou o erro de execu{\c{c}}{\~a}o em tempo de execu{\c{c}}{\~a}o.
+    \item \Proibicao{} de \importacoes{} externas (\texttt{import numpy}, \texttt{collections}, \texttt{math}, etc.);
+    \item Uso exclusivo de tipos e \funcoes{} nativas (\texttt{list}, \texttt{dict}, \texttt{range}, \texttt{enumerate}, \texttt{zip}, \texttt{min}, \texttt{max}).
 \end{itemize}
-Este contraexemplo {\'e} formatado e realimentado no contexto do chat, solicitando ao modelo a corre{\c{c}}{\~a}o do c{\'o}digo. Esse loop de feedback se repete at{\'e} que o programa passe em todas as demonstra{\c{c}}{\~o}es ou atinja o limite m{\'a}ximo de itera{\c{c}}{\~o}es configurado pelo par{\^a}metro \texttt{MAX\_CEGIS\_ITERS} (padr{\~a}o de 5 itera{\c{c}}{\~o}es). Ap{\'o}s a converg{\^e}ncia ou esgotamento de tentativas, o programa final {\'e} avaliado no teste oculto.
+Essas regras eliminam \divergencias{} de ambiente e induzem o modelo a explicitar as \operacoes{} matriciais em \codigo{} puro e \deterministico{}.
 
-\section{Robustez e Prote{\c{c}}{\~o}es para N{\'i}vel Gratuito}
-Uma contribui{\c{c}}{\~a}o t{\'e}cnica relevante do reposit{\'o}rio {\'e} a sua engenharia de robustez contra as limita{\c{c}}{\~o}es estritas de uso da API gratuita do Google AI Studio (especialmente com o modelo \texttt{gemini-3.1-flash-lite}):
+\subsection{Feedback \Semantico{} via Contraexemplos (CEGIS)}
+Na abordagem CEGIS (\textit{Counterexample-Guided Inductive Synthesis}), o prompt inicial expande-se em um \dialogo{} interativo orientado pelo resultado da \execucao{} em sandbox isolada.
+
+Caso o \codigo{} falhe em qualquer \demonstracao{} de treino, o sistema isola o primeiro contraexemplo discordante e \constroi{} um prompt de retorno com:
+\begin{enumerate}
+    \item \Indice{} da \demonstracao{} violada;
+    \item Grade de entrada (\textit{Input});
+    \item Grade esperada de \referencia{} (\textit{Expected Output});
+    \item Grade produzida (\textit{Produced Output}) ou erro de \execucao{} (\textit{Execution Error}).
+\end{enumerate}
+O refinamento prossegue iterativamente \ate{} a \convergencia{} em treino ou o limite de $K_{\max} = 5$ \iteracoes{}.
+
+\subsection{Regras \AntiTrapaca{} e \Elicitacao{} de Invariantes}
+Ao receber feedback de erro, LLMs frequentemente introduzem \ramificacoes{} condicionais ad-hoc (\textit{if/else}) restritas aos contraexemplos, gerando sobreajuste aos dados \visiveis{}.
+
+Para mitigar esse comportamento, o prompt incorpora regras \antitrapaca{} (\texttt{ANTI\_CHEAT\_RULES}):
 \begin{itemize}
-    \item \textbf{Limitador de Taxa RPM:} Garante um intervalo m{\'i}nimo entre requisi{\c{c}}{\~o}es para respeitar o limite de 15 requisi{\c{c}}{\~o}es por minuto (RPM).
-    \item \textbf{Guarda de Tokens por Minuto (TPM):} Minimiza a transmiss{\~a}o de dados utilizando representa{\c{c}}{\~o}es compactas para as grades e prompts, mantendo o tr{\'a}fego abaixo de 250K TPM.
-    \item \textbf{Guarda de Cota Di{\'a}ria (RPD):} Rastreia as chamadas acumuladas com um limite estrito de seguran{\c{c}}a de 1.450 requisi{\c{c}}{\~o}es di{\'a}rias (evitando o bloqueio r{\'i}gido de 1.500 RPD).
-    \item \textbf{Salvamento Incremental (Checkpoint \& Resume):} O progresso do experimento {\'e} salvo no disco ap{\'o}s cada tarefa individual conclu{\'i}da. Se houver interrup{\c{c}}{\~o}es por falta de cota ou falha de conex{\~a}o, a execu{\c{c}}{\~a}o pode ser retomada sem perda de trabalho. Backups de seguran{\c{c}}a s{\~a}o gerados a cada 5 tarefas.
+    \item \Proibicao{} \explicita{} de \condicoes{} baseadas em \indices{} de treino ou coordenadas pontuais;
+    \item \Elicitacao{} de invariantes: o modelo deve descrever em linguagem natural, antes do \codigo{}, a regra abstrata unificada que corrige a falha anterior e atende a todas as \demonstracoes{}.
 \end{itemize}
 
-\section{Configura{\c{c}}{\~a}o Experimental}
-A execu{\c{c}}{\~a}o de testes e benchmark {\'e} parametrizada de maneira flex{\'i}vel. O arquivo principal \texttt{main.py} permite definir o provedor de LLM (\texttt{gemini} ou \texttt{groq}), o modelo de destino (\texttt{MODEL\_NAME}), o limite de tempo (\texttt{TIMEOUT\_SECONDS}) e o atraso entre requisi{\c{c}}{\~o}es. 
+\section{Metodologia e \Fundamentacao{} \Estatistica{}}
+Adotamos testes de \hipoteses{} pareados \naoparametricos{} para avaliar formalmente as \estrategias{} de prompting.
 
-O reposit{\'o}rio suporta a cria{\c{c}}{\~a}o de um pool de modelos distribu{\'i}dos (\texttt{LLM\_POOL}) para alternar requisi{\c{c}}{\~o}es em \textit{round-robin} entre diferentes provedores e chaves de API, distribuindo a carga de forma eficiente e contornando limites individuais de taxa.
+\subsection{\Formulacao{} das \Hipoteses{}}
+Sejam $M_{\text{base}}$ e $M_{\text{var}}$ duas \estrategias{} de prompting. Para cada tarefa $i \in \{1, \dots, N\}$, a \variavel{} $X_i \in \{0, 1\}$ indica sucesso estrito (acerto conjunto em treino e teste). Formulamos dois testes:
 
-\section{Conclus{\~a}o}
-O reposit{\'o}rio \texttt{arc-agi-1} fornece uma infraestrutura experimental s{\'o}lida para o estudo de s{\'i}ntese indutiva de programas sob restri{\c{c}}{\~o}es realistas de recursos. Ao formalizar a compara{\c{c}}{\~a}o entre o aprendizado 1-Shot simples e o refinamento estruturado guiado por feedback sem{\^a}ntico (CEGIS), o framework pavimenta o caminho para investiga{\c{c}}{\~o}es mais detalhadas sobre as capacidades de racioc{\'i}nio de LLMs compactos.
+\begin{enumerate}
+    \item \textbf{\Diferenca{} Geral ($H_{0,\text{dif}}$):}
+    \begin{equation}
+        H_{0,\text{dif}}: P(X_i^{(M_{\text{var}})} = 1) = P(X_i^{(M_{\text{base}})} = 1)
+    \end{equation}
+    com alternativa bilateral $H_{1,\text{dif}}$ ($P(X_i^{(M_{\text{var}})} = 1) \neq P(X_i^{(M_{\text{base}})} = 1)$).
+    
+    \item \textbf{Superioridade Direcional ($H_{0,\text{melhor}}$):}
+    \begin{equation}
+        H_{0,\text{melhor}}: P(X_i^{(M_{\text{var}})} = 1) \le P(X_i^{(M_{\text{base}})} = 1)
+    \end{equation}
+    com alternativa unilateral $H_{1,\text{melhor}}$ ($\Delta > 0$).
+\end{enumerate}
+
+\subsection{Desenho Pareado e Tabela de \Contingencia{}}
+Como ambos os \metodos{} avaliam o mesmo conjunto de tarefas, os resultados formam uma matriz $2 \times 2$:
+\begin{itemize}
+    \item $a = n_{11}$: acerto em ambos os \metodos{};
+    \item $b = n_{10}$: acerto exclusivo do Baseline (\regressoes{});
+    \item $c = n_{01}$: acerto exclusivo do CEGIS (\recuperacoes{});
+    \item $d = n_{00}$: falha em ambos os \metodos{}.
+\end{itemize}
+
+\subsection{Teste Exato de McNemar}
+Para testar $H_{0,\text{dif}}$, aplicamos o teste exato de McNemar \cite{mcnemar1947note}. Sob a nula, os pares discordantes ($n_{\text{disc}} = b + c$) seguem uma \distribuicao{} $\text{Binomial}(b + c, 0.5)$. O $p$-valor bilateral \e{}:
+\begin{equation}
+    p_{\text{McNemar}} = \min \left( 1, \, 2 \sum_{k=0}^{\min(b, c)} \binom{b + c}{k} \left(\frac{1}{2}\right)^{b+c} \right)
+\end{equation}
+A \formulacao{} exata \e{} essencial no ARC, onde o baixo \numero{} de casos discordantes invalida a \aproximacao{} assintotica por $\chi^2$.
+
+\subsection{\Inferencia{} por Bootstrap Pareado}
+Para avaliar $H_{0,\text{melhor}}$ e estimar a incerteza do efeito, empregamos bootstrap pareado ($B = 10{.}000$ reamostragens com \reposicao{}) \cite{efron1993introduction}. Em cada \iteracao{} $j$:
+\begin{equation}
+    \Delta^*_j = \frac{1}{N} \sum_{i=1}^N \left( X_{i, j}^{*(M_{\text{var}})} - X_{i, j}^{*(M_{\text{base}})} \right)
+\end{equation}
+Com a \diferenca{} observada $\hat{\Delta} = (c - b)/N$, centralizamos as \replicas{} sob $H_0$ ($\tilde{\Delta}^*_j = \Delta^*_j - \hat{\Delta}$). O $p$-valor \empirico{} \e{}:
+\begin{equation}
+    p_{\text{boot}} = \frac{1 + \sum_{j=1}^B \mathbb{I}(\tilde{\Delta}^*_j \ge \hat{\Delta})}{B + 1}
+\end{equation}
+onde $\mathbb{I}(\cdot)$ \e{} a \funcao{} indicadora. O intervalo de \confianca{} de 95\% \e{} obtido a partir dos percentis 2.5\% e 97.5\% de $\Delta^*$.
+
+\subsection{Taxonomia de Falhas e \Transicoes{} de Estado}
+\decompoe{}-se o comportamento das \solucoes{} em quatro categorias operacionais:
+\begin{enumerate}
+    \item \textbf{\Recuperacao{} \Semantica{} ($0 \to 1$):} Falha no Baseline revertida com sucesso no teste cego via CEGIS.
+    \item \textbf{\Regressao{} ($1 \to 0$):} Acerto no Baseline perdido durante o refinamento iterativo.
+    \item \textbf{Sobreajuste \Espurio{} / Falsa \Convergencia{}:} Acerto total em treino seguido de falha no teste cego.
+    \item \textbf{Teto de \Representacao{}:} Falha em convergir no treino \apos{} $K_{\max}$ \iteracoes{}.
+\end{enumerate}
+
+\section{Protocolo Experimental e \Execucao{}}
+A infraestrutura garante reprodutibilidade e conformidade com limites operacionais das APIs.
+
+\subsection{\Criterio{} de \Avaliacao{} e Sandbox}
+Os programas \sao{} executados em sandbox isolada com limite de tempo (\texttt{TIMEOUT\_SECONDS} $= 2.0\text{s}$). O acerto exige que a \funcao{} \texttt{transform(grid)} produza matrizes estritamente \identicas{} \as{} de \referencia{} no treino e no teste cego.
+
+\subsection{Modelos e Infraestrutura de \Execucao{}}
+O pipeline suporta modelos comerciais (ex.: \texttt{gemini-3.1-flash-lite}) e de pesos abertos (ex.: \texttt{llama-3.3-70b-versatile} via Groq ou Ollama com ROCm/CUDA).
+
+Mecanismos de estabilidade e controle incluem:
+\begin{itemize}
+    \item Controle de taxa de \requisicoes{} por minuto (RPM) e tokens por minuto (TPM);
+    \item Monitoramento de cota \diaria{} (RPD);
+    \item \Persistencia{} incremental (\textit{Checkpoint \& Resume}) \apos{} cada tarefa individual \concluida{}.
+\end{itemize}
+
+\section{\Discussao{} e Escalonamento \Empirico{}}
+O feedback por contraexemplos introduz um compromisso estrutural: embora viabilize a \correcao{} de \hipoteses{} \geometricas{} incorretas, amplia o risco de sobreajuste em tarefas com poucos exemplos.
+
+A metodologia proposta quantifica esse efeito com rigor. No ARC-AGI-1 completo (400 tarefas de treino e 400 de \avaliacao{}), o protocolo assegura poder \estatistico{} ($1 - \beta$) suficiente para detectar \diferencas{} com \nivel{} de \significancia{} $\alpha = 0.05$, mesmo diante de ganhos modestos de \acuracia{}.
+
+\section{\Conclusao{}}
+Este trabalho apresenta uma metodologia formal para avaliar o impacto de \variacoes{} de prompt e feedback \semantico{} no ARC-AGI-1. A \integracao{} entre prompts estruturados e \inferencia{} \estatistica{} pareada (McNemar e bootstrap) estabelece uma base rigorosa e \reproduzivel{} para a \sintese{} de programas com LLMs.
 
 \section*{Agradecimentos}
-Agradecemos aos contribuidores Matheus Machado Cezar e Izadora Candotti pelo desenvolvimento do reposit{\'o}rio e disponibiliza{\c{c}}{\~a}o p{\'u}blica do c{\'o}digo sob licen{\c{c}}a aberta para fins de pesquisa.
+Agradecemos aos colaboradores do projeto \texttt{arc-agi-1} pelo desenvolvimento dos \modulos{} de \execucao{} e \analise{} \estatistica{}.
 
 \bibliography{references}
 
