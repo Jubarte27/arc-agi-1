@@ -41,6 +41,12 @@ def _load_dotenv_values() -> None:
 
 _load_dotenv_values()
 
+cloudflare_account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+if cloudflare_account_id:
+    cloudflare = {"cloudflare": f"https://api.cloudflare.com/client/v4/accounts/{cloudflare_account_id}/ai/v1"}
+else:
+    cloudflare = {}
+
 # Model Definition (Official Google AI Studio / Gemini SDK)
 # Default: "gemini-3.1-flash-lite" (High quota Free Tier: 1500 RPD / 250K TPM / 15 RPM)
 MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.1-flash-lite")
@@ -51,10 +57,13 @@ API_BASE_URLS = {
     "openrouter": "https://openrouter.ai/api/v1/",
     "mistral": "https://api.mistral.ai/v1",
     "cohere": "https://api.cohere.ai/compatibility/v1",
+    "huggingface": "https://router.huggingface.co/v1",
+    "pollinations": "https://gen.pollinations.ai/v1",
+    "vercel": "https://ai-gateway.vercel.sh/v1",
     "ollama": os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1"),
     "local": os.getenv("LOCAL_BASE_URL", "http://127.0.0.1:11434/v1"),
     "vllm": os.getenv("VLLM_BASE_URL", "http://127.0.0.1:8000/v1"),
-}
+} | cloudflare
 API_BASE_URL = os.getenv("API_BASE_URL") or API_BASE_URLS.get(LLM_PROVIDER)
 API_KEYS = {
     "gemini": ("GEMINI_API_KEY", "GOOGLE_API_KEY"),
@@ -64,6 +73,10 @@ API_KEYS = {
     "openrouter": ("OPENROUTER_API_KEY", "OPENAI_API_KEY"),
     "mistral": ("MISTRAL_API_KEY", "OPENAI_API_KEY"),
     "cohere": ("COHERE_API_KEY", "OPENAI_API_KEY"),
+    "huggingface": ("HF_TOKEN", "OPENAI_API_KEY"),
+    "pollinations": ("POLLINATIONS_API_KEY", "OPENAI_API_KEY"),
+    "vercel": ("VERCEL_API_KEY", "OPENAI_API_KEY"),
+    "cloudflare": ("CLOUDFLARE_API_KEY", "OPENAI_API_KEY"),
     "ollama": ("OLLAMA_API_KEY", "OPENAI_API_KEY"),
     "local": ("LOCAL_API_KEY", "OPENAI_API_KEY"),
     "vllm": ("VLLM_API_KEY", "OPENAI_API_KEY"),
@@ -83,8 +96,11 @@ def get_api_key(provider: str | None = None) -> str:
     selected_provider = (provider or LLM_PROVIDER).strip().lower()
     key_names = API_KEYS.get(selected_provider, ())
     key = next((key for name in key_names if (key:=os.getenv(name))), "")
-    if not key and selected_provider in ("ollama", "local", "vllm"):
-        return "vllm"
+    if not key:
+        if selected_provider in ("ollama", "local"):
+            return "ollama"
+        if selected_provider == "vllm":
+            return "vllm"
     return key
 
 
@@ -94,7 +110,9 @@ API_KEY = get_api_key()
 # Execution Parameters & Reproducibility
 MAX_CEGIS_ITERS = int(os.getenv("MAX_CEGIS_ITERS", "5"))
 TIMEOUT_SECONDS = float(os.getenv("TIMEOUT_SECONDS", "2.0"))
-TEMPERATURE = float(os.getenv("TEMPERATURE", "0.0"))  # 0.0 ensures deterministic output
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0.2"))  # 0.0 ensures deterministic output
+TEMPERATURE_STEP = float(os.getenv("TEMPERATURE_STEP", "0.0"))
+TOP_P = float(os.getenv("TOP_P", "1"))
 
 # Rate Limit Prevention (Google AI Studio Free Tier: 15 RPM limit)
 # 4.2s delay ensures <= 14.3 RPM to strictly avoid 429 Resource Exhausted
@@ -153,5 +171,3 @@ def get_next_llm() -> LLMConfig:
 
 # Log file is truncated whenever a new experiment process starts.
 LOG_FILE = os.getenv("LOG_FILE", "experiment.log")
-
-THINKING = os.getenv("THINKING", "")

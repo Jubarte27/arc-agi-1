@@ -46,18 +46,20 @@ def build_counterexample_feedback(
     expected_grid: List[List[int]],
     actual_grid: Optional[List[List[int]]],
     error_msg: str,
+    anti_cheat: bool,
 ) -> str:
     """
     Builds semantic counterexample feedback when code fails on a training pair.
     """
     output_repr = json.dumps(actual_grid) if not error_msg else f"Execution Error: {error_msg}"
+    anti_cheat_text = f"{ANTI_CHEAT_RULES}\n" if anti_cheat else ""
     feedback = (
         f"Your code failed on Training Example {example_idx}.\n"
         f"- Input:\n{json.dumps(input_grid)}\n"
         f"- Expected Output:\n{json.dumps(expected_grid)}\n"
         f"- Produced Output:\n{output_repr}\n\n"
         f"{ANTI_IMPORT_RULES}\n"
-        f"{ANTI_CHEAT_RULES}\n"
+        f"{anti_cheat_text}"
         "Analyze the discrepancy, fix your logic, and provide the updated `transform(grid)` function "
         "inside a ```python ... ``` block."
     )

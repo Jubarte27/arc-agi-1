@@ -50,6 +50,6 @@ cd "$TARGET_DIR"
 
 DOTENV="$ENV_DIR/.env:$ENV_DIR/.env.secret:$ENV_DIR/.env.$PROVIDER"  \
     python3 "$SCRIPT_DIR/main.py" \
-        --tasks "$SCRIPT_DIR/data" \
+        --tasks "$SCRIPT_DIR/data100/" \
         --output "$TARGET_DIR/results_experiment.json" \
         "$@"

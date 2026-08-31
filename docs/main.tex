@@ -44,7 +44,7 @@ O benchmark Abstraction and Reasoning Corpus (ARC-AGI-1) avalia o \raciocinio{} 
 \section{\Introducao{}}
 O Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019measure} avalia a \aquisicao{} de habilidades e o \raciocinio{} indutivo amplo, priorizando a \generalizacao{} sobre a \memorizacao{}. Cada tarefa \e{} composta por 2 a 5 pares de matrizes de treino e grades de teste cujas \saidas{} devem ser inferidas.
 
-Uma abordagem comum converte o problema em \sintese{} de programas (\textit{Program Synthesis}) \cite{solar2008program}, instruindo LLMs a gerar a \funcao{} \texttt{transform(grid)}. O desempenho dessa abordagem depende da estrutura do prompt \cite{wei2022chain}, de \restricoes{} no \espaco{} de busca e de mecanismos de \correcao{} via \execucao{}.
+Uma abordagem comum converte o problema em \sintese{} de programas (\textit{Program Synthesis}) \cite{solar2008program}, instruindo LLMs a gerar a \funcao{} \texttt{transform(grid)}. O desempenho dessa abordagem depende da estrutura do prompt, de \restricoes{} no \espaco{} de busca e de mecanismos de \correcao{} via \execucao{}.
 
 Este trabalho investiga o impacto de \variacoes{} estruturadas de prompt no ARC-AGI-1, contrastando a \geracao{} direta com ciclos iterativos de feedback \semantico{} (CEGIS). \Alem{} disso, formalizamos uma metodologia \estatistica{} pareada para guiar experimentos no benchmark e mitigar falsos positivos decorrentes da variabilidade amostral.
 
@@ -161,9 +161,6 @@ A metodologia proposta quantifica esse efeito com rigor. No ARC-AGI-1 completo (
 
 \section{\Conclusao{}}
 Este trabalho apresenta uma metodologia formal para avaliar o impacto de \variacoes{} de prompt e feedback \semantico{} no ARC-AGI-1. A \integracao{} entre prompts estruturados e \inferencia{} \estatistica{} pareada (McNemar e bootstrap) estabelece uma base rigorosa e \reproduzivel{} para a \sintese{} de programas com LLMs.
-
-\section*{Agradecimentos}
-Agradecemos aos colaboradores do projeto \texttt{arc-agi-1} pelo desenvolvimento dos \modulos{} de \execucao{} e \analise{} \estatistica{}.
 
 \bibliography{references}
 
