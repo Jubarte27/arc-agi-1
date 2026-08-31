@@ -1,7 +1,8 @@
 #!/usr/bin/bash
+set -e
 
 main() {
-    build_if_not_exists $IMAGE_NAME "$SCRIPT_DIR/texlive"
+    build_if_not_exists "$IMAGE_NAME" "$SCRIPT_DIR/texlive"
 
     if [[ "$clean" == true ]]; then
         remove_aux_files
@@ -9,38 +10,42 @@ main() {
     fi
 
     if [[ "$autocompile" == true ]]; then
-        run_latexmk -pvc "$@"
+        run_latexmk -pvc "${EXTRA_ARGS[@]}"
     else
-        run_latexmk "$@"
+        run_latexmk "${EXTRA_ARGS[@]}"
     fi
 }
 
 _setConfigArgs() {
+    autocompile=false
+    clean=false
+    EXTRA_ARGS=()
+    MAIN_TEX=""
+
     ## Options
-    while [ "${1:-}" != '' ]; do
+    while [ $# -gt 0 ]; do
         case "$1" in
         '-a' | '--autocompile')
             autocompile=true
-            shift
             ;;
         '-c' | '--clean')
             clean=true
-            shift
             ;;
 
         ## end of Options
-        [!-]*)
-            break
+        -*)
+            EXTRA_ARGS+=("$1")
             ;;
         *)
-            log "$WARN" "Unknown option \"$1\", ignoring" 0
+            if [ -z "$MAIN_TEX" ]; then
+                MAIN_TEX="$1"
+            else
+                EXTRA_ARGS+=("$1")
+            fi
             ;;
         esac
         shift
     done
-
-    ## Positional
-    if [ "${1:-}" != '' ]; then MAIN_TEX=$1; fi
 
     MAIN_TEX=${MAIN_TEX:-"$SCRIPT_DIR/docs/main.tex"}
     MAIN_FILE_ONLY=$(basename "$MAIN_TEX")
@@ -58,12 +63,12 @@ build_if_not_exists() {
         echo "Image $1 already exists. Skipping build."
     fi
 }
-run_docker() { echo $MAIN_DIR; docker run --rm -v "$MAIN_DIR:/data" -w /data $IMAGE_NAME "$@"; }
-remove_aux_files() { run_docker latexmk -aux-directory=.tmp -c; }
+run_docker() { docker run --rm -v "$MAIN_DIR:/data" -w /data "$IMAGE_NAME" "$@"; }
+remove_aux_files() { run_docker latexmk -aux-directory=.tmp -c "$MAIN_FILE_ONLY"; }
 run_latexmk() { run_docker latexmk -aux-directory=.tmp -pdf "$@" "$MAIN_FILE_ONLY"; }
-count_on_log() { grep --ignore-case --count --perl-regexp --regexp="$1" "${@:2}" main.log; }
+count_on_log() { grep --ignore-case --count --perl-regexp --regexp="$1" "${@:2}" "$AUX_DIR/${MAIN_FILE_ONLY%.tex}.log"; }
 
 
-SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")") && source "$SCRIPT_DIR/util"
+SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 _setConfigArgs "$@"
-main "$@"
+main

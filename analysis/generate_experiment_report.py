@@ -124,6 +124,12 @@ def build_report(payload: dict[str, Any]) -> str:
         if incremental_requests is not None and task_count
         else None
     )
+    baseline_avg_str = f"{baseline_requests / task_count:.2f}" if task_count else "n/a"
+    cegis_avg_str = (
+        f"{cegis_requests / task_count:.2f}"
+        if cegis_requests is not None and task_count
+        else "n/a"
+    )
     return f"""## Experimental Results
 
 A comparative evaluation was performed across `{title}` using `{model}`.
@@ -132,8 +138,8 @@ A comparative evaluation was performed across `{title}` using `{model}`.
 
 | Approach | Exact Accuracy | Solved Tasks | API Requests | Avg. Requests/Task |
 | :--- | :---: | :---: | :---: | :---: |
-| **Baseline (1-Shot)** | **{_percent(baseline_accuracy)}** | {baseline_correct} / {task_count} | {baseline_requests} | {baseline_requests / task_count:.2f} |
-| **CEGIS (Semantic Feedback)** | **{_percent(cegis_accuracy)}** | {cegis_correct} / {task_count} | {cegis_request_cell} | {cegis_requests / task_count:.2f} |
+| **Baseline (1-Shot)** | **{_percent(baseline_accuracy)}** | {baseline_correct} / {task_count} | {baseline_requests} | {baseline_avg_str} |
+| **CEGIS (Semantic Feedback)** | **{_percent(cegis_accuracy)}** | {cegis_correct} / {task_count} | {cegis_request_cell} | {cegis_avg_str} |
 | **Delta / Impact** | **{accuracy_delta * 100:+.1f}%** *({relative_delta * 100:+.1f}% rel.)* | **{int(cegis_correct) - int(baseline_correct):+d} tasks** | {incremental_requests if incremental_requests is not None else 'n/a'} | {incremental_avg if incremental_avg is not None else 'n/a'} |
 
 ### Derived Findings & Error Breakdown
