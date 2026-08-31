@@ -4,15 +4,18 @@ Includes proactive Rate Limiting (RPM), Daily Quota Guard (RPD),
 and intelligent 429/RPM wait-and-retry protections.
 """
 
+import contextlib
 import random
 import re
 import logging
 import threading
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, cast
 
 from google import genai
 from google.genai import errors, types
+from openai import OpenAI
+import openai
 
 from . import config
 
@@ -35,7 +38,7 @@ _REQUEST_COUNT: int = 0
 _POOL_REQUEST_COUNTS: Dict[str, int] = {}
 _POOL_LAST_REQUEST_TIMES: Dict[str, float] = {}
 _POOL_SEMAPHORES: Dict[str, threading.BoundedSemaphore] = {}
-_CLIENT_CACHE: Dict[str, Any] = {}
+_CLIENT_CACHE: Dict[str, OpenAI | genai.Client] = {}
 _CLIENT_CACHE_LOCK = threading.Lock()
 _REQUEST_LOCK = threading.Lock()
 
@@ -56,8 +59,9 @@ def reset_request_count(value: int = 0) -> None:
         _POOL_SEMAPHORES.clear()
 
 
-def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
-    """Serializes quota accounting and schedules rate-limit dispatch for concurrent workers."""
+@contextlib.contextmanager
+def request_slot(llm_config: config.LLMConfig):
+    """Context manager ensuring balanced semaphore acquire/release and rate limit/quota accounting."""
     global _REQUEST_COUNT
     pool_key = f"{llm_config.pool_index}:{llm_config.provider}:{llm_config.model}"
     with _REQUEST_LOCK:
@@ -65,29 +69,39 @@ def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
             pool_key, threading.BoundedSemaphore(max(1, llm_config.max_concurrent_tasks))
         )
     semaphore.acquire()
+    acquired = True
+    try:
+        sleep_needed = 0.0
+        with _REQUEST_LOCK:
+            pool_count = _POOL_REQUEST_COUNTS.get(pool_key, 0)
+            if pool_count >= llm_config.max_daily_requests:
+                raise QuotaExceededError(
+                    f"Daily request safety limit reached for {pool_key} ({pool_count}/{llm_config.max_daily_requests} requests). "
+                    "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
+                )
 
-    sleep_needed = 0.0
-    with _REQUEST_LOCK:
-        pool_count = _POOL_REQUEST_COUNTS.get(pool_key, 0)
-        if pool_count >= llm_config.max_daily_requests:
+            now = time.time()
+            last_time = _POOL_LAST_REQUEST_TIMES.get(pool_key, 0.0)
+            delay = llm_config.request_delay
+            target_time = max(now, last_time + delay) if (delay > 0 and last_time > 0) else now
+            sleep_needed = max(0.0, target_time - now)
+
+            _POOL_LAST_REQUEST_TIMES[pool_key] = target_time
+            _REQUEST_COUNT += 1
+            _POOL_REQUEST_COUNTS[pool_key] = pool_count + 1
+
+        if sleep_needed > 0:
+            time.sleep(sleep_needed)
+
+        yield
+    finally:
+        if acquired:
             semaphore.release()
-            raise QuotaExceededError(
-                f"Daily request safety limit reached for {pool_key} ({pool_count}/{llm_config.max_daily_requests} requests). "
-                "Execution paused gracefully. Use checkpoint resume to continue when quota resets."
-            )
 
-        now = time.time()
-        last_time = _POOL_LAST_REQUEST_TIMES.get(pool_key, 0.0)
-        delay = llm_config.request_delay
-        target_time = max(now, last_time + delay) if (delay > 0 and last_time > 0) else now
-        sleep_needed = max(0.0, target_time - now)
 
-        _POOL_LAST_REQUEST_TIMES[pool_key] = target_time
-        _REQUEST_COUNT += 1
-        _POOL_REQUEST_COUNTS[pool_key] = pool_count + 1
-
-    if sleep_needed > 0:
-        time.sleep(sleep_needed)
+def _reserve_request_slot(llm_config: config.LLMConfig) -> None:
+    """Legacy helper; deprecated in favor of request_slot context manager."""
+    pass
 
 
 def _extract_retry_delay(error: Exception) -> Optional[float]:
@@ -162,10 +176,10 @@ def get_gemini_client(api_key: Optional[str] = None) -> genai.Client:
     with _CLIENT_CACHE_LOCK:
         if key not in _CLIENT_CACHE:
             _CLIENT_CACHE[key] = genai.Client(api_key=key)
-        return _CLIENT_CACHE[key]
+        return cast(genai.Client, _CLIENT_CACHE[key])
 
 
-def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -> Any:
+def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -> OpenAI:
     """Initializes and caches an OpenAI-compatible client, including Groq."""
     try:
         from openai import OpenAI
@@ -192,7 +206,7 @@ def get_openai_compatible_client(provider: str, api_key: Optional[str] = None) -
             if base_url:
                 client_kwargs["base_url"] = base_url
             _CLIENT_CACHE[cache_key] = OpenAI(**client_kwargs)
-        return _CLIENT_CACHE[cache_key]
+        return cast(OpenAI, _CLIENT_CACHE[cache_key])
 
 
 def _call_openai_compatible(
@@ -202,28 +216,28 @@ def _call_openai_compatible(
     api_key: Optional[str],
     max_retries: int,
     llm_config: config.LLMConfig,
+    temperature: float
 ) -> str:
     """Calls an OpenAI-compatible chat-completions endpoint with retries."""
     client = get_openai_compatible_client(provider, api_key=api_key)
     base_delay = 2.0
 
+
+    create_kwargs: Dict[str, Any] = {
+        "model": model,
+        "messages": messages,
+        "temperature": temperature,
+    }
+
+    if llm_config.provider in ("vercel",):
+        create_kwargs |= {"extra_body": {"provider": {"sort": "cost"}}}
+
     for attempt in range(1, max_retries + 1):
-        slot_reserved = False
         try:
-            _reserve_request_slot(llm_config)
-            slot_reserved = True
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=config.TEMPERATURE,
-                stream=False
-            )
-            result = response.choices[0].message.content or ""
-            _release_request_slot(llm_config)
-            return result
+            with request_slot(llm_config):
+                response = client.chat.completions.create(**create_kwargs)
+                return response.choices[0].message.content or ""
         except Exception as e:
-            if slot_reserved:
-                _release_request_slot(llm_config)
             status_code = getattr(e, "status_code", None) or getattr(e, "code", None)
             err_msg = str(e).lower()
 
@@ -295,6 +309,7 @@ def call_llm(
     api_key: Optional[str] = None,
     provider: Optional[str] = None,
     max_retries: int = 5,
+    temperature: float = config.TEMPERATURE 
 ) -> str:
     """
     Sends chat messages to the Google Gemini API with proactive rate limiting,
@@ -305,6 +320,7 @@ def call_llm(
         model: Target Gemini model identifier (e.g. 'gemini-3.1-flash-lite').
         api_key: Optional Gemini API key override.
         max_retries: Maximum retry attempts for transient errors (429, 503, timeouts).
+        temperature: model temperature
         
     Returns:
         Generated text response from the model.
@@ -335,17 +351,25 @@ def call_llm(
             else:
                 raise AuthError(f"Missing API key for provider '{selected_provider}'.")
         return _call_openai_compatible(
-            messages, model, selected_provider, resolved_key, max_retries, llm_config,
+            messages,
+            model,
+            selected_provider,
+            resolved_key,
+            max_retries,
+            llm_config,
+            temperature,
         )
 
     client = get_gemini_client(api_key=resolved_key)
     system_instruction, contents = format_messages_for_gemini(messages)
 
-    gen_config = types.GenerateContentConfig(
-        temperature=config.TEMPERATURE,
-        system_instruction=system_instruction,
-        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-    )
+    gen_config_kwargs: Dict[str, Any] = {
+        "temperature": temperature,
+        "system_instruction": system_instruction,
+        "automatic_function_calling": types.AutomaticFunctionCallingConfig(disable=True),
+    }
+
+    gen_config = types.GenerateContentConfig(**gen_config_kwargs)
 
     if not contents:
         raise ValueError("At least one user message is required")
@@ -353,30 +377,24 @@ def call_llm(
     base_delay = 4.0
 
     for attempt in range(1, max_retries + 1):
-        slot_reserved = False
         try:
-            # Reserve the quota and rate-limit slot before making the request.
-            _reserve_request_slot(llm_config)
-            slot_reserved = True
-            logger.debug(
-                "Starting API request: model=%s attempt=%s request=%s/%s",
-                model,
-                attempt,
-                get_request_count(),
-                config.MAX_DAILY_REQUESTS,
-            )
+            with request_slot(llm_config):
+                logger.debug(
+                    "Starting API request: model=%s attempt=%s request=%s/%s",
+                    model,
+                    attempt,
+                    get_request_count(),
+                    config.MAX_DAILY_REQUESTS,
+                )
 
-            response = client.models.generate_content(
-                model=model,
-                contents=contents,
-                config=gen_config,
-            )
-            _release_request_slot(llm_config)
-            return response.text or ""
+                response = client.models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=gen_config,
+                )
+                return response.text or ""
 
         except Exception as e:
-            if slot_reserved:
-                _release_request_slot(llm_config)
             status_code = getattr(e, "status_code", None) or getattr(e, "code", None)
             err_msg = str(e).lower()
 

@@ -1,6 +1,6 @@
 {
   "config": {
-    "model": "gemma-4-26b-a4b-it",
+    "model": "gemini-3.6-flash",
     "max_cegis_iters": 5,
     "timeout_seconds": 150.0,
     "request_delay_seconds": 5.0,
@@ -8,7 +8,8 @@
     "total_tasks_in_dataset": 800,
     "completed_tasks": 9,
     "faulty_tasks": 0,
-    "total_requests_used": 60
+    "total_requests_used": 10,
+    "use_anti_cheat": false
   },
   "summary": {
     "baseline_accuracy": 88.88888888888889,

@@ -9,12 +9,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import logging
 import os
+import threading
 from typing import Any, Dict, List, Set
 from util.parsing import compact_long_numeric_lists
 
 from arc_cegis import (
     AuthError,
     QuotaExceededError,
+    build_initial_prompt,
     config,
     get_request_count,
     load_tasks,
@@ -36,12 +38,18 @@ _EMERGENCY_STATE: Dict[str, Any] = {
     "detailed_results": [],
     "baseline_correct": 0,
     "cegis_correct": 0,
+    "cegis_anticheat_correct": 0,
     "faulty_task_ids": set(),
 }
 
 
 def extract_first_n_runs(input_path: str, output_path: str, n: int) -> None:
-    """Write a result file containing only its first ``n`` runs."""
+    """
+    [DEPRECATED] Write a result file containing only its first ``n`` runs.
+    Warning: Asynchronous worker completion order is non-deterministic, so
+    slicing arbitrary runs across experiments leads to mismatched task subsets.
+    """
+    logger.warning("extract_first_n_runs is DEPRECATED and should not be used for comparisons.")
     if n < 0:
         raise ValueError("n must be non-negative")
 
@@ -63,6 +71,11 @@ def extract_first_n_runs(input_path: str, output_path: str, n: int) -> None:
         for item in selected_results
         if isinstance(item, dict)
     )
+    cegis_anticheat_correct = sum(
+        bool(item.get("cegis_anticheat", {}).get("success"))
+        for item in selected_results
+        if isinstance(item, dict)
+    )
     selected_count = len(selected_results)
 
     output_payload = dict(payload)
@@ -70,8 +83,10 @@ def extract_first_n_runs(input_path: str, output_path: str, n: int) -> None:
     output_payload["summary"] = {
         "baseline_accuracy": baseline_correct / selected_count * 100 if selected_count else 0.0,
         "cegis_accuracy": cegis_correct / selected_count * 100 if selected_count else 0.0,
+        "cegis_anticheat_accuracy": cegis_anticheat_correct / selected_count * 100 if selected_count else 0.0,
         "baseline_correct": baseline_correct,
         "cegis_correct": cegis_correct,
+        "cegis_anticheat_correct": cegis_anticheat_correct,
     }
     if isinstance(output_payload.get("config"), dict):
         output_payload["config"] = dict(output_payload["config"])
@@ -83,12 +98,13 @@ def extract_first_n_runs(input_path: str, output_path: str, n: int) -> None:
                 continue
             if isinstance(item.get("baseline"), dict) and item["baseline"]:
                 request_count += 1
-            cegis_result = item.get("cegis")
-            if isinstance(cegis_result, dict) and isinstance(
-                cegis_result.get("iteration_history"), list
-            ):
-                has_iteration_history = True
-                request_count += len(cegis_result["iteration_history"])
+            for strat_key in ("cegis", "cegis_anticheat"):
+                strat_res = item.get(strat_key)
+                if isinstance(strat_res, dict) and isinstance(
+                    strat_res.get("iteration_history"), list
+                ):
+                    has_iteration_history = True
+                    request_count += len(strat_res["iteration_history"])
         if has_iteration_history:
             output_payload["config"]["total_requests_used"] = request_count
     if isinstance(output_payload.get("faulty_task_ids"), list):
@@ -200,6 +216,7 @@ def save_checkpoint(
     detailed_results: List[Dict[str, Any]],
     baseline_correct: int,
     cegis_correct: int,
+    cegis_anticheat_correct: int,
     faulty_task_ids: Set[str],
     checkpoint_error: str = "",
 ) -> None:
@@ -209,6 +226,10 @@ def save_checkpoint(
     completed_count = len(detailed_results)
     base_acc = (baseline_correct / completed_count) * 100 if completed_count > 0 else 0.0
     cegis_acc = (cegis_correct / completed_count) * 100 if completed_count > 0 else 0.0
+    cegis_ac_acc = (cegis_anticheat_correct / completed_count) * 100 if completed_count > 0 else 0.0
+
+    # Sort results deterministically by task_id before serialization
+    sorted_results = sorted(detailed_results, key=lambda item: str(item.get("task_id", "")))
 
     output_payload = {
         "config": {
@@ -225,10 +246,12 @@ def save_checkpoint(
         "summary": {
             "baseline_accuracy": base_acc,
             "cegis_accuracy": cegis_acc,
+            "cegis_anticheat_accuracy": cegis_ac_acc,
             "baseline_correct": baseline_correct,
             "cegis_correct": cegis_correct,
+            "cegis_anticheat_correct": cegis_anticheat_correct,
         },
-        "results": detailed_results,
+        "results": sorted_results,
         "faulty_task_ids": sorted(faulty_task_ids),
     }
     if checkpoint_error:
@@ -247,13 +270,13 @@ def progress_checkpoint_path(output_path: str, completed_count: int, total_tasks
     return f"{output_root}_{completed_count}_{total_tasks}{extension}"
 
 
-def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, Set[str], Set[str]]:
+def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, int, Set[str], Set[str]]:
     """
     Loads completed task results from an existing checkpoint file.
-    Returns (detailed_results, baseline_correct, cegis_correct, completed_task_ids, faulty_task_ids).
+    Returns (detailed_results, baseline_correct, cegis_correct, cegis_anticheat_correct, completed_task_ids, faulty_task_ids).
     """
     if not os.path.exists(output_path):
-        return [], 0, 0, set(), set()
+        return [], 0, 0, 0, set(), set()
 
     try:
         with open(output_path, "r", encoding="utf-8") as f:
@@ -262,6 +285,7 @@ def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, S
         detailed_results = data.get("results", [])
         baseline_correct = 0
         cegis_correct = 0
+        cegis_anticheat_correct = 0
         completed_task_ids = set()
         faulty_task_ids = set(data.get("faulty_task_ids", []))
 
@@ -273,11 +297,13 @@ def load_checkpoint(output_path: str) -> tuple[List[Dict[str, Any]], int, int, S
                 baseline_correct += 1
             if item.get("cegis", {}).get("success"):
                 cegis_correct += 1
+            if item.get("cegis_anticheat", {}).get("success"):
+                cegis_anticheat_correct += 1
 
-        return detailed_results, baseline_correct, cegis_correct, completed_task_ids, faulty_task_ids
+        return detailed_results, baseline_correct, cegis_correct, cegis_anticheat_correct, completed_task_ids, faulty_task_ids
     except Exception as e:
         logger.warning("Failed to read checkpoint from '%s': %s. Starting fresh.", output_path, e)
-        return [], 0, 0, set(), set()
+        return [], 0, 0, 0, set(), set()
 
 
 def save_emergency_checkpoint(error: BaseException) -> None:
@@ -294,6 +320,7 @@ def save_emergency_checkpoint(error: BaseException) -> None:
             detailed_results=state["detailed_results"],
             baseline_correct=state["baseline_correct"],
             cegis_correct=state["cegis_correct"],
+            cegis_anticheat_correct=state.get("cegis_anticheat_correct", 0),
             faulty_task_ids=state["faulty_task_ids"],
             checkpoint_error=error_message,
         )
@@ -331,7 +358,7 @@ def _run_main() -> None:
     else:
         logger.info("Parsed LLM pool: empty; using global configuration.")
     parser = argparse.ArgumentParser(
-        description="ARC-AGI-1 Comparative Experiment: Baseline (1-shot) vs CEGIS with Free Tier Protections"
+        description="ARC-AGI-1 Comparative Experiment: Baseline (1-shot) vs CEGIS vs CEGIS AntiCheat with Free Tier Protections"
     )
     parser.add_argument(
         "--tasks",
@@ -441,7 +468,7 @@ def _run_main() -> None:
     
     model = config.LLM_POOL[0].model if config.LLM_POOL else args.model
 
-    logger.info("ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS (%s)", config.LLM_PROVIDER)
+    logger.info("ARC-AGI-1 Comparative Experiment: Baseline vs CEGIS Variants (%s)", config.LLM_PROVIDER)
     logger.info("Model: %s | Max CEGIS Iters: %s | Timeout: %ss", model, args.max_iters, config.TIMEOUT_SECONDS)
     logger.info("Rate Delay: %ss (<= %s RPM) | Daily Quota Guard: %s RPD", config.REQUEST_DELAY, rpm_effective, config.MAX_DAILY_REQUESTS)
 
@@ -481,47 +508,89 @@ def _run_main() -> None:
     detailed_results: List[Dict[str, Any]] = []
     baseline_correct = 0
     cegis_correct = 0
+    cegis_anticheat_correct = 0
     completed_task_ids: Set[str] = set()
     faulty_task_ids: Set[str] = set()
     _EMERGENCY_STATE.update({
         "detailed_results": detailed_results,
+        "baseline_correct": baseline_correct,
+        "cegis_correct": cegis_correct,
+        "cegis_anticheat_correct": cegis_anticheat_correct,
         "faulty_task_ids": faulty_task_ids,
     })
 
     if args.resume and os.path.exists(args.output):
-        detailed_results, baseline_correct, cegis_correct, completed_task_ids, faulty_task_ids = load_checkpoint(args.output)
+        detailed_results, baseline_correct, cegis_correct, cegis_anticheat_correct, completed_task_ids, faulty_task_ids = load_checkpoint(args.output)
         _EMERGENCY_STATE.update({
             "detailed_results": detailed_results,
             "baseline_correct": baseline_correct,
             "cegis_correct": cegis_correct,
+            "cegis_anticheat_correct": cegis_anticheat_correct,
             "faulty_task_ids": faulty_task_ids,
         })
         if completed_task_ids or faulty_task_ids:
             logger.info(
                 "Checkpoint found. Resuming from '%s': %s completed, %s faulty, %s/%s tasks accounted for "
-                "(Baseline: %s, CEGIS: %s).",
+                "(Baseline: %s, CEGIS: %s, AntiCheat: %s).",
                 args.output, len(completed_task_ids), len(faulty_task_ids),
-                len(completed_task_ids | faulty_task_ids), total_tasks, baseline_correct, cegis_correct,
+                len(completed_task_ids | faulty_task_ids), total_tasks,
+                baseline_correct, cegis_correct, cegis_anticheat_correct,
             )
 
     consecutive_api_failures = 0
     CIRCUIT_BREAKER_THRESHOLD = 3
     quota_exhausted = False
     auth_failed = False
+    stop_event = threading.Event()
 
     def evaluate_task(task_id: str, task_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Run both strategies for one task in a worker thread."""
+        """Run all strategies for one task in a worker thread, sharing the first LLM call."""
+        if stop_event.is_set():
+            raise RuntimeError(f"Evaluation cancelled for task {task_id} due to stop event.")
+
         selected_model = None if config.LLM_POOL else args.model
-        base_res = run_baseline(task_data, model=selected_model)
-        cegis_res = run_cegis(task_data, max_iters=args.max_iters, model=selected_model)
+
+        # Shared first call: all three strategies start from the same initial prompt,
+        # so we make a single API request and hand the response to each of them.
+        train_pairs = task_data.get("train", [])
+        shared_messages = [
+            {"role": "system", "content": "You are an expert AI solving ARC-AGI puzzles by writing Python code."},
+            {"role": "user", "content": build_initial_prompt(train_pairs)},
+        ]
+        try:
+            shared_response = (
+                call_llm(shared_messages, model=selected_model)
+                if selected_model
+                else call_llm(shared_messages)
+            )
+        except (AuthError, QuotaExceededError):
+            raise
+        except Exception:
+            shared_response = None  # fall back: each strategy will make its own call
+
+        if stop_event.is_set():
+            raise RuntimeError(f"Evaluation cancelled for task {task_id} due to stop event.")
+
+        base_res = run_baseline(task_data, model=selected_model, initial_response=shared_response)
+        if stop_event.is_set():
+            raise RuntimeError(f"Evaluation cancelled for task {task_id} due to stop event.")
+
+        cegis_res = run_cegis(task_data, anti_cheat=False, max_iters=args.max_iters, model=selected_model, initial_response=shared_response)
+        if stop_event.is_set():
+            raise RuntimeError(f"Evaluation cancelled for task {task_id} due to stop event.")
+
+        cegis_anticheat = run_cegis(task_data, anti_cheat=True, max_iters=args.max_iters, model=selected_model, initial_response=shared_response)
+        if stop_event.is_set():
+            raise RuntimeError(f"Evaluation cancelled for task {task_id} due to stop event.")
+
         return {
             "task_id": task_id,
             "baseline": base_res,
             "cegis": cegis_res,
+            "cegis_anticheat": cegis_anticheat,
         }
 
     # 4. Run evaluations with Protections and Incremental Checkpointing
-    current_task_id: str | None = None
     previous_progress_path: str | None = None
     try:
         pending_tasks = [
@@ -540,35 +609,44 @@ def _run_main() -> None:
 
             for future in as_completed(future_to_task):
                 task_id = future_to_task[future]
-                current_task_id = task_id
-                if future.cancelled():
+                if future.cancelled() or stop_event.is_set():
                     continue
                 try:
                     result = future.result()
                 except AuthError as auth_err:
                     auth_failed = True
+                    stop_event.set()
                     logger.error("AUTH ERROR: %s", auth_err)
                     for pending in future_to_task:
                         pending.cancel()
                     break
                 except QuotaExceededError as quota_err:
                     quota_exhausted = True
+                    stop_event.set()
                     logger.error("SAFE PAUSE / DAILY QUOTA GUARD: %s", quota_err)
                     for pending in future_to_task:
                         pending.cancel()
                     break
                 except Exception as err:
-                    faulty_task_ids.add(task_id)
-                    logger.exception("TASK ERROR: %s failed and will not be added to results: %s", task_id, err)
+                    if not stop_event.is_set():
+                        faulty_task_ids.add(task_id)
+                        logger.exception("TASK ERROR: %s failed and will not be added to results: %s", task_id, err)
                     continue
 
                 base_res = result["baseline"]
                 cegis_res = result["cegis"]
-                task_api_error = base_res.get("api_error", False) or cegis_res.get("api_error", False)
-                if base_res["success"]:
+                cegis_ac_res = result.get("cegis_anticheat", {})
+                task_api_error = (
+                    base_res.get("api_error", False)
+                    or cegis_res.get("api_error", False)
+                    or cegis_ac_res.get("api_error", False)
+                )
+                if base_res.get("success"):
                     baseline_correct += 1
-                if cegis_res["success"]:
+                if cegis_res.get("success"):
                     cegis_correct += 1
+                if cegis_ac_res.get("success"):
+                    cegis_anticheat_correct += 1
                 if task_api_error:
                     consecutive_api_failures += 1
                 else:
@@ -579,12 +657,14 @@ def _run_main() -> None:
                 _EMERGENCY_STATE.update({
                     "baseline_correct": baseline_correct,
                     "cegis_correct": cegis_correct,
+                    "cegis_anticheat_correct": cegis_anticheat_correct,
                 })
                 logger.info(
-                    "[%s/%s] %s: Baseline=%s, CEGIS=%s (API Requests: %s/%s)",
+                    "[%s/%s] %s: Baseline=%s, CEGIS=%s, AntiCheat=%s, (API Requests: %s/%s)",
                     len(detailed_results), total_tasks, task_id,
-                    "PASSED" if base_res["success"] else "FAILED",
-                    "PASSED" if cegis_res["success"] else "FAILED",
+                    "PASSED" if base_res.get("success") else "FAILED",
+                    "PASSED" if cegis_res.get("success") else "FAILED",
+                    "PASSED" if cegis_ac_res.get("success") else "FAILED",
                     get_request_count(), config.MAX_DAILY_REQUESTS,
                 )
                 save_checkpoint(
@@ -595,6 +675,7 @@ def _run_main() -> None:
                     detailed_results=detailed_results,
                     baseline_correct=baseline_correct,
                     cegis_correct=cegis_correct,
+                    cegis_anticheat_correct=cegis_anticheat_correct,
                     faulty_task_ids=faulty_task_ids,
                 )
                 completed_count = len(detailed_results)
@@ -608,6 +689,7 @@ def _run_main() -> None:
                         detailed_results=detailed_results,
                         baseline_correct=baseline_correct,
                         cegis_correct=cegis_correct,
+                        cegis_anticheat_correct=cegis_anticheat_correct,
                         faulty_task_ids=faulty_task_ids,
                     )
                     if previous_progress_path and os.path.exists(previous_progress_path):
@@ -617,6 +699,7 @@ def _run_main() -> None:
 
                 if consecutive_api_failures >= CIRCUIT_BREAKER_THRESHOLD:
                     logger.error("CIRCUIT BREAKER: %s consecutive tasks had API errors.", CIRCUIT_BREAKER_THRESHOLD)
+                    stop_event.set()
                     for pending in future_to_task:
                         pending.cancel()
                     break
@@ -627,11 +710,10 @@ def _run_main() -> None:
             logger.error("Progress safely saved to '%s'; rerun to resume after quota reset.", args.output)
 
     except KeyboardInterrupt:
+        stop_event.set()
         logger.warning("Interrupted. Saving current checkpoint...")
         raise SystemExit(0)
     except Exception as err:
-        if current_task_id is not None:
-            faulty_task_ids.add(current_task_id)
         logger.exception("EXPERIMENT ERROR: %s", err)
         raise
     finally:
@@ -644,6 +726,7 @@ def _run_main() -> None:
                 detailed_results=detailed_results,
                 baseline_correct=baseline_correct,
                 cegis_correct=cegis_correct,
+                cegis_anticheat_correct=cegis_anticheat_correct,
                 faulty_task_ids=faulty_task_ids,
             )
             logger.info("Checkpoint safely saved to '%s'. You can resume at any time.", args.output)
@@ -658,6 +741,7 @@ def _run_main() -> None:
     evaluated_count = len(detailed_results)
     base_acc = (baseline_correct / evaluated_count) * 100 if evaluated_count > 0 else 0.0
     cegis_acc = (cegis_correct / evaluated_count) * 100 if evaluated_count > 0 else 0.0
+    cegis_ac_acc = (cegis_anticheat_correct / evaluated_count) * 100 if evaluated_count > 0 else 0.0
 
     logger.info("EXPERIMENT SUMMARY%s", " (PAUSED - DAILY QUOTA REACHED)" if quota_exhausted else "")
     logger.info("Total Tasks in Dataset: %s", total_tasks)
@@ -666,8 +750,10 @@ def _run_main() -> None:
     logger.info("Total API Calls Used: %s/%s", get_request_count(), config.MAX_DAILY_REQUESTS)
     logger.info("Baseline Accuracy: %s", f"{baseline_correct}/{evaluated_count} ({base_acc:.2f}%)" if evaluated_count else "N/A")
     logger.info("CEGIS Accuracy: %s", f"{cegis_correct}/{evaluated_count} ({cegis_acc:.2f}%)" if evaluated_count else "N/A")
+    logger.info("CEGIS AntiCheat Accuracy: %s", f"{cegis_anticheat_correct}/{evaluated_count} ({cegis_ac_acc:.2f}%)" if evaluated_count else "N/A")
     if evaluated_count > 0:
-        logger.info("Absolute Gain: %+.2f%%", cegis_acc - base_acc)
+        logger.info("Absolute Gain (CEGIS vs Baseline): %+.2f%%", cegis_acc - base_acc)
+        logger.info("Absolute Gain (CEGIS AntiCheat vs Baseline): %+.2f%%", cegis_ac_acc - base_acc)
     logger.info("Results safely saved to: %s", args.output)
 
 
@@ -685,6 +771,11 @@ def main() -> None:
     """Run the experiment and preserve state if any failure escapes handling."""
     try:
         _run_main()
+    except SystemExit as error:
+        if error.code not in (0, None):
+            save_emergency_checkpoint(error)
+        _stop_ollama_server()
+        raise
     except BaseException as error:
         save_emergency_checkpoint(error)
         _stop_ollama_server()

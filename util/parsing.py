@@ -3,7 +3,7 @@
 import re
 
 
-_LONG_NUMERIC_LIST_RE = re.compile(r"\[(?:\s+\d+,?)+\s*\]")
+_LONG_NUMERIC_LIST_RE = re.compile(r"\[(?:\s+-?\d+,?)+\s*\]")
 _LONG_NUMERIC_LIST_ITEM_RE = re.compile(r"\s*(-?\d+)(,?)\s*")
 
 

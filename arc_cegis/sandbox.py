@@ -2,6 +2,7 @@
 Safe execution environment and Python code extraction for ARC grid transformations.
 """
 
+import ast
 import multiprocessing as mp
 import queue as _queue_mod
 import re
@@ -11,12 +12,48 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from . import config
 
+_mp_ctx = mp.get_context("spawn")
+
+
+def _clean_unfenced_code(text: str) -> str:
+    """Attempts to isolate valid python code containing def transform when markdown fences are missing."""
+    start_idx = text.find("def transform")
+    if start_idx == -1:
+        return text.strip()
+
+    lines_before = text[:start_idx].splitlines()
+    first_def_idx = start_idx
+    for i in range(len(lines_before) - 1, -1, -1):
+        line = lines_before[i]
+        if line.startswith("def ") or line.startswith("class "):
+            first_def_idx = len("\n".join(lines_before[:i])) + (1 if i > 0 else 0)
+        elif line.strip() and not line.startswith(" ") and not line.startswith("\t") and not line.startswith("#"):
+            break
+
+    raw_code = text[first_def_idx:]
+    lines = raw_code.splitlines()
+
+    for end in range(len(lines), 0, -1):
+        candidate = "\n".join(lines[:end]).strip()
+        try:
+            tree = ast.parse(candidate)
+            has_transform = any(
+                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "transform"
+                for node in ast.walk(tree)
+            )
+            if has_transform:
+                return candidate
+        except SyntaxError:
+            continue
+
+    return text[start_idx:].strip()
+
 
 def extract_python_code(response_text: str) -> str:
     """
     Extracts executable Python code from markdown response text.
     Matches ```python ... ```, ```py ... ```, or ``` ... ``` code fences, prioritizing blocks
-    containing the `def transform` definition, or falls back to raw text.
+    containing the `def transform` definition, or falls back to AST-guided raw text parsing.
     """
     code_blocks = re.findall(r"```(?:python\d*|py)?\s*([\s\S]*?)\s*```", response_text, re.IGNORECASE)
     if code_blocks:
@@ -25,11 +62,7 @@ def extract_python_code(response_text: str) -> str:
                 return block.strip()
         return code_blocks[-1].strip()
 
-    if "def transform" in response_text:
-        start_idx = response_text.find("def transform")
-        return response_text[start_idx:].strip()
-
-    return response_text.strip()
+    return _clean_unfenced_code(response_text)
 
 
 # Immutable builtins whitelist — shared across all invocations, safe because
@@ -171,7 +204,7 @@ def _worker_process_target(code_str: str, input_grid: List[List[int]], queue: mp
             return
 
         queue.put((True, result, ""))
-    except Exception as e:
+    except BaseException as e:
         queue.put((False, None, f"{type(e).__name__}: {str(e)}"))
 
 
@@ -192,10 +225,10 @@ def run_transform(
     if not code_str:
         return False, None, "Empty code string provided."
 
-    queue: mp.Queue = mp.Queue()
+    queue: mp.Queue = _mp_ctx.Queue()
     proc: Optional[mp.Process] = None
     try:
-        proc = mp.Process(target=_worker_process_target, args=(code_str, input_grid, queue))
+        proc = _mp_ctx.Process(target=_worker_process_target, args=(code_str, input_grid, queue))
         proc.start()
 
         # Drain the queue FIRST to unblock the child's put(), then join.
