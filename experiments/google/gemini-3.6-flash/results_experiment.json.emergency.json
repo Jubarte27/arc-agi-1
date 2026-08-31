@@ -1,0 +1,2568 @@
+{
+  "config": {
+    "model": "gemma-4-26b-a4b-it",
+    "max_cegis_iters": 5,
+    "timeout_seconds": 150.0,
+    "request_delay_seconds": 5.0,
+    "max_daily_requests": 1450,
+    "total_tasks_in_dataset": 800,
+    "completed_tasks": 9,
+    "faulty_tasks": 0,
+    "total_requests_used": 60
+  },
+  "summary": {
+    "baseline_accuracy": 88.88888888888889,
+    "cegis_accuracy": 88.88888888888889,
+    "baseline_correct": 8,
+    "cegis_correct": 8
+  },
+  "results": [
+    {
+      "task_id": "007bbfb7",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [7,7,7,7,7,7,7,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7]
+            ],
+            "expected_output": [
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [7,7,7,7,7,7,7,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [4,0,4,0,0,0,4,0,4],
+              [0,0,0,0,0,0,0,0,0],
+              [0,4,0,0,0,0,0,4,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,4,0,4,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,4,0,0,0,0]
+            ],
+            "expected_output": [
+              [4,0,4,0,0,0,4,0,4],
+              [0,0,0,0,0,0,0,0,0],
+              [0,4,0,0,0,0,0,4,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,4,0,4,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,4,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,2],
+              [0,0,0,0,0,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,2,0,0,0,0,0,2],
+              [2,0,2,0,0,0,2,0,2]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,2],
+              [0,0,0,0,0,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,2,0,0,0,0,0,2],
+              [2,0,2,0,0,0,2,0,2]
+            ]
+          },
+          {
+            "test_idx": 3,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [6,6,0,6,6,0,0,0,0],
+              [6,0,0,6,0,0,0,0,0],
+              [0,6,6,0,6,6,0,0,0],
+              [6,6,0,0,0,0,0,0,0],
+              [6,0,0,0,0,0,0,0,0],
+              [0,6,6,0,0,0,0,0,0],
+              [0,0,0,6,6,0,6,6,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,6,0,6,6]
+            ],
+            "expected_output": [
+              [6,6,0,6,6,0,0,0,0],
+              [6,0,0,6,0,0,0,0,0],
+              [0,6,6,0,6,6,0,0,0],
+              [6,6,0,0,0,0,0,0,0],
+              [6,0,0,0,0,0,0,0,0],
+              [0,6,6,0,0,0,0,0,0],
+              [0,0,0,6,6,0,6,6,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,6,0,6,6]
+            ]
+          },
+          {
+            "test_idx": 4,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,2,2,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,2,2,0,2,2,0,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,2,2,0,2,2]
+            ],
+            "expected_output": [
+              [2,2,2,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,2,2,0,2,2,0,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,2,2,0,2,2]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 9.189992427825928,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    H = len(grid)\n    W = len(grid[0])\n    out_H = H * H\n    out_W = W * W\n    \n    output_grid = [[0] * out_W for _ in range(out_H)]\n    \n    for r in range(H):\n        for c in range(W):\n            if grid[r][c] != 0:\n                for br in range(H):\n                    for bc in range(W):\n                        output_grid[r * H + br][c * W + bc] = grid[br][bc]\n                        \n    return output_grid",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ],
+            "expected_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [7,7,7,7,7,7,7,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7]
+            ],
+            "expected_output": [
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [7,7,7,7,7,7,7,7,7],
+              [0,7,7,0,7,7,0,7,7],
+              [0,0,0,0,7,7,0,7,7],
+              [0,0,0,7,7,7,7,7,7],
+              [0,0,0,0,7,7,0,7,7]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [4,0,4,0,0,0,4,0,4],
+              [0,0,0,0,0,0,0,0,0],
+              [0,4,0,0,0,0,0,4,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,4,0,4,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,4,0,0,0,0]
+            ],
+            "expected_output": [
+              [4,0,4,0,0,0,4,0,4],
+              [0,0,0,0,0,0,0,0,0],
+              [0,4,0,0,0,0,0,4,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,4,0,4,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,4,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,2],
+              [0,0,0,0,0,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,2,0,0,0,0,0,2],
+              [2,0,2,0,0,0,2,0,2]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,2],
+              [0,0,0,0,0,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,2,0,0,0,0,0,2],
+              [2,0,2,0,0,0,2,0,2]
+            ]
+          },
+          {
+            "test_idx": 3,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [6,6,0,6,6,0,0,0,0],
+              [6,0,0,6,0,0,0,0,0],
+              [0,6,6,0,6,6,0,0,0],
+              [6,6,0,0,0,0,0,0,0],
+              [6,0,0,0,0,0,0,0,0],
+              [0,6,6,0,0,0,0,0,0],
+              [0,0,0,6,6,0,6,6,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,6,0,6,6]
+            ],
+            "expected_output": [
+              [6,6,0,6,6,0,0,0,0],
+              [6,0,0,6,0,0,0,0,0],
+              [0,6,6,0,6,6,0,0,0],
+              [6,6,0,0,0,0,0,0,0],
+              [6,0,0,0,0,0,0,0,0],
+              [0,6,6,0,0,0,0,0,0],
+              [0,0,0,6,6,0,6,6,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,6,0,6,6]
+            ]
+          },
+          {
+            "test_idx": 4,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,2,2,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,2,2,0,2,2,0,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,2,2,0,2,2]
+            ],
+            "expected_output": [
+              [2,2,2,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,2,2,0,2,2,0,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,2,2,2],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,2,2,0,2,2]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 74.0653190612793,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    out = [[0] * (C * C) for _ in range(R * R)]\n    \n    for i in range(R * R):\n        for j in range(C * C):\n            if grid[i // R][j // C] != 0:\n                out[i][j] = grid[i % R][j % C]\n                \n    return out",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    out = [[0] * (C * C) for _ in range(R * R)]\n    \n    for i in range(R * R):\n        for j in range(C * C):\n            if grid[i // R][j // C] != 0:\n                out[i][j] = grid[i % R][j % C]\n                \n    return out"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ],
+            "expected_output": [
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,0,0,0,7,0,7],
+              [7,0,7,0,0,0,7,0,7],
+              [7,7,0,0,0,0,7,7,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,0,7,7,0,7,0,0,0],
+              [7,7,0,7,7,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "0520fde7",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0],
+              [0,2,0],
+              [0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0],
+              [0,2,0],
+              [0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [0,0,2],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [0,0,2],
+              [0,2,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0],
+              [2,0,0],
+              [0,0,2]
+            ],
+            "expected_output": [
+              [0,0,0],
+              [2,0,0],
+              [0,0,2]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 49.07935929298401,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    H = len(grid)\n    W = len(grid[0])\n    \n    # Find the separator column index containing 5\n    sep_col = 0\n    for c in range(W):\n        if grid[0][c] == 5:\n            sep_col = c\n            break\n            \n    output = []\n    for r in range(H):\n        row = []\n        for c in range(sep_col):\n            left_val = grid[r][c]\n            right_val = grid[r][sep_col + 1 + c]\n            if left_val == 1 and right_val == 1:\n                row.append(2)\n            else:\n                row.append(0)\n        output.append(row)\n        \n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ],
+            "expected_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0],
+              [0,2,0],
+              [0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0],
+              [0,2,0],
+              [0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [0,0,2],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [0,0,2],
+              [0,2,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0],
+              [2,0,0],
+              [0,0,2]
+            ],
+            "expected_output": [
+              [0,0,0],
+              [2,0,0],
+              [0,0,2]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 54.386807918548584,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n\n    # Find the divider column (filled with color 5)\n    col_5 = -1\n    for c in range(cols):\n        if grid[0][c] == 5:\n            col_5 = c\n            break\n\n    width = col_5\n    output = [[0] * width for _ in range(rows)]\n\n    for r in range(rows):\n        for c in range(width):\n            left_val = grid[r][c]\n            right_val = grid[r][col_5 + 1 + c]\n            # Red (2) appears where blue (1) overlaps in both halves\n            if left_val == 1 and right_val == 1:\n                output[r][c] = 2\n\n    return output",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    rows = len(grid)\n    cols = len(grid[0])\n\n    # Find the divider column (filled with color 5)\n    col_5 = -1\n    for c in range(cols):\n        if grid[0][c] == 5:\n            col_5 = c\n            break\n\n    width = col_5\n    output = [[0] * width for _ in range(rows)]\n\n    for r in range(rows):\n        for c in range(width):\n            left_val = grid[r][c]\n            right_val = grid[r][col_5 + 1 + c]\n            # Red (2) appears where blue (1) overlaps in both halves\n            if left_val == 1 and right_val == 1:\n                output[r][c] = 2\n\n    return output"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ],
+            "expected_output": [
+              [2,0,2],
+              [0,0,0],
+              [0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "05269061",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2]
+            ],
+            "expected_output": [
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2]
+            ],
+            "expected_output": [
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4]
+            ],
+            "expected_output": [
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 42.050835371017456,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    mod_map = {}\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] != 0:\n                mod_map[(r + c) % 3] = grid[r][c]\n                \n    output = [[0] * C for _ in range(R)]\n    for r in range(R):\n        for c in range(C):\n            output[r][c] = mod_map[(r + c) % 3]\n            \n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2]
+            ],
+            "expected_output": [
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2]
+            ],
+            "expected_output": [
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2],
+              [8,3,2,8,3,2,8],
+              [3,2,8,3,2,8,3],
+              [2,8,3,2,8,3,2]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2]
+            ],
+            "expected_output": [
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2],
+              [4,1,2,4,1,2,4],
+              [1,2,4,1,2,4,1],
+              [2,4,1,2,4,1,2]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4]
+            ],
+            "expected_output": [
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4],
+              [8,3,4,8,3,4,8],
+              [3,4,8,3,4,8,3],
+              [4,8,3,4,8,3,4]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 74.48169183731079,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    mapping = {}\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0:\n                mapping[(r + c) % 3] = val\n                \n    out = [[0] * C for _ in range(R)]\n    for r in range(R):\n        for c in range(C):\n            out[r][c] = mapping[(r + c) % 3]\n            \n    return out",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    mapping = {}\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0:\n                mapping[(r + c) % 3] = val\n                \n    out = [[0] * C for _ in range(R)]\n    for r in range(R):\n        for c in range(C):\n            out[r][c] = mapping[(r + c) % 3]\n            \n    return out"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2]
+            ],
+            "expected_output": [
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2],
+              [1,4,2,1,4,2,1],
+              [4,2,1,4,2,1,4],
+              [2,1,4,2,1,4,2]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "08ed6ac7",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,2,0,0,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,2,0,0,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 33.5587682723999,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    # Identify columns containing color 5 and count the number of 5s in each\n    col_counts = {}\n    for c in range(C):\n        count = sum(1 for r in range(R) if grid[r][c] == 5)\n        if count > 0:\n            col_counts[c] = count\n            \n    # Sort columns by count descending\n    sorted_cols = sorted(col_counts.keys(), key=lambda c: col_counts[c], reverse=True)\n    \n    # Map each column to its rank (1-indexed based on height/length rank)\n    col_rank = {}\n    for rank, c in enumerate(sorted_cols, start=1):\n        col_rank[c] = rank\n        \n    # Create the output grid with updated column colors\n    out = [row[:] for row in grid]\n    for r in range(R):\n        for c in range(C):\n            if out[r][c] == 5:\n                out[r][c] = col_rank[c]\n                \n    return out",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,1,0,0,0,0,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,1,0,0,0,0,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,0,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,0,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0],
+              [0,2,0,3,0,1,0,4,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,2,0,0,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,0,0,0,0,1,0],
+              [0,0,0,2,0,0,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,0,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0],
+              [0,4,0,2,0,3,0,1,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 13.268256425857544,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    # Calculate length of 5s in each column\n    col_lengths = []\n    for c in range(C):\n        count = sum(1 for r in range(R) if grid[r][c] == 5)\n        if count > 0:\n            col_lengths.append((count, c))\n            \n    # Sort columns by length descending, then column index ascending\n    col_lengths.sort(key=lambda x: (-x[0], x[1]))\n    \n    # Map column index to color (1-based rank)\n    col_to_color = {}\n    for rank, (count, c) in enumerate(col_lengths, start=1):\n        col_to_color[c] = rank\n        \n    # Create output grid\n    output_grid = [row[:] for row in grid]\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] == 5:\n                output_grid[r][c] = col_to_color[c]\n                \n    return output_grid",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    # Calculate length of 5s in each column\n    col_lengths = []\n    for c in range(C):\n        count = sum(1 for r in range(R) if grid[r][c] == 5)\n        if count > 0:\n            col_lengths.append((count, c))\n            \n    # Sort columns by length descending, then column index ascending\n    col_lengths.sort(key=lambda x: (-x[0], x[1]))\n    \n    # Map column index to color (1-based rank)\n    col_to_color = {}\n    for rank, (count, c) in enumerate(col_lengths, start=1):\n        col_to_color[c] = rank\n        \n    # Create output grid\n    output_grid = [row[:] for row in grid]\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] == 5:\n                output_grid[r][c] = col_to_color[c]\n                \n    return output_grid"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,1,0,0,0,0,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,1,0,0,0,0,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,0,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,0,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0],
+              [0,1,0,4,0,2,0,3,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "017c7c7b",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 138.73128652572632,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    n = len(grid)\n    period = n\n    for p in range(1, n + 1):\n        if all(grid[i] == grid[i % p] for i in range(n)):\n            period = p\n            break\n\n    target_rows = 9\n    out = []\n    for i in range(target_rows):\n        row = grid[i % period]\n        out.append([2 if val == 1 else val for val in row])\n    return out",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,2],
+              [0,2,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0],
+              [2,0,2],
+              [0,2,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0],
+              [0,2,0],
+              [2,2,0],
+              [0,2,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 24.741268396377563,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    n = len(grid)\n    \n    # Find the smallest period of the row sequence in the input grid\n    p = n\n    for candidate_p in range(1, n + 1):\n        if all(grid[i] == grid[i - candidate_p] for i in range(candidate_p, n)):\n            p = candidate_p\n            break\n            \n    # Extend the repeating pattern to 1.5x the original height (e.g., 6 -> 9)\n    out_h = int(n * 1.5)\n    \n    # Generate output by extending pattern and changing 1s to 2s\n    res = []\n    for i in range(out_h):\n        row = grid[i % p]\n        new_row = [2 if val == 1 else val for val in row]\n        res.append(new_row)\n        \n    return res",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    n = len(grid)\n    \n    # Find the smallest period of the row sequence in the input grid\n    p = n\n    for candidate_p in range(1, n + 1):\n        if all(grid[i] == grid[i - candidate_p] for i in range(candidate_p, n)):\n            p = candidate_p\n            break\n            \n    # Extend the repeating pattern to 1.5x the original height (e.g., 6 -> 9)\n    out_h = int(n * 1.5)\n    \n    # Generate output by extending pattern and changing 1s to 2s\n    res = []\n    for i in range(out_h):\n        row = grid[i % p]\n        new_row = [2 if val == 1 else val for val in row]\n        res.append(new_row)\n        \n    return res"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0]
+            ],
+            "expected_output": [
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0],
+              [2,2,2],
+              [0,2,0],
+              [0,2,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "025d127b",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,6,6,6,0,0,0,0],
+              [0,0,6,0,0,6,0,0,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,0,6,0,0],
+              [0,0,0,0,6,6,6,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,2,0,2,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,6,6,6,0,0,0,0],
+              [0,0,6,0,0,6,0,0,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,0,6,0,0],
+              [0,0,0,0,6,6,6,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,2,0,2,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,8,8,8,8,8,0,0],
+              [0,0,8,0,0,0,0,8,0],
+              [0,0,0,8,0,0,0,0,8],
+              [0,0,0,0,8,0,0,0,8],
+              [0,0,0,0,8,8,8,8,8],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,8,8,8,8,8,0,0],
+              [0,0,8,0,0,0,0,8,0],
+              [0,0,0,8,0,0,0,0,8],
+              [0,0,0,0,8,0,0,0,8],
+              [0,0,0,0,8,8,8,8,8],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 80.81355166435242,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    output = [[0] * C for _ in range(R)]\n    visited = set()\n\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] != 0 and (r, c) not in visited:\n                color = grid[r][c]\n                comp = []\n                queue = [(r, c)]\n                visited.add((r, c))\n                \n                head = 0\n                while head < len(queue):\n                    curr_r, curr_c = queue[head]\n                    head += 1\n                    comp.append((curr_r, curr_c))\n                    \n                    for dr in (-1, 0, 1):\n                        for dc in (-1, 0, 1):\n                            if dr == 0 and dc == 0:\n                                continue\n                            nr, nc = curr_r + dr, curr_c + dc\n                            if 0 <= nr < R and 0 <= nc < C:\n                                if (nr, nc) not in visited and grid[nr][nc] == color:\n                                    visited.add((nr, nc))\n                                    queue.append((nr, nc))\n                \n                max_row = max(pr for pr, pc in comp)\n                max_col = max(pc for pr, pc in comp if pr == max_row)\n                \n                for pr, pc in comp:\n                    if pr < max_row:\n                        new_c = min(pc + 1, max_col)\n                    else:\n                        new_c = pc\n                    output[pr][new_c] = color\n\n    return output",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,4,4,4,4,4,4,0,0],
+              [0,0,4,0,0,0,0,0,4,0],
+              [0,0,0,4,0,0,0,0,0,4],
+              [0,0,0,0,4,0,0,0,0,4],
+              [0,0,0,0,4,4,4,4,4,4],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,4,4,4,4,4,4,0,0],
+              [0,0,4,0,0,0,0,0,4,0],
+              [0,0,0,4,0,0,0,0,0,4],
+              [0,0,0,0,4,0,0,0,0,4],
+              [0,0,0,0,4,4,4,4,4,4],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,6,6,6,0,0,0,0],
+              [0,0,6,0,0,6,0,0,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,0,6,0,0],
+              [0,0,0,0,6,6,6,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,2,0,2,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,6,6,6,0,0,0,0],
+              [0,0,6,0,0,6,0,0,0],
+              [0,0,0,6,0,0,6,0,0],
+              [0,0,0,0,6,0,6,0,0],
+              [0,0,0,0,6,6,6,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,2,0,2,0,0,0],
+              [0,0,0,2,2,2,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,8,8,8,8,8,0,0],
+              [0,0,8,0,0,0,0,8,0],
+              [0,0,0,8,0,0,0,0,8],
+              [0,0,0,0,8,0,0,0,8],
+              [0,0,0,0,8,8,8,8,8],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,8,8,8,8,8,0,0],
+              [0,0,8,0,0,0,0,8,0],
+              [0,0,0,8,0,0,0,0,8],
+              [0,0,0,0,8,0,0,0,8],
+              [0,0,0,0,8,8,8,8,8],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 99.93734169006348,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    out_grid = [[0] * C for _ in range(R)]\n\n    visited = set()\n    components = []\n\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] != 0 and (r, c) not in visited:\n                color = grid[r][c]\n                comp = []\n                queue = [(r, c)]\n                visited.add((r, c))\n                while queue:\n                    curr_r, curr_c = queue.pop(0)\n                    comp.append((curr_r, curr_c))\n                    for dr in (-1, 0, 1):\n                        for dc in (-1, 0, 1):\n                            if dr == 0 and dc == 0:\n                                continue\n                            nr, nc = curr_r + dr, curr_c + dc\n                            if 0 <= nr < R and 0 <= nc < C:\n                                if grid[nr][nc] == color and (nr, nc) not in visited:\n                                    visited.add((nr, nc))\n                                    queue.append((nr, nc))\n                components.append((color, comp))\n\n    for color, comp in components:\n        comp_rows = {}\n        for r, c in comp:\n            if r not in comp_rows:\n                comp_rows[r] = []\n            comp_rows[r].append(c)\n\n        r_min = min(comp_rows.keys())\n        r_max = max(comp_rows.keys())\n\n        L = {r: min(cols) for r, cols in comp_rows.items()}\n        R_bound = {r: max(cols) for r, cols in comp_rows.items()}\n\n        max_L = max(L.values())\n        max_R = max(R_bound.values())\n\n        for r in comp_rows:\n            L_new = min(L[r] + 1, max_L)\n            R_new = min(R_bound[r] + 1, max_R)\n\n            if r == r_min or r == r_max:\n                for c in range(L_new, R_new + 1):\n                    out_grid[r][c] = color\n            else:\n                out_grid[r][L_new] = color\n                out_grid[r][R_new] = color\n\n    return out_grid",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    out_grid = [[0] * C for _ in range(R)]\n\n    visited = set()\n    components = []\n\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] != 0 and (r, c) not in visited:\n                color = grid[r][c]\n                comp = []\n                queue = [(r, c)]\n                visited.add((r, c))\n                while queue:\n                    curr_r, curr_c = queue.pop(0)\n                    comp.append((curr_r, curr_c))\n                    for dr in (-1, 0, 1):\n                        for dc in (-1, 0, 1):\n                            if dr == 0 and dc == 0:\n                                continue\n                            nr, nc = curr_r + dr, curr_c + dc\n                            if 0 <= nr < R and 0 <= nc < C:\n                                if grid[nr][nc] == color and (nr, nc) not in visited:\n                                    visited.add((nr, nc))\n                                    queue.append((nr, nc))\n                components.append((color, comp))\n\n    for color, comp in components:\n        comp_rows = {}\n        for r, c in comp:\n            if r not in comp_rows:\n                comp_rows[r] = []\n            comp_rows[r].append(c)\n\n        r_min = min(comp_rows.keys())\n        r_max = max(comp_rows.keys())\n\n        L = {r: min(cols) for r, cols in comp_rows.items()}\n        R_bound = {r: max(cols) for r, cols in comp_rows.items()}\n\n        max_L = max(L.values())\n        max_R = max(R_bound.values())\n\n        for r in comp_rows:\n            L_new = min(L[r] + 1, max_L)\n            R_new = min(R_bound[r] + 1, max_R)\n\n            if r == r_min or r == r_max:\n                for c in range(L_new, R_new + 1):\n                    out_grid[r][c] = color\n            else:\n                out_grid[r][L_new] = color\n                out_grid[r][R_new] = color\n\n    return out_grid"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,4,4,4,4,4,4,0,0],
+              [0,0,4,0,0,0,0,0,4,0],
+              [0,0,0,4,0,0,0,0,0,4],
+              [0,0,0,0,4,0,0,0,0,4],
+              [0,0,0,0,4,4,4,4,4,4],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,4,4,4,4,4,4,0,0],
+              [0,0,4,0,0,0,0,0,4,0],
+              [0,0,0,4,0,0,0,0,0,4],
+              [0,0,0,0,4,0,0,0,0,4],
+              [0,0,0,0,4,4,4,4,4,4],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "05f2a901",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,2,2,2,0,0,0,0,0],
+              [2,2,0,2,0,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,2,2,2,0,0,0,0,0],
+              [2,2,0,2,0,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,2,2,0,0,0,0],
+              [0,0,0,0,2,2,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0,0],
+              [0,0,0,0,2,2,8,8,0,0],
+              [0,0,0,0,0,0,8,8,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,2,2,0,0,0,0],
+              [0,0,0,0,2,2,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0,0],
+              [0,0,0,0,2,2,8,8,0,0],
+              [0,0,0,0,0,0,8,8,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0,0],
+              [0,2,2,2,2,2,0,0,0,0],
+              [0,0,2,2,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0,0],
+              [0,0,0,8,8,0,0,0,0,0],
+              [0,0,0,2,2,2,0,0,0,0],
+              [0,2,2,2,2,2,0,0,0,0],
+              [0,0,2,2,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 66.75513815879822,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    red_cells = []\n    teal_cells = []\n    \n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] == 2:\n                red_cells.append((r, c))\n            elif grid[r][c] == 8:\n                teal_cells.append((r, c))\n                \n    if not red_cells or not teal_cells:\n        return [row[:] for row in grid]\n        \n    r_min_r = min(r for r, c in red_cells)\n    r_max_r = max(r for r, c in red_cells)\n    r_min_c = min(c for r, c in red_cells)\n    r_max_c = max(c for r, c in red_cells)\n    \n    t_min_r = min(r for r, c in teal_cells)\n    t_max_r = max(r for r, c in teal_cells)\n    t_min_c = min(c for r, c in teal_cells)\n    t_max_c = max(c for r, c in teal_cells)\n    \n    row_overlap = max(r_min_r, t_min_r) <= min(r_max_r, t_max_r)\n    col_overlap = max(r_min_c, t_min_c) <= min(r_max_c, t_max_c)\n    \n    dr, dc = 0, 0\n    if col_overlap:\n        if r_max_r < t_min_r:\n            dr = t_min_r - 1 - r_max_r\n        elif r_min_r > t_max_r:\n            dr = t_max_r + 1 - r_min_r\n    elif row_overlap:\n        if r_max_c < t_min_c:\n            dc = t_min_c - 1 - r_max_c\n        elif r_min_c > t_max_c:\n            dc = t_max_c + 1 - r_min_c\n    else:\n        if r_max_r < t_min_r:\n            dr = t_min_r - 1 - r_max_r\n        elif r_min_r > t_max_r:\n            dr = t_max_r + 1 - r_min_r\n            \n        if r_max_c < t_min_c:\n            dc = t_min_c - 1 - r_max_c\n        elif r_min_c > t_max_c:\n            dc = t_max_c + 1 - r_min_c\n\n    out = [row[:] for row in grid]\n    for r, c in red_cells:\n        out[r][c] = 0\n    for r, c in red_cells:\n        out[r + dr][c + dc] = 2\n        \n    return out",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,2,0,0,0,0,0,0],
+              [0,0,0,2,2,0,0,0,0,0],
+              [0,8,8,2,2,0,0,0,0,0],
+              [0,8,8,0,2,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": false,
+        "api_error": true,
+        "converged_train": false,
+        "train_success": false,
+        "train_results": [],
+        "test_success": false,
+        "iterations_used": 1,
+        "latency": 150.96617245674133,
+        "generated_code": "",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "error": "LLM Call Failed: Gemini API call failed after 5 attempts (Status: 503): 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+          }
+        ],
+        "test_results": []
+      }
+    },
+    {
+      "task_id": "045e512c",
+      "baseline": {
+        "strategy": "baseline",
+        "success": false,
+        "api_error": false,
+        "train_success": false,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,8,0,8,0,3,0,3,0,3,0,3,0,3,0,3],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,8,0,8,0,3,0,3,0,3,0,3,0,3,0,3],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": false,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,4,0,0,0,0,0,0,0],
+              [2,2,0,2,2,2,0,2,2,2,0,1,1,1,0,0,0,0,0,0,0],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,4,0,0,0,4],
+              [2,2,0,2,2,2,0,2,2,2,0,1,1,1,0,4,4,4,0,4,4],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,4,0,0,0,4],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": false,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1]
+            ]
+          }
+        ],
+        "test_success": false,
+        "latency": 144.84686708450317,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n\n    # Find pixels per color\n    color_pixels = {}\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0:\n                if val not in color_pixels:\n                    color_pixels[val] = []\n                color_pixels[val].append((r, c))\n\n    if not color_pixels:\n        return [[0] * C for _ in range(R)]\n\n    # Template color is the one with maximum number of pixels\n    template_color = max(color_pixels.keys(), key=lambda k: len(color_pixels[k]))\n    temp_pixels = color_pixels[template_color]\n\n    r_min = min(r for r, c in temp_pixels)\n    r_max = max(r for r, c in temp_pixels)\n    c_min = min(c for r, c in temp_pixels)\n    c_max = max(c for r, c in temp_pixels)\n\n    H = r_max - r_min + 1\n    W = c_max - c_min + 1\n    S = max(H, W) + 1  # Step size (usually 4 for 3x3 objects)\n\n    rel_temp = set((r - r_min, c - c_min) for r, c in temp_pixels)\n\n    out = [[0] * C for _ in range(R)]\n\n    # Draw template shape\n    for dr, dc in rel_temp:\n        out[r_min + dr][c_min + dc] = template_color\n\n    # Draw other colors by stepping along the determined direction vector\n    for color, pixels in color_pixels.items():\n        if color == template_color:\n            continue\n\n        if len(pixels) == 1:\n            pr, pc = pixels[0]\n            center_r = r_min + H // 2\n            center_c = c_min + W // 2\n            dr = pr - center_r\n            dc = pc - center_c\n\n            step_r = 0 if dr == 0 else (S if dr > 0 else -S)\n            step_c = 0 if dc == 0 else (S if dc > 0 else -S)\n\n            start_tr = r_min + step_r\n            start_tc = c_min + step_c\n        else:\n            # Find matching top-left coordinate for the subset of template pixels\n            start_tr, start_tc = None, None\n            pr, pc = pixels[0]\n            for ir, ic in rel_temp:\n                tr = pr - ir\n                tc = pc - ic\n                if all((r - tr, c - tc) in rel_temp for r, c in pixels):\n                    start_tr, start_tc = tr, tc\n                    break\n\n            if start_tr is None:\n                start_tr = min(r for r, c in pixels)\n                start_tc = min(c for r, c in pixels)\n\n            dr = start_tr - r_min\n            dc = start_tc - c_min\n\n            step_r = 0 if dr == 0 else (S if dr > 0 else -S)\n            step_c = 0 if dc == 0 else (S if dc > 0 else -S)\n\n        # Replicate template pattern in direction (step_r, step_c)\n        tr, tc = start_tr, start_tc\n        while True:\n            placed = False\n            for dr_rel, dc_rel in rel_temp:\n                nr, nc = tr + dr_rel, tc + dc_rel\n                if 0 <= nr < R and 0 <= nc < C:\n                    out[nr][nc] = color\n                    placed = True\n\n            if not placed or (step_r == 0 and step_c == 0):\n                break\n\n            tr += step_r\n            tc += step_c\n\n    return out",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": false,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,2,2,2,0,2,2,2,0,2,2,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,2,2,2,0,2,2,2,0,2,2,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,8,0,8,0,3,0,3,0,3,0,3,0,3,0,3],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,8,0,8,0,3,0,3,0,3,0,3,0,3,0,3],
+              [0,0,0,0,0,0,8,8,8,0,3,3,3,0,3,3,3,0,3,3,3],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,4,0,0,0,4],
+              [2,2,0,2,2,2,0,2,2,2,0,1,1,1,0,4,4,4,0,4,4],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,4,0,0,0,4],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,4,0,0,0,4],
+              [2,2,0,2,2,2,0,2,2,2,0,1,1,1,0,4,4,4,0,4,4],
+              [2,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,4,0,0,0,4],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,6,0,6,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 92.5210509300232,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    # 1. Count non-zero colors\n    color_counts = {}\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0:\n                color_counts[val] = color_counts.get(val, 0) + 1\n                \n    # Template color T has the maximum pixel count\n    T = max(color_counts, key=color_counts.get)\n    \n    # 2. Extract template pixels and bounding box\n    template_pixels = [(r, c) for r in range(R) for c in range(C) if grid[r][c] == T]\n    min_r = min(r for r, c in template_pixels)\n    max_r = max(r for r, c in template_pixels)\n    min_c = min(c for r, c in template_pixels)\n    max_c = max(c for r, c in template_pixels)\n    \n    rel_template = {(r - min_r, c - min_c) for r, c in template_pixels}\n    \n    step_r = max_r - min_r + 2\n    step_c = max_c - min_c + 2\n    \n    possible_vectors = []\n    for kr in [-1, 0, 1]:\n        for kc in [-1, 0, 1]:\n            if kr == 0 and kc == 0:\n                continue\n            possible_vectors.append((kr * step_r, kc * step_c))\n            \n    # 3. Find unique (Color, Vector) repetition rules from seed pixels\n    seed_pairs = set()\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0 and val != T:\n                for VR, VC in possible_vectors:\n                    dr = r - min_r - VR\n                    dc = c - min_c - VC\n                    if (dr, dc) in rel_template:\n                        seed_pairs.add((val, (VR, VC)))\n                        break\n                        \n    # 4. Construct output grid\n    out_grid = [[0] * C for _ in range(R)]\n    \n    # Draw original template\n    for dr, dc in rel_template:\n        out_grid[min_r + dr][min_c + dc] = T\n        \n    # Draw repeating tiled shapes for each seed rule\n    for color, (VR, VC) in seed_pairs:\n        k = 1\n        while True:\n            origin_r = min_r + k * VR\n            origin_c = min_c + k * VC\n            has_drawn = False\n            for dr, dc in rel_template:\n                nr = origin_r + dr\n                nc = origin_c + dc\n                if 0 <= nr < R and 0 <= nc < C:\n                    out_grid[nr][nc] = color\n                    has_drawn = True\n            if not has_drawn:\n                break\n            k += 1\n            \n    return out_grid",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    # 1. Count non-zero colors\n    color_counts = {}\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0:\n                color_counts[val] = color_counts.get(val, 0) + 1\n                \n    # Template color T has the maximum pixel count\n    T = max(color_counts, key=color_counts.get)\n    \n    # 2. Extract template pixels and bounding box\n    template_pixels = [(r, c) for r in range(R) for c in range(C) if grid[r][c] == T]\n    min_r = min(r for r, c in template_pixels)\n    max_r = max(r for r, c in template_pixels)\n    min_c = min(c for r, c in template_pixels)\n    max_c = max(c for r, c in template_pixels)\n    \n    rel_template = {(r - min_r, c - min_c) for r, c in template_pixels}\n    \n    step_r = max_r - min_r + 2\n    step_c = max_c - min_c + 2\n    \n    possible_vectors = []\n    for kr in [-1, 0, 1]:\n        for kc in [-1, 0, 1]:\n            if kr == 0 and kc == 0:\n                continue\n            possible_vectors.append((kr * step_r, kc * step_c))\n            \n    # 3. Find unique (Color, Vector) repetition rules from seed pixels\n    seed_pairs = set()\n    for r in range(R):\n        for c in range(C):\n            val = grid[r][c]\n            if val != 0 and val != T:\n                for VR, VC in possible_vectors:\n                    dr = r - min_r - VR\n                    dc = c - min_c - VC\n                    if (dr, dc) in rel_template:\n                        seed_pairs.add((val, (VR, VC)))\n                        break\n                        \n    # 4. Construct output grid\n    out_grid = [[0] * C for _ in range(R)]\n    \n    # Draw original template\n    for dr, dc in rel_template:\n        out_grid[min_r + dr][min_c + dc] = T\n        \n    # Draw repeating tiled shapes for each seed rule\n    for color, (VR, VC) in seed_pairs:\n        k = 1\n        while True:\n            origin_r = min_r + k * VR\n            origin_c = min_c + k * VC\n            has_drawn = False\n            for dr, dc in rel_template:\n                nr = origin_r + dr\n                nc = origin_c + dc\n                if 0 <= nr < R and 0 <= nc < C:\n                    out_grid[nr][nc] = color\n                    has_drawn = True\n            if not has_drawn:\n                break\n            k += 1\n            \n    return out_grid"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,2,2,2,0,2,2,2,0,2,2,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,8,8,8,0,2,2,2,0,2,2,2,0,2,2,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,8,0,8,0,2,0,2,0,2,0,2,0,2,0,2],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "task_id": "00d62c1b",
+      "baseline": {
+        "strategy": "baseline",
+        "success": true,
+        "api_error": false,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0],
+              [0,0,3,0,0,0],
+              [0,3,4,3,0,0],
+              [0,0,3,4,3,0],
+              [0,0,0,3,0,0],
+              [0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0],
+              [0,0,3,0,0,0],
+              [0,3,4,3,0,0],
+              [0,0,3,4,3,0],
+              [0,0,0,3,0,0],
+              [0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,0,0,0,0],
+              [0,0,0,3,0,3,0,0,0,0],
+              [0,0,3,0,0,0,3,0,0,0],
+              [0,0,0,0,0,3,4,3,0,0],
+              [0,0,0,3,0,3,3,0,0,0],
+              [0,0,3,3,3,0,0,0,0,0],
+              [0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,0,0,0,0],
+              [0,0,0,3,0,3,0,0,0,0],
+              [0,0,3,0,0,0,3,0,0,0],
+              [0,0,0,0,0,3,4,3,0,0],
+              [0,0,0,3,0,3,3,0,0,0],
+              [0,0,3,3,3,0,0,0,0,0],
+              [0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,0,0],
+              [0,3,3,0,3,3,0,3,0,0],
+              [3,0,0,3,4,4,3,4,3,0],
+              [0,0,0,3,4,4,3,3,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,0,3,3,0,3,0,0],
+              [0,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,0,0],
+              [0,3,3,0,3,3,0,3,0,0],
+              [3,0,0,3,4,4,3,4,3,0],
+              [0,0,0,3,4,4,3,3,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,0,3,3,0,3,0,0],
+              [0,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 3,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,3,3,3,0,0,0,0],
+              [0,0,3,4,4,3,0,0,0,0],
+              [0,0,3,4,4,3,0,3,0,0],
+              [0,0,3,3,3,3,3,3,3,0],
+              [0,0,0,3,0,0,0,0,3,0],
+              [0,0,0,3,0,0,0,3,3,0],
+              [0,0,0,3,3,0,0,3,4,3],
+              [0,0,0,3,4,3,0,0,3,0],
+              [0,0,0,0,3,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,3,3,3,0,0,0,0],
+              [0,0,3,4,4,3,0,0,0,0],
+              [0,0,3,4,4,3,0,3,0,0],
+              [0,0,3,3,3,3,3,3,3,0],
+              [0,0,0,3,0,0,0,0,3,0],
+              [0,0,0,3,0,0,0,3,3,0],
+              [0,0,0,3,3,0,0,3,4,3],
+              [0,0,0,3,4,3,0,0,3,0],
+              [0,0,0,0,3,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 4,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,4,3,3,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,3,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,3,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,3,0,3,0,0],
+              [0,0,0,0,0,0,3,3,4,4,3,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,3,3,0,0,3,0,0,3,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,4,3,3,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,3,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,3,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,3,0,3,0,0],
+              [0,0,0,0,0,0,3,3,4,4,3,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,3,3,0,0,3,0,0,3,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "latency": 146.82940363883972,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    R = len(grid)\n    C = len(grid[0])\n    \n    visited = [[False] * C for _ in range(R)]\n    queue = []\n    \n    # Step 1: Add all border cells with value 0 to the BFS queue\n    for r in range(R):\n        for c in range(C):\n            if r == 0 or r == R - 1 or c == 0 or c == C - 1:\n                if grid[r][c] == 0 and not visited[r][c]:\n                    visited[r][c] = True\n                    queue.append((r, c))\n                    \n    # Step 2: Flood-fill to find all 0s reachable from the border\n    head = 0\n    while head < len(queue):\n        r, c = queue[head]\n        head += 1\n        \n        for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < R and 0 <= nc < C:\n                if grid[nr][nc] == 0 and not visited[nr][nc]:\n                    visited[nr][nc] = True\n                    queue.append((nr, nc))\n                    \n    # Step 3: Replace all unvisited 0s (enclosed holes) with 4\n    output_grid = [row[:] for row in grid]\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] == 0 and not visited[r][c]:\n                output_grid[r][c] = 4\n                \n    return output_grid",
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      },
+      "cegis": {
+        "strategy": "cegis",
+        "success": true,
+        "api_error": false,
+        "converged_train": true,
+        "train_success": true,
+        "train_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0],
+              [0,0,3,0,0,0],
+              [0,3,4,3,0,0],
+              [0,0,3,4,3,0],
+              [0,0,0,3,0,0],
+              [0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0],
+              [0,0,3,0,0,0],
+              [0,3,4,3,0,0],
+              [0,0,3,4,3,0],
+              [0,0,0,3,0,0],
+              [0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 1,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,0,0,0,0],
+              [0,0,0,3,0,3,0,0,0,0],
+              [0,0,3,0,0,0,3,0,0,0],
+              [0,0,0,0,0,3,4,3,0,0],
+              [0,0,0,3,0,3,3,0,0,0],
+              [0,0,3,3,3,0,0,0,0,0],
+              [0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,0,0,0,0],
+              [0,0,0,3,0,3,0,0,0,0],
+              [0,0,3,0,0,0,3,0,0,0],
+              [0,0,0,0,0,3,4,3,0,0],
+              [0,0,0,3,0,3,3,0,0,0],
+              [0,0,3,3,3,0,0,0,0,0],
+              [0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 2,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,0,0],
+              [0,3,3,0,3,3,0,3,0,0],
+              [3,0,0,3,4,4,3,4,3,0],
+              [0,0,0,3,4,4,3,3,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,0,3,3,0,3,0,0],
+              [0,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,0,0],
+              [0,3,3,0,3,3,0,3,0,0],
+              [3,0,0,3,4,4,3,4,3,0],
+              [0,0,0,3,4,4,3,3,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,3,4,4,3,0,0,0],
+              [0,0,0,0,3,3,0,3,0,0],
+              [0,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 3,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,3,3,3,0,0,0,0],
+              [0,0,3,4,4,3,0,0,0,0],
+              [0,0,3,4,4,3,0,3,0,0],
+              [0,0,3,3,3,3,3,3,3,0],
+              [0,0,0,3,0,0,0,0,3,0],
+              [0,0,0,3,0,0,0,3,3,0],
+              [0,0,0,3,3,0,0,3,4,3],
+              [0,0,0,3,4,3,0,0,3,0],
+              [0,0,0,0,3,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,3,3,3,0,0,0,0],
+              [0,0,3,4,4,3,0,0,0,0],
+              [0,0,3,4,4,3,0,3,0,0],
+              [0,0,3,3,3,3,3,3,3,0],
+              [0,0,0,3,0,0,0,0,3,0],
+              [0,0,0,3,0,0,0,3,3,0],
+              [0,0,0,3,3,0,0,3,4,3],
+              [0,0,0,3,4,3,0,0,3,0],
+              [0,0,0,0,3,0,0,0,0,0]
+            ]
+          },
+          {
+            "test_idx": 4,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,4,3,3,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,3,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,3,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,3,0,3,0,0],
+              [0,0,0,0,0,0,3,3,4,4,3,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,3,3,0,0,3,0,0,3,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,4,3,3,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,3,0,0,0,0,0,0,0,3,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,3,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,4,4,4,4,4,4,3,0,0,0,0],
+              [0,0,3,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,3,0,3,0,0],
+              [0,0,0,0,0,0,3,3,4,4,3,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,3,3,0,0,3,0,0,3,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ],
+        "test_success": true,
+        "iterations_used": 1,
+        "latency": 106.07836771011353,
+        "generated_code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    H = len(grid)\n    W = len(grid[0])\n    \n    visited = [[False] * W for _ in range(H)]\n    queue = []\n    \n    # Add all 0s on the outer border to queue\n    for r in range(H):\n        for c in range(W):\n            if r == 0 or r == H - 1 or c == 0 or c == W - 1:\n                if grid[r][c] == 0 and not visited[r][c]:\n                    visited[r][c] = True\n                    queue.append((r, c))\n                    \n    # BFS to mark all 0s reachable from the grid border\n    head = 0\n    while head < len(queue):\n        r, c = queue[head]\n        head += 1\n        \n        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < H and 0 <= nc < W:\n                if grid[nr][nc] == 0 and not visited[nr][nc]:\n                    visited[nr][nc] = True\n                    queue.append((nr, nc))\n                    \n    # Construct output grid, replacing unreachable (enclosed) 0s with 4\n    output = [row[:] for row in grid]\n    for r in range(H):\n        for c in range(W):\n            if grid[r][c] == 0 and not visited[r][c]:\n                output[r][c] = 4\n                \n    return output",
+        "iteration_history": [
+          {
+            "iteration": 1,
+            "status": "passed_all_train",
+            "code": "def transform(grid: list[list[int]]) -> list[list[int]]:\n    H = len(grid)\n    W = len(grid[0])\n    \n    visited = [[False] * W for _ in range(H)]\n    queue = []\n    \n    # Add all 0s on the outer border to queue\n    for r in range(H):\n        for c in range(W):\n            if r == 0 or r == H - 1 or c == 0 or c == W - 1:\n                if grid[r][c] == 0 and not visited[r][c]:\n                    visited[r][c] = True\n                    queue.append((r, c))\n                    \n    # BFS to mark all 0s reachable from the grid border\n    head = 0\n    while head < len(queue):\n        r, c = queue[head]\n        head += 1\n        \n        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < H and 0 <= nc < W:\n                if grid[nr][nc] == 0 and not visited[nr][nc]:\n                    visited[nr][nc] = True\n                    queue.append((nr, nc))\n                    \n    # Construct output grid, replacing unreachable (enclosed) 0s with 4\n    output = [row[:] for row in grid]\n    for r in range(H):\n        for c in range(W):\n            if grid[r][c] == 0 and not visited[r][c]:\n                output[r][c] = 4\n                \n    return output"
+          }
+        ],
+        "test_results": [
+          {
+            "test_idx": 0,
+            "success": true,
+            "is_correct": true,
+            "error_msg": "",
+            "actual_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ],
+            "expected_output": [
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,3,3,3,3,0,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,3,4,4,4,4,3,4,4,3,0,0,0,0,0,0,0],
+              [0,0,0,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,0,3,4,4,4,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,0,0,3,3,3,3,3,3,4,4,4,3,0,0],
+              [0,0,0,0,0,0,3,3,4,3,0,0,0,3,3,3,3,3,0,0],
+              [0,0,3,0,0,0,0,0,3,3,0,0,0,0,0,0,0,0,0,0],
+              [0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+              [0,0,3,0,3,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,4,4,4,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "faulty_task_ids": [],
+  "emergency_error": "SystemExit: 0"
+}

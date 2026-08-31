@@ -68,7 +68,6 @@ remove_aux_files() { run_docker latexmk -aux-directory=.tmp -c "$MAIN_FILE_ONLY"
 run_latexmk() { run_docker latexmk -aux-directory=.tmp -pdf "$@" "$MAIN_FILE_ONLY"; }
 count_on_log() { grep --ignore-case --count --perl-regexp --regexp="$1" "${@:2}" "$AUX_DIR/${MAIN_FILE_ONLY%.tex}.log"; }
 
-
-SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+SCRIPT_DIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
 _setConfigArgs "$@"
 main

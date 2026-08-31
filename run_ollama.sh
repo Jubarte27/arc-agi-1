@@ -10,22 +10,45 @@ if [[ -f "$SCRIPT_DIR/.venv/bin/activate" ]]; then
     source "$SCRIPT_DIR/.venv/bin/activate"
 fi
 
-# ── ROCm / Portable Ollama Environment ──────────────────────────────────────
-export ROCM_PATH="${ROCM_PATH:-/opt/rocm}"
-if [[ -d "${ROCM_PATH}/bin" ]]; then
-    export PATH="${ROCM_PATH}/bin:$SCRIPT_DIR/.ollama/bin:$PATH"
-elif [[ -d "$SCRIPT_DIR/.ollama/bin" ]]; then
+# ── Ollama Bundled Libraries ────────────────────────────────────────────────
+if [[ -d "${SCRIPT_DIR}/.ollama/lib/ollama" ]]; then
+    export LD_LIBRARY_PATH="${SCRIPT_DIR}/.ollama/lib/ollama:${LD_LIBRARY_PATH:-}"
+fi
+if [[ -d "$SCRIPT_DIR/.ollama/bin" ]]; then
     export PATH="$SCRIPT_DIR/.ollama/bin:$PATH"
 fi
 
+# ── NVIDIA / CUDA Environment ───────────────────────────────────────────────
+export CUDA_PATH="${CUDA_PATH:-/usr/local/cuda}"
+if [[ -d "${CUDA_PATH}/bin" ]]; then
+    export PATH="${CUDA_PATH}/bin:$PATH"
+fi
+if [[ -d "${CUDA_PATH}/lib64" ]]; then
+    export LD_LIBRARY_PATH="${CUDA_PATH}/lib64:${LD_LIBRARY_PATH:-}"
+elif [[ -d "${CUDA_PATH}/lib" ]]; then
+    export LD_LIBRARY_PATH="${CUDA_PATH}/lib:${LD_LIBRARY_PATH:-}"
+fi
+if [[ -n "${CUDA_VISIBLE_DEVICES:-}" ]]; then
+    export CUDA_VISIBLE_DEVICES
+fi
+
+# ── ROCm / AMD Environment ──────────────────────────────────────────────────
+export ROCM_PATH="${ROCM_PATH:-/opt/rocm}"
+if [[ -d "${ROCM_PATH}/bin" ]]; then
+    export PATH="${ROCM_PATH}/bin:$PATH"
+fi
 if [[ -d "${ROCM_PATH}/lib" ]]; then
-    export LD_LIBRARY_PATH="${ROCM_PATH}/lib:${SCRIPT_DIR}/.ollama/lib/ollama:${LD_LIBRARY_PATH:-}"
-elif [[ -d "${SCRIPT_DIR}/.ollama/lib/ollama" ]]; then
-    export LD_LIBRARY_PATH="${SCRIPT_DIR}/.ollama/lib/ollama:${LD_LIBRARY_PATH:-}"
+    export LD_LIBRARY_PATH="${ROCM_PATH}/lib:${LD_LIBRARY_PATH:-}"
 fi
 
 if [[ -n "${HSA_OVERRIDE_GFX_VERSION:-}" ]]; then
     export HSA_OVERRIDE_GFX_VERSION
+fi
+if [[ -n "${ROCR_VISIBLE_DEVICES:-}" ]]; then
+    export ROCR_VISIBLE_DEVICES
+fi
+if [[ -n "${HIP_VISIBLE_DEVICES:-}" ]]; then
+    export HIP_VISIBLE_DEVICES
 fi
 
 # MODEL_NAME=qwen2.5-coder:7b

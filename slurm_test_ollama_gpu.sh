@@ -15,6 +15,12 @@
 
 set -euo pipefail
 
+report_end() {
+    local exit_code=$? 
+    echo "Something made me finnish. Last exit code was: $exit_code"
+}
+trap report_end EXIT
+
 MODEL_NAME="${MODEL_NAME:-"hf.co/unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M"}"
 
 cd "$SCRATCH/arc-agi-1"
