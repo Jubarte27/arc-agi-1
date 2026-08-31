@@ -1,0 +1,69 @@
+#!/bin/bash
+#SBATCH --job-name=arc-ollama
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=lunaris
+#SBATCH --nodelist=lunaris
+#SBATCH --time=2:00:00
+#SBATCH --output=logs/slurm_arc_ollama_%j.out
+#SBATCH --error=logs/slurm_arc_ollama_%j.err
+
+set -euo pipefail
+
+cd "$SCRATCH"
+if [[ ! -d "arc-agi-1" ]]; then
+    echo "Cloning arc-agi-1 repository..."
+    git clone --branch ollama https://github.com/Jubarte27/arc-agi-1
+    cd arc-agi-1
+else
+    echo "arc-agi-1 repository already exists. Pulling latest changes..."
+    cd arc-agi-1
+    git pull origin ollama
+fi
+SCRIPT_DIR="$(pwd)"
+cd "$SCRIPT_DIR"
+
+mkdir -p "$SCRIPT_DIR/logs"
+
+export OLLAMA_HOST="${OLLAMA_HOST:-127.0.0.1:11434}"
+export OLLAMA_MODELS="${OLLAMA_MODELS:-$SCRIPT_DIR/.ollama/models}"
+export OLLAMA_BIN="${OLLAMA_BIN:-$SCRIPT_DIR/.ollama/bin/ollama}"
+export PATH="$SCRIPT_DIR/.ollama/bin:$PATH"
+
+echo "============================================================"
+echo "          Slurm: install portable Ollama + models           "
+echo "============================================================"
+echo "Workspace: $SCRIPT_DIR"
+echo "Ollama host: $OLLAMA_HOST"
+echo "Model storage: $OLLAMA_MODELS"
+echo "Binary: $OLLAMA_BIN"
+
+echo "Installing portable Ollama..."
+./install_ollama_portable.sh --dir "$SCRIPT_DIR/.ollama" --version "${OLLAMA_VERSION:-latest}"
+
+if [[ ! -x "$OLLAMA_BIN" ]]; then
+    echo "Error: Ollama binary not found at $OLLAMA_BIN" >&2
+    exit 1
+fi
+
+echo "Downloading configured models..."
+./download_models.sh \
+    --file "$SCRIPT_DIR/models.txt" \
+    --binary "$OLLAMA_BIN" \
+    --host "$OLLAMA_HOST" \
+    --models-dir "$OLLAMA_MODELS"
+
+
+cd "$SCRIPT_DIR"
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+
+echo "============================================================"
+echo "Portable Ollama install and model pull complete."
+echo "Run the ARC-CEGIS job with:"
+echo "  sbatch slurm_run_arc_ollama.sh"
+echo "============================================================"
