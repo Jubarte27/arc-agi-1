@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import argparse
-import math
 import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+from scipy.stats import binomtest
+from statsmodels.stats.contingency_tables import mcnemar
 
 if __package__:
     from .load_results_experiment import load_results
@@ -21,8 +22,14 @@ else:
 ALTERNATIVES = {"two-sided", "greater", "less"}
 
 
-def _exact_mcnemar_p_value(a_only: int, b_only: int, alternative: str = "two-sided") -> float:
-    """Exact p-value for McNemar's test based on discordant pairs."""
+def _paired_difference_p_value(
+    both_correct: int,
+    both_wrong: int,
+    a_only: int,
+    b_only: int,
+    alternative: str = "two-sided",
+) -> float:
+    """Library-based p-value for paired binary outcomes."""
     if alternative not in ALTERNATIVES:
         raise ValueError(f"alternative must be one of: {', '.join(sorted(ALTERNATIVES))}")
 
@@ -30,16 +37,12 @@ def _exact_mcnemar_p_value(a_only: int, b_only: int, alternative: str = "two-sid
     if discordant == 0:
         return 1.0
 
-    if alternative == "greater":
-        k = b_only
-        return float(sum(math.comb(discordant, x) for x in range(k, discordant + 1)) / (2**discordant))
+    contingency = [[both_correct, a_only], [b_only, both_wrong]]
 
-    if alternative == "less":
-        k = b_only
-        return float(sum(math.comb(discordant, x) for x in range(0, k + 1)) / (2**discordant))
+    if alternative == "two-sided":
+        return float(mcnemar(contingency, exact=True, correction=False).pvalue)
 
-    lower = sum(math.comb(discordant, x) for x in range(0, min(a_only, b_only) + 1)) / (2**discordant)
-    return float(min(1.0, 2 * lower))
+    return float(binomtest(k=b_only, n=discordant, p=0.5, alternative=alternative).pvalue)
 
 
 def _coerce_success_column(dataframe: pd.DataFrame, strategy: str, label: str) -> pd.DataFrame:
@@ -102,7 +105,13 @@ def compare_runs(
     both_correct = int((success_a & success_b).sum())
     both_wrong = int((~success_a & ~success_b).sum())
 
-    p_value = _exact_mcnemar_p_value(a_only, b_only, alternative=alternative)
+    p_value = _paired_difference_p_value(
+        both_correct=both_correct,
+        both_wrong=both_wrong,
+        a_only=a_only,
+        b_only=b_only,
+        alternative=alternative,
+    )
     n = len(paired)
     accuracy_a = float(success_a.mean())
     accuracy_b = float(success_b.mean())

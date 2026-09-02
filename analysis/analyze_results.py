@@ -1,13 +1,13 @@
 """Statistical analysis and plots for baseline versus CEGIS results."""
 
 import argparse
-import math
 import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+from statsmodels.stats.contingency_tables import mcnemar
 
 if __package__:
     from .load_results_experiment import load_results
@@ -16,17 +16,16 @@ else:
     from analysis.load_results_experiment import load_results
 
 
-def _exact_mcnemar_p_value(baseline_only: int, cegis_only: int) -> float:
+def _exact_mcnemar_p_value(
+    both_correct: int, both_wrong: int, baseline_only: int, cegis_only: int
+) -> float:
     """Return the two-sided exact McNemar p-value for any difference."""
     discordant = baseline_only + cegis_only
     if discordant == 0:
         return 1.0
 
-    lower_tail = sum(
-        math.comb(discordant, successes)
-        for successes in range(min(baseline_only, cegis_only) + 1)
-    ) / (2**discordant)
-    return min(1.0, 2 * lower_tail)
+    contingency = [[both_correct, baseline_only], [cegis_only, both_wrong]]
+    return float(mcnemar(contingency, exact=True, correction=False).pvalue)
 
 
 def _validate_results(dataframe: pd.DataFrame, strategy: str = "cegis") -> pd.DataFrame:
@@ -70,6 +69,8 @@ def calculate_significance(
     differences = cegis.astype(int) - baseline.astype(int)
     baseline_only = int(((baseline == 1) & (cegis == 0)).sum())
     cegis_only = int(((baseline == 0) & (cegis == 1)).sum())
+    both_correct = int(((baseline == 1) & (cegis == 1)).sum())
+    both_wrong = int(((baseline == 0) & (cegis == 0)).sum())
     sample_size = len(paired)
 
     rng = np.random.default_rng(seed)
@@ -83,7 +84,12 @@ def calculate_significance(
         (np.count_nonzero(null_bootstrap >= observed_difference) + 1)
         / (bootstrap_samples + 1)
     )
-    mcnemar_p_value = _exact_mcnemar_p_value(baseline_only, cegis_only)
+    mcnemar_p_value = _exact_mcnemar_p_value(
+        both_correct=both_correct,
+        both_wrong=both_wrong,
+        baseline_only=baseline_only,
+        cegis_only=cegis_only,
+    )
 
     return {
         "n": sample_size,
@@ -95,7 +101,7 @@ def calculate_significance(
         "accuracy_difference": float(differences.mean()),
         "baseline_only": baseline_only,
         "cegis_only": cegis_only,
-        "same_outcome": int((baseline == cegis).sum()),
+        "same_outcome": both_correct + both_wrong,
         "mcnemar_p_value": mcnemar_p_value,
         "bootstrap_better_p_value": bootstrap_p_value,
         "alpha": alpha,
