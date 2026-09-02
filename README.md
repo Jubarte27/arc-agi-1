@@ -85,6 +85,33 @@ python3 main.py --provider groq --model llama-3.3-70b-versatile --tasks ./data/t
 python3 main.py --tasks ./data/training --no-resume --output results_experiment.json
 ```
 
+### 4. Compare Two Runs with McNemar
+
+Use this to compare either:
+- two model runs with the same strategy; or
+- two strategies on the same run file.
+
+```bash
+# Model-vs-model (same strategy from different files)
+python3 analysis/compare_runs_mcnemar.py \
+  ./experiments/model_a/results_experiment.json \
+  ./experiments/model_b/results_experiment.json \
+  --strategy-a cegis --strategy-b cegis \
+  --label-a model_a --label-b model_b
+
+# Strategy-vs-strategy (same file)
+python3 analysis/compare_runs_mcnemar.py \
+  ./experiments/model_x/results_experiment.json \
+  ./experiments/model_x/results_experiment.json \
+  --strategy-a baseline --strategy-b cegis \
+  --label-a baseline --label-b cegis
+```
+
+By default, the script requires identical `task_id` sets in both runs and uses
+the exact two-sided McNemar test. Use `--alternative greater` to test whether
+run B is better than run A, and `--allow-partial-match` to compare only the
+overlapping tasks.
+
 ## Running Local Ollama on AMD ROCm GPUs
 
 The portable installer supports rootless installation with AMD ROCm GPU acceleration:
