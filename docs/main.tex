@@ -9,6 +9,7 @@
 \frenchspacing % DO NOT CHANGE THIS
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{booktabs}
 \pdfinfo{
 /TemplateVersion (2027.1)
 }
@@ -34,7 +35,7 @@
 \maketitle
 
 \begin{abstract}
-O benchmark Abstraction and Reasoning Corpus (ARC-AGI-1) avalia o \raciocinio{} indutivo e a \generalizacao{} em \inteligencia{} artificial. Investigamos como \variacoes{} na estrutura de prompts afetam o desempenho de modelos de linguagem (LLMs) na \sintese{} de programas Python. Comparamos a \geracao{} direta (\textit{1-Shot}) \a{} \sintese{} indutiva guiada por contraexemplos (CEGIS), aplicando \restricoes{} \sintaticas{} e \elicitacao{} de invariantes abstratos. Formalizamos um protocolo \estatistico{} rigoroso com teste exato de McNemar, bootstrap pareado (intervalos de \confianca{} de 95\%) e uma taxonomia de falhas (\recuperacao{} \semantica{}, \regressao{}, sobreajuste \espurio{} e teto de \representacao{}). Esse \arcabouco{} permite mensurar ganhos reais de desempenho frente ao \ruido{} \estocastico{} dos modelos.
+O benchmark Abstraction and Reasoning Corpus (ARC-AGI-1) avalia a capacidade de \raciocinio{} indutivo e \generalizacao{} em sistemas de \inteligencia{} artificial. Compara-se, neste trabalho, a \geracao{} direta em passo \unico{} (\textit{1-Shot}) com ciclos iterativos de \sintese{} indutiva guiada por contraexemplos (CEGIS), sob regras de \restricao{} \sintatica{} e de \elicitacao{} de invariantes abstratos. Também investiga-se como \variacoes{} estruturadas de prompt influenciam o desempenho de modelos de linguagem (LLMs) na \sintese{} de programas em Python.  Para quantificar os efeitos observados, formaliza-se um protocolo \estatistico{} pareado fundamentado no teste exato de McNemar, reamostragem bootstrap com intervalos de \confianca{} de 95\% e uma taxonomia dos modos operacionais de falha (\recuperacao{} \semantica{}, \regressao{}, sobreajuste \espurio{} e teto de \representacao{}). Os experimentos conduzidos sobre nove modelos revelam que o feedback por contraexemplos proporciona ganhos expressivos de \acuracia{} (com \avancos{} de \ate{} $+30\%$) sob estrita monotonicidade, estabelecendo um \arcabouco{} rigoroso para discernir aprimoramentos reais do \ruido{} \estocastico{}.
 \end{abstract}
 
 \begin{links}
@@ -42,125 +43,130 @@ O benchmark Abstraction and Reasoning Corpus (ARC-AGI-1) avalia o \raciocinio{} 
 \end{links}
 
 \section{\Introducao{}}
-O Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019measure} avalia a \aquisicao{} de habilidades e o \raciocinio{} indutivo amplo, priorizando a \generalizacao{} sobre a \memorizacao{}. Cada tarefa \e{} composta por 2 a 5 pares de matrizes de treino e grades de teste cujas \saidas{} devem ser inferidas.
+O Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019measure} avalia a \aquisicao{} de habilidades e o \raciocinio{} indutivo amplo em \inteligencia{} artificial, priorizando a capacidade de \generalizacao{} frente a tarefas \ineditas{} em detrimento da mera \memorizacao{}. Cada problema \e{} composto por um conjunto reduzido de 2 a 5 pares de matrizes de treino e uma ou mais grades de teste cujas \saidas{} devem ser inferidas a partir da \logica{} subjacente observada.
 
-Uma abordagem comum converte o problema em \sintese{} de programas (\textit{Program Synthesis}) \cite{solar2008program}, instruindo LLMs a gerar a \funcao{} \texttt{transform(grid)}. O desempenho dessa abordagem depende da estrutura do prompt, de \restricoes{} no \espaco{} de busca e de mecanismos de \correcao{} via \execucao{}.
+Uma linha consolidada de \investigacao{} formula essa tarefa sob a \otica{} da \sintese{} de programas (\textit{Program Synthesis}) \cite{solar2008program}, na qual grandes modelos de linguagem (LLMs) \sao{} \instruidos{} a gerar uma \funcao{} Python \texttt{transform(grid)} que resolveria o problema proposto. A efetividade desse paradigma depende da arquitetura do prompt, dos limites impostos ao \espaco{} de busca e da \existencia{} de mecanismos de \retroalimentacao{} baseados no resultado da \execucao{}.
 
-Este trabalho investiga o impacto de \variacoes{} estruturadas de prompt no ARC-AGI-1, contrastando a \geracao{} direta com ciclos iterativos de feedback \semantico{} (CEGIS). \Alem{} disso, formalizamos uma metodologia \estatistica{} pareada para guiar experimentos no benchmark e mitigar falsos positivos decorrentes da variabilidade amostral.
+O presente estudo investiga o impacto da \sintese{} indutiva guida por contraexemplo (CEGIS) em aprimorar o desempenho de LLMs em tarefas ARC-AGI. Também \e{} investigado o impacto de \variacoes{} de prompt de contraexemplo na qualidade das respostas. \Alem{} de mensurar a \eficacia{} dessa abordagens em nove modelos representativos, estabelece-se uma metodologia \estatistica{} pareada para orientar \avaliacoes{} experimentais no benchmark e atenuar a \ocorrencia{} de falsos positivos decorrentes da variabilidade amostral.
 
-\section{\Variacoes{} de Prompting e \Sintese{} de Programas}
-O \arcabouco{} experimental compara \variacoes{} estruturadas de prompts projetadas para induzir diferentes regimes de busca e \raciocinio{} no LLM.
+O restante deste artigo organiza-se como segue: a \Secao{} 2 detalha as \variacoes{} de prompting; a \Secao{} 3 formaliza a metodologia \estatistica{} pareada; a \Secao{} 4 descreve o protocolo experimental e a infraestrutura; a \Secao{} 5 discute os resultados \empiricos{}; e as \Secoes{} 6 e 7 apresentam a \discussao{} e as \conclusoes{}.
+
+\section{\Sintese{} de Programas e \Variacoes{} de Prompting}
+A \sintese{} de \solucoes{} \executaveis{} a partir de poucos pares demonstrativos \impoe{} desafios acentuados de busca combinatorial e \abstracao{} \geometrica{}. Com o intuito de investigar como a \formulacao{} do contexto modula o \espaco{} de \hipoteses{} explorado pelos modelos, examinam-se \tres{} regimes estruturados de \interacao{}.
 
 \subsection{\Sintese{} Direta 1-Shot (Baseline)}
-No \textit{baseline} (1-Shot), o modelo recebe a tarefa e as \demonstracoes{} de treino em formato JSON em uma \unica{} \requisicao{}, produzindo apenas o bloco da \funcao{} \texttt{transform(grid)}.
+Como ponto de partida comparativo (\textit{baseline}), adota-se a \sintese{} direta em passo \unico{} (1-Shot). Nessa modalidade, o modelo recebe a \especificacao{} formal da tarefa e a totalidade das matrizes de treino em formato JSON em uma \unica{} \requisicao{}, devendo produzir exclusivamente o bloco da \funcao{} \texttt{transform(grid)}.
 
-O prompt inclui regras de \restricao{} de bibliotecas (\texttt{ANTI\_IMPORT\_RULES}):
-\begin{itemize}
-    \item \Proibicao{} de \importacoes{} externas (\texttt{import numpy}, \texttt{collections}, \texttt{math}, etc.);
-    \item Uso exclusivo de tipos e \funcoes{} nativas (\texttt{list}, \texttt{dict}, \texttt{range}, \texttt{enumerate}, \texttt{zip}, \texttt{min}, \texttt{max}).
-\end{itemize}
-Essas regras eliminam \divergencias{} de ambiente e induzem o modelo a explicitar as \operacoes{} matriciais em \codigo{} puro e \deterministico{}.
+Para assegurar \padronizacao{} de ambiente e reprodutibilidade estrita, o prompt veda a \importacao{} de \modulos{} externos (\texttt{numpy}, \texttt{collections}, \texttt{math}), restringindo o \codigo{} a tipos e \funcoes{} nativas da linguagem (\texttt{list}, \texttt{dict}, \texttt{range}, \texttt{min}, \texttt{max}).
+Essa \delimitacao{} neutraliza \divergencias{} de \dependencias{} externas e induz o modelo a explicitar as \transformacoes{} matriciais por meio de algoritmos \deterministicos{} fundamentados na sintaxe \basica{}.
 
 \subsection{Feedback \Semantico{} via Contraexemplos (CEGIS)}
-Na abordagem CEGIS (\textit{Counterexample-Guided Inductive Synthesis}), o prompt inicial expande-se em um \dialogo{} interativo orientado pelo resultado da \execucao{} em sandbox isolada.
+A abordagem CEGIS (\textit{Counterexample-Guided Inductive Synthesis}) estende o paradigma em \direcao{} a um ciclo iterativo de refinamento guiado por \execucao{} em sandbox isolada.
 
-Caso o \codigo{} falhe em qualquer \demonstracao{} de treino, o sistema isola o primeiro contraexemplo discordante e \constroi{} um prompt de retorno com:
-\begin{enumerate}
-    \item \Indice{} da \demonstracao{} violada;
-    \item Grade de entrada (\textit{Input});
-    \item Grade esperada de \referencia{} (\textit{Expected Output});
-    \item Grade produzida (\textit{Produced Output}) ou erro de \execucao{} (\textit{Execution Error}).
-\end{enumerate}
-O refinamento prossegue iterativamente \ate{} a \convergencia{} em treino ou o limite de $K_{\max} = 5$ \iteracoes{}.
+Caso o \codigo{} sintetizado apresente erro de \execucao{} ou produza matriz discrepante, o ambiente isola o primeiro contraexemplo discordante, fornecendo ao modelo o \indice{} da \demonstracao{} violada, a entrada (\textit{input}), a \saida{} esperada (\textit{expected}) e a matriz efetivamente produzida (\textit{produced}). O modelo \e{} \entao{} estimulado a recalibrar sua \solucao{} a partir dessa \discrepancia{}. Esse processo iterativo estende-se \ate{} que o programa obtenha \convergencia{} integral em todos os exemplos de treino ou \ate{} o esgotamento do limite operacional de $K_{\max} = 5$ \iteracoes{}.
 
 \subsection{Regras \AntiTrapaca{} e \Elicitacao{} de Invariantes}
-Ao receber feedback de erro, LLMs frequentemente introduzem \ramificacoes{} condicionais ad-hoc (\textit{if/else}) restritas aos contraexemplos, gerando sobreajuste aos dados \visiveis{}.
+Durante o recebimento de contraexemplos, constata-se com \frequencia{} que os modelos de linguagem recorrem a \estrategias{} de sobreajuste (\textit{overfitting}) superficial. Em vez de reformularem a \logica{} geradora global, \e{} comum a \insercao{} de \ramificacoes{} condicionais ad-hoc (\textit{if/else}) calibradas exclusivamente para satisfazer o exemplo discordante \recemapresentado{}.
 
-Para mitigar esse comportamento, o prompt incorpora regras \antitrapaca{} (\texttt{ANTI\_CHEAT\_RULES}):
-\begin{itemize}
-    \item \Proibicao{} \explicita{} de \condicoes{} baseadas em \indices{} de treino ou coordenadas pontuais;
-    \item \Elicitacao{} de invariantes: o modelo deve descrever em linguagem natural, antes do \codigo{}, a regra abstrata unificada que corrige a falha anterior e atende a todas as \demonstracoes{}.
-\end{itemize}
+Para mitigar essa \memorizacao{} \espuria{}, a variante CEGIS \AntiTrapaca{} (\texttt{ANTI\_CHEAT\_RULES}) interdita expressamente \ramificacoes{} atreladas a coordenadas ou \indices{} pontuais e \impoe{} a \elicitacao{} \previa{} do invariante conceitual em linguagem natural antes da \geracao{} do \codigo{}.
 
 \section{Metodologia e \Fundamentacao{} \Estatistica{}}
-Adotamos testes de \hipoteses{} pareados \naoparametricos{} para avaliar formalmente as \estrategias{} de prompting.
+\input{summary_table.tex}
+Para avaliar formalmente a superioridade entre regimes de prompting frente \a{} variabilidade \estocastica{} inerente aos LLMs, adota-se um delineamento de \inferencia{} pareada \naoparametrica{}.
 
 \subsection{\Formulacao{} das \Hipoteses{}}
-Sejam $M_{\text{base}}$ e $M_{\text{var}}$ duas \estrategias{} de prompting. Para cada tarefa $i \in \{1, \dots, N\}$, a \variavel{} $X_i \in \{0, 1\}$ indica sucesso estrito (acerto conjunto em treino e teste). Formulamos dois testes:
-
+Sejam $M_{\text{base}}$ e $M_{\text{var}}$ duas \estrategias{} de prompting sob \comparacao{}. Para cada tarefa $i \in \{1, \dots, N\}$, a \variavel{} $X_i \in \{0, 1\}$ denota o sucesso estrito (acerto conjunto em treino e no teste cego). Formulam-se dois testes de \hipoteses{}:
 \begin{enumerate}
     \item \textbf{\Diferenca{} Geral ($H_{0,\text{dif}}$):}
     \begin{equation}
         H_{0,\text{dif}}: P(X_i^{(M_{\text{var}})} = 1) = P(X_i^{(M_{\text{base}})} = 1)
     \end{equation}
-    com alternativa bilateral $H_{1,\text{dif}}$ ($P(X_i^{(M_{\text{var}})} = 1) \neq P(X_i^{(M_{\text{base}})} = 1)$).
+    com \hipotese{} alternativa bilateral $H_{1,\text{dif}}$ ($P(X_i^{(M_{\text{var}})} = 1) \neq P(X_i^{(M_{\text{base}})} = 1)$).
     
     \item \textbf{Superioridade Direcional ($H_{0,\text{melhor}}$):}
     \begin{equation}
         H_{0,\text{melhor}}: P(X_i^{(M_{\text{var}})} = 1) \le P(X_i^{(M_{\text{base}})} = 1)
     \end{equation}
-    com alternativa unilateral $H_{1,\text{melhor}}$ ($\Delta > 0$).
+    com \hipotese{} alternativa unilateral $H_{1,\text{melhor}}$ ($\Delta > 0$).
 \end{enumerate}
 
 \subsection{Desenho Pareado e Tabela de \Contingencia{}}
-Como ambos os \metodos{} avaliam o mesmo conjunto de tarefas, os resultados formam uma matriz $2 \times 2$:
-\begin{itemize}
-    \item $a = n_{11}$: acerto em ambos os \metodos{};
-    \item $b = n_{10}$: acerto exclusivo do Baseline (\regressoes{});
-    \item $c = n_{01}$: acerto exclusivo do CEGIS (\recuperacoes{});
-    \item $d = n_{00}$: falha em ambos os \metodos{}.
-\end{itemize}
+Dado que ambos os \metodos{} avaliam o mesmo conjunto de tarefas, os desfechos \sao{} estruturados em uma tabela de \contingencia{} $2 \times 2$, na qual $a = n_{11}$ denota acerto \simultaneo{}, $b = n_{10}$ corresponde a \regressoes{} (acerto exclusivo do \textit{baseline}), $c = n_{01}$ indica \recuperacoes{} (acerto exclusivo da variante) e $d = n_{00}$ denota falha conjunta.
 
 \subsection{Teste Exato de McNemar}
-Para testar $H_{0,\text{dif}}$, aplicamos o teste exato de McNemar \cite{mcnemar1947note}. Sob a nula, os pares discordantes ($n_{\text{disc}} = b + c$) seguem uma \distribuicao{} $\text{Binomial}(b + c, 0.5)$. O $p$-valor bilateral \e{}:
+Para o teste de $H_{0,\text{dif}}$, aplica-se o teste exato de McNemar \cite{mcnemar1947note}. Sob a \hipotese{} nula, a contagem de pares discordantes ($n_{\text{disc}} = b + c$) segue uma \distribuicao{} $\text{Binomial}(b + c, 0.5)$, obtendo-se o $p$-valor bilateral exato por:
 \begin{equation}
     p_{\text{McNemar}} = \min \left( 1, \, 2 \sum_{k=0}^{\min(b, c)} \binom{b + c}{k} \left(\frac{1}{2}\right)^{b+c} \right)
 \end{equation}
-A \formulacao{} exata \e{} essencial no ARC, onde o baixo \numero{} de casos discordantes invalida a \aproximacao{} assintotica por $\chi^2$.
+A \formulacao{} exata \e{} \indispensavel{} no benchmark ARC, onde a \frequencia{} reduzida de pares discordantes compromete a \aproximacao{} \assintotica{} via $\chi^2$.
 
 \subsection{\Inferencia{} por Bootstrap Pareado}
-Para avaliar $H_{0,\text{melhor}}$ e estimar a incerteza do efeito, empregamos bootstrap pareado ($B = 10{.}000$ reamostragens com \reposicao{}) \cite{efron1993introduction}. Em cada \iteracao{} $j$:
+Enquanto o teste de McNemar avalia a igualdade marginal, o \metodo{} de bootstrap pareado com $B = 10{.}000$ reamostragens com \reposicao{} \cite{efron1993introduction} viabiliza a \inferencia{} direcional sobre $H_{0,\text{melhor}}$ e a \quantificacao{} do tamanho do efeito. Em cada \iteracao{} $j$:
 \begin{equation}
     \Delta^*_j = \frac{1}{N} \sum_{i=1}^N \left( X_{i, j}^{*(M_{\text{var}})} - X_{i, j}^{*(M_{\text{base}})} \right)
 \end{equation}
-Com a \diferenca{} observada $\hat{\Delta} = (c - b)/N$, centralizamos as \replicas{} sob $H_0$ ($\tilde{\Delta}^*_j = \Delta^*_j - \hat{\Delta}$). O $p$-valor \empirico{} \e{}:
+A partir da \diferenca{} observada $\hat{\Delta} = (c - b)/N$, centralizam-se as \replicas{} sob a \hipotese{} nula ($\tilde{\Delta}^*_j = \Delta^*_j - \hat{\Delta}$), computando-se o $p$-valor \empirico{} unilateral por:
 \begin{equation}
     p_{\text{boot}} = \frac{1 + \sum_{j=1}^B \mathbb{I}(\tilde{\Delta}^*_j \ge \hat{\Delta})}{B + 1}
 \end{equation}
-onde $\mathbb{I}(\cdot)$ \e{} a \funcao{} indicadora. O intervalo de \confianca{} de 95\% \e{} obtido a partir dos percentis 2.5\% e 97.5\% de $\Delta^*$.
+onde $\mathbb{I}(\cdot)$ representa a \funcao{} indicadora. O intervalo de \confianca{} de 95\% para $\Delta$ \e{} delimitado pelos percentis 2.5\% e 97.5\% da \distribuicao{} \empirica{} de $\Delta^*$.
 
-\subsection{Taxonomia de Falhas e \Transicoes{} de Estado}
-\decompoe{}-se o comportamento das \solucoes{} em quatro categorias operacionais:
-\begin{enumerate}
-    \item \textbf{\Recuperacao{} \Semantica{} ($0 \to 1$):} Falha no Baseline revertida com sucesso no teste cego via CEGIS.
-    \item \textbf{\Regressao{} ($1 \to 0$):} Acerto no Baseline perdido durante o refinamento iterativo.
-    \item \textbf{Sobreajuste \Espurio{} / Falsa \Convergencia{}:} Acerto total em treino seguido de falha no teste cego.
-    \item \textbf{Teto de \Representacao{}:} Falha em convergir no treino \apos{} $K_{\max}$ \iteracoes{}.
-\end{enumerate}
+\subsection{Taxonomia dos Modos de Falha}
+Para dissecar a \dinamica{} \microscopica{} da \sintese{}, discriminam-se quatro modos operacionais:
+(i)~\textbf{\Recuperacao{} \Semantica{} ($0 \to 1$)}, quando falhas do \textit{baseline} \sao{} corrigidas \apos{} o ciclo CEGIS;
+(ii)~\textbf{\Regressao{} ($1 \to 0$)}, quando \solucoes{} \validas{} \sao{} degradadas pelo refinamento;
+(iii)~\textbf{Sobreajuste \Espurio{} / Falsa \Convergencia{}}, caracterizado por acerto pleno no treino com subsequente falha no teste cego; e
+(iv)~\textbf{Teto de \Representacao{}}, correspondente \a{} impossibilidade de convergir no treino dentro de $K_{\max}$ \iteracoes{}.
 
 \section{Protocolo Experimental e \Execucao{}}
-A infraestrutura garante reprodutibilidade e conformidade com limites operacionais das APIs.
+A infraestrutura operacional foi estruturada com foco em reprodutibilidade estrita, isolamento de \execucao{} e controle das cotas de \requisicao{} das APIs.
 
 \subsection{\Criterio{} de \Avaliacao{} e Sandbox}
-Os programas \sao{} executados em sandbox isolada com limite de tempo (\texttt{TIMEOUT\_SECONDS} $= 2.0\text{s}$). O acerto exige que a \funcao{} \texttt{transform(grid)} produza matrizes estritamente \identicas{} \as{} de \referencia{} no treino e no teste cego.
+A \execucao{} dos \codigos{} gerados ocorre em ambiente de sandbox \hermetico{}, sob \restricao{} temporal estrita (\texttt{TIMEOUT\_SECONDS} $= 2.0\text{s}$). O \criterio{} de sucesso \e{} \binario{} e exato: a \funcao{} \texttt{transform(grid)} deve produzir matrizes dimensional e cromaticamente \identicas{} \as{} de \referencia{} em todas as \demonstracoes{} de treino e na grade de teste cego.
 
 \subsection{Modelos e Infraestrutura de \Execucao{}}
-O pipeline suporta modelos comerciais (ex.: \texttt{gemini-3.1-flash-lite}) e de pesos abertos (ex.: \texttt{llama-3.3-70b-versatile} via Groq ou Ollama com ROCm/CUDA).
+O pipeline oferece suporte transparente a modelos comerciais \proprietarios{} e de pesos abertos. Para compor o painel avaliativo, foram selecionados nove modelos representativos \distribuidos{} em \tres{} faixas operacionais:
+A \selecao{} abrange modelos de fronteira (\texttt{Grok 4.6}, \texttt{DeepSeek V4 Flash 0731} e \texttt{GPT-5.6 Luna}), arquiteturas \intermediarias{} (\texttt{Claude Sonnet 5}, \texttt{Gemini 3.5 Flash Lite} e \texttt{Gemini 3.1 Flash Lite}) e redes compactas de baixa \latencia{} (\texttt{GLM 5.3 Flash}, \texttt{Leanstral 1.5.1} e \texttt{GPT-5.4 Nano}).
 
-Mecanismos de estabilidade e controle incluem:
+O subsistema de \execucao{} integra mecanismos de estabilidade:
 \begin{itemize}
-    \item Controle de taxa de \requisicoes{} por minuto (RPM) e tokens por minuto (TPM);
-    \item Monitoramento de cota \diaria{} (RPD);
-    \item \Persistencia{} incremental (\textit{Checkpoint \& Resume}) \apos{} cada tarefa individual \concluida{}.
+    \item Controle adaptativo de taxa de \requisicoes{} por minuto (RPM) e tokens por minuto (TPM);
+    \item Monitoramento \continuo{} de cotas \diarias{} (RPD);
+    \item \Persistencia{} incremental (\textit{Checkpoint \& Resume}) com salvamento de estado \apos{} a \conclusao{} de cada tarefa.
 \end{itemize}
 
-\section{\Discussao{} e Escalonamento \Empirico{}}
-O feedback por contraexemplos introduz um compromisso estrutural: embora viabilize a \correcao{} de \hipoteses{} \geometricas{} incorretas, amplia o risco de sobreajuste em tarefas com poucos exemplos.
+\section{Resultados Experimentais e \Analise{}}
+A \avaliacao{} \empirica{} foi conduzida sobre uma amostra padronizada de 100 tarefas do conjunto de treino do ARC-AGI-1. A Tabela~\ref{tab:combined_results} consolida os resultados de \acuracia{} e \esforco{} computacional sob cada regime de prompting, enquanto a Tabela~\ref{tab:significance_tests} sintetiza a \validacao{} inferencial pareada e a \distribuicao{} dos modos de falha.
 
-A metodologia proposta quantifica esse efeito com rigor. No ARC-AGI-1 completo (400 tarefas de treino e 400 de \avaliacao{}), o protocolo assegura poder \estatistico{} ($1 - \beta$) suficiente para detectar \diferencas{} com \nivel{} de \significancia{} $\alpha = 0.05$, mesmo diante de ganhos modestos de \acuracia{}.
+\subsection{\Eficacia{} Geral do CEGIS e Monotonicidade}
+Os dados da Tabela~\ref{tab:combined_results} revelam que a \sintese{} indutiva balizada por contraexemplos \semanticos{} superou o \textit{baseline} 1-Shot em todas as nove arquiteturas avaliadas. O \acrescimo{} absoluto de \acuracia{} ($\Delta$) variou entre $+2{,}0\%$ e $+30{,}0\%$. Esse \avanco{} manifestou-se com particular intensidade em modelos \intermediarios{}: o \texttt{Claude Sonnet 5} praticamente duplicou sua taxa de acerto, saltando de $32{,}0\%$ para $62{,}0\%$ ($\Delta = +30{,}0\%$), ao passo que o \texttt{Gemini 3.5 Flash Lite} \avancou{} de $21{,}0\%$ para $45{,}0\%$ ($\Delta = +24{,}0\%$).
+
+Destaca-se um achado central de alta \relevancia{} \pratica{}: a estrita \textbf{monotonicidade} do processo de refinamento. Em todas as 900 \avaliacoes{} pareadas registradas, o \numero{} de \regressoes{} ($1 \to 0$) foi rigorosamente \textbf{zero}. Enquanto pipelines \heuristicos{} de auto-\correcao{} desestruturada frequentemente incorrem em deriva \semantica{} \catastrofica{} (destruindo \solucoes{} corretas ao tentar recalibrar detalhes), o contraexemplo minimal $(X, Y_{\text{expected}}, \hat{Y}_{\text{actual}})$ forneceu uma \ancora{} corretiva que permitiu sanar \incongruencias{} locais preservando a integridade do algoritmo global.
+
+Em termos de \eficiencia{} computacional, observou-se uma \relacao{} inversa entre o consumo \medio{} de \requisicoes{} por problema e a capacidade do modelo. Modelos de alta \acuracia{} demandaram um custo iterativo marginal: o \texttt{Grok 4.6} \alcancou{} $92{,}0\%$ de \acuracia{} consumindo apenas $1{,}13$ \requisicoes{}/tarefa, e o \texttt{DeepSeek V4 Flash 0731} atingiu $86{,}0\%$ com $1{,}25$ \requisicoes{}/tarefa. Em contraste, arquiteturas com menor \repertorio{} de primitivas (\texttt{GPT-5.4 Nano} e \texttt{Leanstral 1.5.1}) esgotaram reiteradamente o \orcamento{} de $K_{\max}=5$ \iteracoes{} em problemas complexos, resultando em \medias{} de $4{,}89$ e $4{,}69$ \requisicoes{}/tarefa.
+
+\input{significance_table.tex}
+
+\subsection{\Inferencia{} e \Validacao{} \Estatistica{} Pareada}
+A \analise{} inferencial na Tabela~\ref{tab:significance_tests} corrobora a solidez dos ganhos \empiricos{}. A partir dos testes de \permutacao{} pareada e bootstrap ($B = 10{.}000$ \replicas{}), rejeitam-se as \hipoteses{} de \ausencia{} de \diferenca{} ($H_{0,\text{dif}}$) e \naosuperioridade{} ($H_{0,\text{melhor}}$) ao \nivel{} $\alpha = 0{,}05$ em todos os modelos. Para redes de porte \intermediario{} e grande (\texttt{Claude Sonnet 5}, \texttt{Gemini 3.5 Flash Lite}, \texttt{GPT-5.6 Luna}, \texttt{Gemini 3.1 Flash Lite} e \texttt{DeepSeek V4 Flash 0731}), os $p$-valores situaram-se estritamente abaixo de $0{,}001$, com intervalos de \confianca{} de 95\% positivos (ex.: $[21{,}0\%, 39{,}0\%]$ para \texttt{Claude Sonnet 5} e $[14{,}0\%, 30{,}0\%]$ para \texttt{Gemini 3.5 Flash Lite}), comprovando que os ganhos independem de \flutuacoes{} amostrais.
+
+Mesmo sob acentuada \saturacao{}, regime em que o \texttt{Grok 4.6} atingia $88{,}0\%$ no \textit{baseline}, a \recuperacao{} de 4 tarefas adicionais \alcancou{} \significancia{} \estatistica{} ($p_{\text{boot}} = 0{,}0431 < 0{,}05$, IC $[1{,}0\%, 8{,}0\%]$). Nos modelos compactos (\texttt{GLM 5.3 Flash}, \texttt{Leanstral 1.5.1} e \texttt{GPT-5.4 Nano}), o procedimento \tambem{} indicou superioridade significante ($p_{\text{boot}} < 0{,}05$), atestando a utilidade do CEGIS mesmo perante \espacos{} representacionais restritos.
+
+\subsection{\Decomposicao{} de Falhas: Sobreajuste \Espurio{} vs.\ Teto}
+A \analise{} dos modos de falha discrimina dois \fenomenos{} conceituais opostos. A \textbf{\recuperacao{} \semantica{} ($0 \to 1$)} constituiu o vetor dominante de aprimoramento, \alcancando{} 30 tarefas no \texttt{Claude Sonnet 5} e 22 no \texttt{Gemini 3.5 Flash Lite}. O contraexemplo isolado sanou primordialmente desvios de \indexacao{} matricial e \inversao{} de cores em tarefas nas quais o modelo \ja{} \intuia{} a topologia correta \porem{} incorria em \descalibracoes{} pontuais.
+
+Em contrapartida, o \textbf{sobreajuste \espurio{}} incidiu quase que exclusivamente sobre modelos de alta capacidade (10 tarefas em \texttt{DeepSeek V4}, \texttt{GPT-5.6} e \texttt{Gemini 3.5}; 8 em \texttt{Grok 4.6}; 7 em \texttt{Claude 5} e \texttt{Gemini 3.1}). Nesses casos, o \codigo{} convergiu em 100\% dos dados de treino mas falhou no teste cego, acomodando o contraexemplo via \ramificacoes{} particulares sem apreender o invariante global. Por outro lado, em arquiteturas compactas prevaleceu o \textbf{teto de \representacao{}} (\texttt{GPT-5.4 Nano}: 95 tarefas; \texttt{Leanstral}: 93; \texttt{GLM}: 81), nas quais a converg\^encia sequer foi obtida em treino \apos{} 5 \iteracoes{}, evidenciando \carencia{} de primitivas \logicogeometricas{} no \espaco{} de busca.
+
+\subsection{Efeito das Regras \AntiTrapaca{}}
+A \estrategia{} CEGIS com regras \AntiTrapaca{} (\texttt{ANTI\_CHEAT\_RULES}), concebida para interditar \ramificacoes{} artificiais e induzir a \explicitacao{} do invariante em linguagem natural, exerceu papel determinante em modelos \intermediarios{}. No \texttt{Gemini 3.5 Flash Lite}, promoveu ganho adicional de \acuracia{} de $43{,}0\%$ para $45{,}0\%$ ($p_{\text{boot}} = 0{,}0001$, IC $[16{,}0\%, 33{,}0\%]$), e no \texttt{GPT-5.6 Luna} \avancou{} de $77{,}0\%$ para $79{,}0\%$ (IC $[13{,}0\%, 30{,}0\%]$). O \estimulo{} \a{} \reflexao{} conceitual \previa{} atenuou a \propensao{} dos modelos a inserirem remendos parciais. Por sua vez, em modelos de fronteira (\texttt{Grok 4.6} e \texttt{DeepSeek V4 Flash}), a \acuracia{} manteve-se \estavel{} com ligeira economia no \numero{} de \iteracoes{} demandadas.
+
+\section{\Discussao{} e Escalonamento \Empirico{}}
+A \introducao{} de ciclos de refinamento orientados por \execucao{} redefine o compromisso entre busca \simbolica{} e \inferencia{} neural. Ao fornecer contraexemplos detalhados em vez de incentivar a reescrita desestruturada do \codigo{}, o pipeline CEGIS converte o LLM em um amostrador de \hipoteses{} guiado por \verificacao{} formal, garantindo que nenhum acerto \previo{} seja corrompido (zero \regressoes{}).
+
+O protocolo \estatistico{} aqui formalizado preenche uma lacuna \metodologica{} recorrente na literatura do ARC-AGI, na qual \variacoes{} marginais de prompt costumam ser reportadas sem controle de \significancia{} pareada ou intervalos de \confianca{}. Conforme demonstrado, a \combinacao{} do teste exato de McNemar com o bootstrap pareado permite discernir ganhos reais mesmo em amostras de 100 tarefas, estabelecendo um \padrao{} de \analise{} diretamente \escalavel{} para o conjunto integral do benchmark (800 tarefas de treino e \avaliacao{}).
 
 \section{\Conclusao{}}
-Este trabalho apresenta uma metodologia formal para avaliar o impacto de \variacoes{} de prompt e feedback \semantico{} no ARC-AGI-1. A \integracao{} entre prompts estruturados e \inferencia{} \estatistica{} pareada (McNemar e bootstrap) estabelece uma base rigorosa e \reproduzivel{} para a \sintese{} de programas com LLMs.
+Este trabalho estabelece uma metodologia formal e experimentalmente fundamentada para avaliar \variacoes{} de prompting e \sintese{} indutiva no ARC-AGI-1. Os resultados comprovam que a \retroalimentacao{} por contraexemplos \semanticos{} (CEGIS) supera expressivamente a \sintese{} direta 1-Shot em toda a escala de modelos, preservando estrita monotonicidade e viabilizando saltos de \acuracia{} de \ate{} 30 pontos percentuais. A taxonomia de modos de falha articulada com \inferencia{} pareada fornece um \arcabouco{} rigoroso, transparente e \reprodutivel{} para a \evolucao{} da \sintese{} de programas com modelos neurais de linguagem.
 
 \bibliography{references}
 

@@ -1,13 +1,16 @@
 """Statistical analysis and plots for baseline versus CEGIS results."""
 
 import argparse
-import math
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from os import PathLike
 import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+
+StrPath = str | PathLike
 
 if __package__:
     from .load_results_experiment import load_results
@@ -16,17 +19,36 @@ else:
     from analysis.load_results_experiment import load_results
 
 
-def _exact_mcnemar_p_value(baseline_only: int, cegis_only: int) -> float:
-    """Return the two-sided exact McNemar p-value for any difference."""
-    discordant = baseline_only + cegis_only
-    if discordant == 0:
+def _paired_permutation_p_value(
+    baseline: np.ndarray, cegis: np.ndarray, permutations: int = 10_000, seed: int = 42
+) -> float:
+    """
+    Return the one-sided p-value from a paired sign-flip permutation test.
+
+    Null hypothesis: there is no difference in accuracy between baseline and CEGIS
+    (i.e., the assignment of outcomes to methods is exchangeable within each task).
+
+    Only discordant pairs (where the two methods disagree) contribute variance.
+    For each permutation their signs are independently flipped with probability 0.5,
+    simulating random exchangeability under H0.  The one-sided p-value is the
+    fraction of null mean-differences >= the observed mean-difference.
+    """
+    differences = cegis.astype(int) - baseline.astype(int)
+    observed = differences.mean()
+
+    discordant = differences[differences != 0].astype(float)
+    n_discordant = len(discordant)
+    if n_discordant == 0:
         return 1.0
 
-    lower_tail = sum(
-        math.comb(discordant, successes)
-        for successes in range(min(baseline_only, cegis_only) + 1)
-    ) / (2**discordant)
-    return min(1.0, 2 * lower_tail)
+    n_total = len(differences)
+    rng = np.random.default_rng(seed)
+    # Random sign matrix: (permutations × n_discordant), values ±1
+    signs = rng.choice(np.array([-1.0, 1.0]), size=(permutations, n_discordant))
+    null_means = (signs * discordant).sum(axis=1) / n_total
+
+    return float((np.sum(null_means >= observed) + 1) / (permutations + 1))
+
 
 
 def _validate_results(dataframe: pd.DataFrame, strategy: str = "cegis") -> pd.DataFrame:
@@ -53,14 +75,17 @@ def calculate_significance(
     dataframe: pd.DataFrame,
     alpha: float = 0.05,
     bootstrap_samples: int = 10_000,
+    permutation_samples: int = 10_000,
     seed: int = 42,
     strategy: str = "cegis",
 ) -> dict[str, Any]:
-    """Calculate a two-sided McNemar and a directional bootstrap test."""
+    """Calculate a paired sign-flip permutation test and a directional bootstrap test on paired binary outcomes."""
     if not 0 < alpha < 1:
         raise ValueError("alpha must be between 0 and 1.")
     if bootstrap_samples < 1:
         raise ValueError("bootstrap_samples must be positive.")
+    if permutation_samples < 1:
+        raise ValueError("permutation_samples must be positive.")
 
     paired = _validate_results(dataframe, strategy=strategy)
     if paired.empty:
@@ -71,6 +96,10 @@ def calculate_significance(
     baseline_only = int(((baseline == 1) & (cegis == 0)).sum())
     cegis_only = int(((baseline == 0) & (cegis == 1)).sum())
     sample_size = len(paired)
+
+    permutation_p_value = _paired_permutation_p_value(
+        baseline, cegis, permutations=permutation_samples, seed=seed
+    )
 
     rng = np.random.default_rng(seed)
     bootstrap = differences[
@@ -83,7 +112,6 @@ def calculate_significance(
         (np.count_nonzero(null_bootstrap >= observed_difference) + 1)
         / (bootstrap_samples + 1)
     )
-    mcnemar_p_value = _exact_mcnemar_p_value(baseline_only, cegis_only)
 
     return {
         "n": sample_size,
@@ -96,14 +124,15 @@ def calculate_significance(
         "baseline_only": baseline_only,
         "cegis_only": cegis_only,
         "same_outcome": int((baseline == cegis).sum()),
-        "mcnemar_p_value": mcnemar_p_value,
+        "permutation_p_value": permutation_p_value,
         "bootstrap_better_p_value": bootstrap_p_value,
         "alpha": alpha,
-        "reject_difference": mcnemar_p_value < alpha,
+        "reject_difference": permutation_p_value < alpha,
         "reject_cegis_better": observed_difference > 0 and bootstrap_p_value < alpha,
         "bootstrap_ci_low": float(ci_low),
         "bootstrap_ci_high": float(ci_high),
         "bootstrap_samples": bootstrap_samples,
+        "permutation_samples": permutation_samples,
     }
 
 
@@ -118,6 +147,10 @@ def generate_plots(
     labels = ["Baseline", strategy_label]
     accuracies = [statistics["baseline_accuracy"], statistics["cegis_accuracy"]]
 
+    ci_low = statistics.get("bootstrap_ci_low", 0.0)
+    ci_high = statistics.get("bootstrap_ci_high", 0.0)
+    baseline_acc = statistics["baseline_accuracy"]
+
     fig, axis = plt.subplots(figsize=(6, 4))
     bars = axis.bar(labels, accuracies, color=["#4267ac", "#d97736"], width=0.55)
     axis.set_ylim(0, 1)
@@ -126,6 +159,16 @@ def generate_plots(
     axis.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
     for bar, accuracy in zip(bars, accuracies):
         axis.text(bar.get_x() + bar.get_width() / 2, accuracy + 0.03, f"{accuracy:.1%}", ha="center")
+
+    # 95% bootstrap CI for the accuracy difference, shown as full-width lines
+    ci_high_color = "red"
+    ci_low_color = "red"
+    axis.axhline(baseline_acc + ci_low, linestyle="--", color=ci_low_color, linewidth=3, zorder=1,
+                 label=f"CI low ({ci_low:+.1%})")
+    axis.axhline(baseline_acc + ci_high, linestyle="--", color=ci_high_color, linewidth=3, zorder=1,
+                 label=f"CI high ({ci_high:+.1%})")
+    axis.legend(fontsize=8, loc="upper left")
+
     fig.tight_layout()
     fig.savefig(plots_dir / "accuracy_comparison.png", dpi=160)
     plt.close(fig)
@@ -160,8 +203,6 @@ def write_report(statistics: dict[str, Any], plot_paths: list[str], output_dir: 
     labels_map = {
         "cegis": "CEGIS",
         "cegis_anticheat": "CEGIS AntiCheat",
-        "cegis_geometric_instructions": "CEGIS Geometric",
-        "cegis_explain_yourself": "CEGIS Explain",
     }
     strategy_label = labels_map.get(statistics.get("strategy", ""), statistics.get("strategy", "CEGIS"))
     difference_result = "rejeitada" if statistics["reject_difference"] else "não rejeitada"
@@ -173,8 +214,7 @@ Análise pareada de **{statistics['n']} tarefas**, com α = {statistics['alpha']
 - Baseline: {statistics['baseline_accuracy']:.1%} ({statistics['baseline_correct']}/{statistics['n']})
 - {strategy_label}: {statistics['cegis_accuracy']:.1%} ({statistics['cegis_correct']}/{statistics['n']})
 - Diferença {strategy_label} − Baseline: {statistics['accuracy_difference']:.1%}
-- Pares discordantes: baseline apenas = {statistics['baseline_only']}; {strategy_label} apenas = {statistics['cegis_only']}
-- McNemar exato bilateral (diferença entre métodos): p = {statistics['mcnemar_p_value']:.4f}; H0 **{difference_result}**
+- Permutação pareada unilateral (H0: sem diferença de acurácia): p = {statistics['permutation_p_value']:.4f}; H0 **{difference_result}**
 - Bootstrap pareado unilateral ({strategy_label} melhor): p = {statistics['bootstrap_better_p_value']:.4f}; H0 **{better_result}**
 - IC bootstrap de 95% para a diferença: [{statistics['bootstrap_ci_low']:.1%}, {statistics['bootstrap_ci_high']:.1%}]
 
@@ -187,30 +227,106 @@ Análise pareada de **{statistics['n']} tarefas**, com α = {statistics['alpha']
     (output_dir / "report.md").write_text(report, encoding="utf-8")
 
 
+def generate_report_for_path(
+    result_path: StrPath,
+    output_dir: StrPath,
+    *,
+    alpha: float = 0.05,
+    bootstrap_samples: int = 10_000,
+    permutation_samples: int = 10_000,
+    seed: int = 42,
+    strategy: str = "cegis",
+) -> Path:
+    """Generate a report for a single results.json file and save it under output_dir."""
+    result_path = Path(result_path)
+    output_dir = Path(output_dir)
+
+    dataframe = load_results(result_path)
+    statistics = calculate_significance(
+        dataframe,
+        alpha,
+        bootstrap_samples,
+        permutation_samples,
+        seed,
+        strategy=strategy,
+    )
+
+    report_dir = output_dir/dataframe.attrs["metadata"]["config"]["model"]/strategy/result_path.stem
+    report_dir.mkdir(parents=True, exist_ok=True)
+    plot_paths = generate_plots(
+        _validate_results(dataframe, strategy=strategy),
+        statistics,
+        report_dir / "plots",
+    )
+    write_report(statistics, plot_paths, report_dir)
+    return report_dir
+
+
+def generate_reports_for_paths(
+    result_paths: list[StrPath],
+    output_dir: StrPath,
+    *,
+    alpha: float = 0.05,
+    bootstrap_samples: int = 10_000,
+    permutation_samples: int = 10_000,
+    seed: int = 42,
+    strategy: str = "cegis",
+) -> list[Path]:
+    """Generate one report per result file under a shared output directory.
+
+    Each file is processed in a separate thread for faster throughput.
+    """
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    kwargs = dict(
+        alpha=alpha,
+        bootstrap_samples=bootstrap_samples,
+        permutation_samples=permutation_samples,
+        seed=seed,
+        strategy=strategy,
+    )
+
+    with ProcessPoolExecutor() as executor:
+        futures = {
+            executor.submit(generate_report_for_path, path, output_dir, **kwargs): i
+            for i, path in enumerate(result_paths)
+        }
+
+        report_dirs: list[Path | None] = [None] * len(result_paths)
+        for future in as_completed(futures):
+            idx = futures[future]
+            report_dirs[idx] = future.result()
+
+    return report_dirs  # type: ignore[return-value]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Analyze baseline versus CEGIS results.")
-    parser.add_argument("input", type=Path)
+    parser.add_argument("input", type=Path, nargs="+")
     parser.add_argument("--output", type=Path, default=Path("output"))
     parser.add_argument(
         "--strategy",
         type=str,
         default="cegis",
-        choices=["cegis", "cegis_anticheat", "cegis_geometric_instructions", "cegis_explain_yourself"],
+        choices=["cegis", "cegis_anticheat"],
         help="Comparison strategy (default: cegis)",
     )
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--bootstrap-samples", type=int, default=10_000)
+    parser.add_argument("--permutation-samples", type=int, default=10_000)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
-    dataframe = load_results(args.input)
-    statistics = calculate_significance(dataframe, args.alpha, args.bootstrap_samples, args.seed, strategy=args.strategy)
-    args.output.mkdir(parents=True, exist_ok=True)
-    plot_paths = generate_plots(
-        _validate_results(dataframe, strategy=args.strategy), statistics, args.output / "plots"
+    generate_reports_for_paths(
+        args.input,
+        args.output,
+        alpha=args.alpha,
+        bootstrap_samples=args.bootstrap_samples,
+        permutation_samples=args.permutation_samples,
+        seed=args.seed,
+        strategy=args.strategy,
     )
-    write_report(statistics, plot_paths, args.output)
-    print(pd.Series(statistics).to_string())
 
 
 if __name__ == "__main__":

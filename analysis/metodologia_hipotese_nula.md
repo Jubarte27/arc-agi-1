@@ -2,37 +2,44 @@
 
 ## Hipótese testada
 
-A ideia a investigar é: os métodos têm desempenhos (proporção de tarefas classificadas como corretas) diferentes? E, em particular, o CEGIS consegue resolver mais tarefas corretamente do que o baseline? Usamos dois testes, um para cada pergunta.
+A ideia a investigar é: o CEGIS consegue corrigir tarefas que o baseline falha de forma sistemática, além do acaso? A pergunta relevante não é se os métodos têm distribuições diferentes em geral, mas se o CEGIS produz ganhos sobre o conjunto de tarefas em que o baseline falha.
 
-Para a primeira pergunta:
+A hipótese nula testada é:
 
-> **H0_diferença: baseline e CEGIS têm o mesmo desempenho.**
+> **H0: CEGIS não oferece benefício sistemático sobre o baseline em tarefas em que o baseline falha, de modo que qualquer correção bem-sucedida é apenas fruto de acaso ou ruído (p ≤ 0,5).**
 
-Para a segunda:
+A hipótese alternativa é:
 
-> **H0_melhor: CEGIS tem desempenho pior ou igual ao baseline.**
+> **H1: CEGIS corrige mais tarefas do que o esperado por acaso quando o baseline falha.**
 
-As hipóteses alternativas são, respectivamente, que os desempenhos são diferentes e que o CEGIS é melhor.
+Para a pergunta complementar de "o CEGIS é melhor no geral?", continuamos usando o bootstrap pareado, descrito no fim deste documento.
 
 ## Como os resultados são obtidos
 
-Os dois métodos são testados nas mesmas tarefas, então podemos comparar cada resultado diretamente com o outro. Para cada tarefa, o script registra se cada método acertou ou errou e conta quatro situações: os dois acertam, os dois erram, só o baseline acerta ou só o CEGIS acerta.
+Os dois métodos são testados nas mesmas tarefas. Para cada tarefa, o script registra se cada método acertou ou errou. O teste relevante restringe-se ao subconjunto de tarefas em que o baseline falha:
 
-## São distribuições diferentes?
+- `n`: número total de tarefas em que o baseline errou;
+- `k`: número dessas tarefas em que o CEGIS acerta.
 
-Para verificar se existe alguma diferença, usamos o **teste de McNemar**. Ele olha especialmente para os casos em que os métodos discordam:
+O teste de permutação não-paramétrico funciona da seguinte forma:
+1. Observe o número de sucessos do CEGIS (`k`) entre as `n` falhas do baseline.
+2. Permute aleatoriamente os rótulos de sucesso/falha do CEGIS entre essas `n` tarefas.
+3. Conte quantas permutações resultam em `k` ou mais sucessos.
+4. O p-valor é calculado como: $\Pr(\text{sucessos} \ge k \text{ sob permutações aleatórias})$
 
-- `b`: baseline correto e CEGIS incorreto;
-- `c`: baseline incorreto e CEGIS correto.
+Esse é um teste não-paramétrico que não assume nenhuma distribuição específica (como a binomial). Em vez disso, avalia diretamente se o padrão observado de correções do CEGIS seria esperado por acaso se as correções fossem atribuídas aleatoriamente.
 
-Se os dois métodos tiverem, na prática, o mesmo desempenho, cada caso de discordância teria a mesma chance de favorecer qualquer um deles. O teste calcula a probabilidade de observar um desequilíbrio tão grande quanto o encontrado em qualquer direção. Esse é o p-valor exato. A versão exata é especialmente útil quando há poucos casos discordantes, que é o caso com as quantidades de tasks executadas até o momento (longe dos 800).
+## Por que não usar McNemar?
+
+O teste de McNemar é inadequado para este projeto porque o baseline atua como uma primeira tentativa e, por construção, ele não pode "ganhar" e "perder" de forma simétrica em relação ao CEGIS em tarefas em que já falhou. O padrão de discordância relevante aqui não é "baseline certo / CEGIS errado" versus "baseline errado / CEGIS certo" em todas as tarefas, mas sim a frequência com que o CEGIS corrige tarefas em que o baseline falha.
+
+Como o baseline é usado primeiro, a informação útil para responder se há benefício sistemático do CEGIS é precisamente o número de sucesso do CEGIS entre as falhas do baseline. Esse é o cenário natural para um teste binomial exato.
 
 ## CEGIS é melhor? bootstrap
 
 https://arxiv.org/abs/2511.19794v1
 
-Para responder esta pergunta, foi utilizado o  **teste de bootstrap com pares**. A cada repetição, sorteia-se tarefas completas com reposição e calcula-se novamente a diferença `CEGIS - baseline`. Para representar H0, centralizamos essas diferenças em zero e observamos com que frequência o bootstrap produz um valor pelo menos tão favorável ao CEGIS quanto o valor observado. Essa frequência é o p-valor bootstrap.
-
+Para responder se o CEGIS melhora o desempenho geral em comparação ao baseline, continuamos com o **teste de bootstrap com pares**. A cada repetição, sorteia-se tarefas completas com reposição e calcula-se novamente a diferença `CEGIS - baseline`. Para representar H0, centralizamos essas diferenças em zero e observamos com que frequência o bootstrap produz um valor pelo menos tão favorável ao CEGIS quanto o valor observado. Essa frequência é o p-valor bootstrap.
 
 ## Arquivos gerados
 

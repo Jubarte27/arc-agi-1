@@ -1,0 +1,23 @@
+% Auto-generated statistical significance and error taxonomy table
+\begin{table*}[t]
+  \centering
+  \small
+  \caption{Testes de \significancia{} \estatistica{} pareada (\permutacao{} e Bootstrap, $B=10{.}000$) e \decomposicao{} de erros sob feedback \semantico{} ($\alpha = 0{,}05$).}
+  \label{tab:significance_tests}
+  \setlength{\tabcolsep}{4.5pt}
+  \begin{tabular}{lcccccc}
+    \toprule
+    Modelo & $\Delta_{\text{CEGIS}}$ & $p_{\text{perm}}$ (CEGIS) & $p_{\text{boot}}$ (CEGIS) & IC 95\% Bootstrap & Sobreajuste \Espurio{} & Teto Repres. \\
+    \midrule
+    \texttt{Grok 4.6} & +4.0\% & 0.0603 & 0.0431 & [1.0\%, 8.0\%] & 8 & 0 \\
+    \texttt{DeepSeek V4 Flash 0731} & +12.0\% & 0.0005 & 0.0007 & [6.0\%, 19.0\%] & 10 & 4 \\
+    \texttt{GPT-5.6 Luna} & +19.0\% & 0.0001 & 0.0001 & [12.0\%, 27.0\%] & 10 & 13 \\
+    \texttt{Claude Sonnet 5} & +30.0\% & 0.0001 & 0.0001 & [21.0\%, 39.0\%] & 7 & 31 \\
+    \texttt{Gemini 3.5 Flash Lite} & +22.0\% & 0.0001 & 0.0001 & [14.0\%, 30.0\%] & 10 & 47 \\
+    \texttt{Gemini 3.1 Flash Lite} & +19.0\% & 0.0001 & 0.0001 & [12.0\%, 27.0\%] & 7 & 62 \\
+    \texttt{GLM 5.3 Flash} & +9.0\% & 0.0012 & 0.0052 & [4.0\%, 15.0\%] & 0 & 81 \\
+    \texttt{Leanstral 1.5.1} & +4.0\% & 0.0603 & 0.0457 & [1.0\%, 8.0\%] & 0 & 93 \\
+    \texttt{GPT-5.4 Nano} & +4.0\% & 0.0603 & 0.0496 & [1.0\%, 8.0\%] & 0 & 95 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
