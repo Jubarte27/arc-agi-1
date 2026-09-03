@@ -183,7 +183,7 @@ def summarize_file(input_path: Path, output_path: Path | None = None) -> Path:
 
     delta_task_text = f"**{delta_tasks:+d} tasks**" if delta_tasks != 0 else "**0 tasks**"
     rows.append(
-        f"| **Delta / Impact** | **{_format_signed_percent(delta_accuracy)}** *({_format_signed_percent(relative_delta)} rel.)* | {delta_task_text} | {request_delta} | {avg_requests_delta:.2f} |"
+        f"| **Delta / Impact** | **{_format_signed_percent(delta_accuracy)}** *({_format_signed_percent(relative_delta)} rel.)* | {delta_task_text} | {request_delta:+d} | {avg_requests_delta:+.2f} |"
     )
 
     semantic_recovery, regression, spurious_overfitting, representation_ceiling = _derived_findings(payload)
