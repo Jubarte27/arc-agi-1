@@ -61,7 +61,14 @@ def _load_model_frame(path: Path, strategy: str, label: str) -> pd.DataFrame:
 def _to_markdown_table(dataframe: pd.DataFrame) -> str:
     if dataframe.empty:
         return "_No data available._"
-    return dataframe.to_markdown(index=False)
+    columns = [str(column) for column in dataframe.columns]
+    header = "| " + " | ".join(columns) + " |"
+    separator = "| " + " | ".join("---" for _ in columns) + " |"
+    body = []
+    for _, row in dataframe.iterrows():
+        values = [str(row[column]) for column in dataframe.columns]
+        body.append("| " + " | ".join(values) + " |")
+    return "\n".join([header, separator, *body])
 
 
 def compare_models(
