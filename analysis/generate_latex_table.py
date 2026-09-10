@@ -260,43 +260,54 @@ def generate_combined_latex_table(
     data_rows: list[str] = []
     for r in rows_data:
         display = _escape_latex(r["label"])
-        n = r["tasks"]
+        base = r["baseline_correct"]
+        cegis = r["cegis_correct"]
+        delta_cegis = cegis - base
+        delta_cegis_str = f"{delta_cegis:+d}"
 
         if any_anticheat:
-            ac_cell = f" & {_fmt_pct(r['anticheat_acc'])}" if r["has_anticheat"] else " & ---"
+            if r["has_anticheat"]:
+                ac_val = str(r["anticheat_correct"])
+                delta_ac = r["anticheat_correct"] - cegis
+                delta_ac_str = f"{delta_ac:+d}"
+            else:
+                ac_val = "---"
+                delta_ac_str = "---"
+            ac_cells = f" & {ac_val} & {delta_ac_str}"
         else:
-            ac_cell = ""
+            ac_cells = ""
+
+        avg_req = f"{r['avg_req']:.2f}"
+        rec = r["semantic_recovery"]
 
         data_rows.append(
-            f"    \\texttt{{{display}}} & {n} "
-            f"& {_fmt_pct(r['baseline_acc'])} "
-            f"& {_fmt_pct(r['cegis_acc'])}"
-            f"{ac_cell} "
-            f"& {_fmt_signed_pct(r['delta_acc'])} "
-            f"& {r['primary_correct']}/{n} "
-            f"& {r['avg_req']:.2f} "
-            f"& {r['semantic_recovery']} "
-            f"& {r['regression']} \\\\"
+            f"    \\texttt{{{display}}} & {base} & {cegis} & {delta_cegis_str}"
+            f"{ac_cells} & {avg_req} & {rec} \\\\"
         )
 
     rows_block = "\n".join(data_rows)
 
-    ac_header = " & AntiCheat" if any_anticheat else ""
-    ac_col = "c" if any_anticheat else ""
+    if any_anticheat:
+        col_spec = "l ccc cc cc"
+        ac_headers = r" & \AntiTrapaca{} & $\Delta$"
+    else:
+        col_spec = "l ccc cc"
+        ac_headers = ""
 
     table = rf"""% Auto-generated combined summary table
-\begin{{table}}[htbp]
+\begin{{table*}}[t]
   \centering
-  \caption{{Combined experimental results across models.}}
+  \small
+  \caption{{Resultados experimentais consolidados nos problemas avaliados do ARC-AGI-1 sob as abordagens 1-Shot, CEGIS e CEGIS \AntiTrapaca{{}}.}}
   \label{{tab:combined_results}}
-  \begin{{tabular}}{{lc ccc{ac_col} cccc}}
+  \begin{{tabular}}{{{col_spec}}}
     \toprule
-    Model & Tasks & Baseline & CEGIS{ac_header} & $\Delta$ & Solved & Avg.\ Req./Task & Recovery & Regression \\
+    Modelo & Baseline & CEGIS & $\Delta${ac_headers} & Req./Tarefa & \Recuperacao{{}} \\
     \midrule
 {rows_block}
     \bottomrule
   \end{{tabular}}
-\end{{table}}
+\end{{table*}}
 """
     return table
 

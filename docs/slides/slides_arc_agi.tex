@@ -1,0 +1,315 @@
+
+\documentclass[aspectratio=169, 10pt]{beamer}
+\usepackage[sfdefault]{roboto}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tcolorbox}
+
+% Theme configuration
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title[ARC-AGI-1: Baseline x CEGIS]{Experimento Comparativo Baseline x CEGIS}
+\subtitle{ARC-AGI-1}
+\author{Grupo C -- Fábio Cieslak, Izadora Candotti e Matheus Machado}
+\date{2026}
+
+
+
+\definecolor{mainblue}{HTML}{2a3990}
+\definecolor{brightblue}{HTML}{3c78d8}
+\definecolor{lightblue}{HTML}{ebf0f9}
+
+\setbeamercolor{frametitle}{fg=mainblue, bg=white}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+
+\setbeamertemplate{frametitle}{
+  \vspace{1em}% Space above the title
+  \begin{centering}
+    \usebeamerfont{frametitle}\insertframetitle\par
+  \end{centering}
+  \vspace{1em}% Space below the title
+}
+
+\setbeamersize{text margin left=3em, text margin right=3em}
+
+
+\setlength{\parindent}{1.5em}
+
+\beamertemplatenavigationsymbolsempty
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{
+  \hfill%
+  \usebeamerfont{page number in head/foot}%
+  \usebeamercolor[fg]{page number in head/foot}%
+  \normalsize\insertframenumber%  Use \insertframenumber/\inserttotalframenumber for X/Y format
+  \hspace*{2em}\vspace*{2em}%
+}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{CEGIS - Counterexample-Guided Inductive Synthesis}
+    
+    \vspace{0.3em}
+    \textcolor{brightblue}{\indent Ciclo iterativo de geração e validação que permite que a LLM refine a resposta, baseando-se em feedbacks que recebe sobre o desempenho das tentativas anteriores.}
+    
+    \vspace{0.5em}
+    \indent mainblue O contra-exemplo fornece as seguintes informações:
+    \begin{quote}
+        \begin{itemize}
+            \item A \textbf{entrada} do exemplo de treino específico onde o código falhou.
+            \item O \textbf{gabarito} oficial correspondente à entrada.
+            \item O \textbf{resultado} real gerado pela execução do código da LLM dentro do sandbox (verificador).
+        \end{itemize}
+    \end{quote}
+    
+    \vspace{0.5em}
+    \begin{tcolorbox}[colback=lightblue, opacityframe=0, arc=3pt, boxrule=0.5pt]
+        \textbf{\color{mainblue} Critério de Parada:} O ciclo termina ao acertar 100\% dos treinos ou ao esgotar o teto de 5 tentativas.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Fluxo do Experimento}
+    \centering
+    \begin{tikzpicture}[scale=0.8, transform shape]
+        \node[draw, fill=blue!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (base) at (0, 2) {Execução\\Baseline};
+        \node[draw, fill=purple!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (val1) at (3.5, 2) {Verificação com\\teste de treino};
+        \node[draw, fill=purple!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (feed) at (7, 2) {Feedback\\para a LLM};
+        \node[draw, fill=purple!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (cegis) at (10.5, 2) {Execução\\CEGIS};
+        
+        \node[draw, fill=blue!30, rounded corners, minimum width=3cm, minimum height=1cm, align=center] (hidden) at (10.5, 0) {Verificação com\\testes ocultos};
+        
+        \draw[->, thick] (base) -- (val1);
+        \draw[->, thick] (val1) -- (feed);
+        \draw[->, thick] (feed) -- (cegis);
+        \draw[->, thick] (base) -- (12.5, 2) -- (12.5, 0.5) -- (hidden);
+        \draw[->, thick] (cegis) |- (3.5, 0.8) node[midway, below] {Máx. 5 iterações};
+    \end{tikzpicture}
+    
+    \vspace{1em}
+    \small Fluxo iterativo comparando a execução direta (Baseline) com o ciclo de refinamento guiado por contra-exemplos (CEGIS).
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Como a LLM Recebe as Informações}
+    \begin{columns}
+        % \column{0.48\textwidth}
+        \textbf{Fase Inicial (Prompt Inicial)}
+        % \begin{itemize}
+        %     \item Apresenta a \textit{task} e os casos de exemplo.
+        %     \item Solicita que a LLM retorne:
+        %     \begin{itemize}
+        %         \item Uma estratégia em linguagem natural.
+        %         \item Um bloco de código Python que implemente a solução encontrada.
+        %     \end{itemize}
+        % \end{itemize}
+        
+        \column{0.48\textwidth}
+        \textbf{Ciclo de Feedback (Prompt com Contraexemplo)}
+        \begin{itemize}
+            \item Recebe o histórico das respostas anteriores.
+            \item Mensagem de erro estruturada:
+        \end{itemize}
+        \tiny
+        \begin{lstlisting}
+Your code failed on Training Example [idx]
+Input: [input_grid]
+Expected Output: [expected_grid]
+Produced Output: [output_string]
+[CODE_RULES]
+Analyze discrepancy, fix logic, and provide updated `transform(grid)` function.
+        \end{lstlisting}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Resposta da LLM}
+    \textbf{Formato Esperado:}
+    \begin{itemize}
+        \item \textbf{Linguagem Natural:} String de texto contendo a estratégia detalhada.
+        \item \textbf{Código Python:} No padrão obrigatório:
+        \begin{center}
+            \texttt{transform(grid: list[list[int]]) -> list[list[int]]}
+        \end{center}
+    \end{itemize}
+    
+    \vspace{0.5em}
+    \textbf{Exemplo de Estrutura da Resposta:}
+    \begin{lstlisting}
+The strategy to solve the task is to double each element...
+
+```python
+def transform(grid):
+    return [[cell * 2 for cell in row] for row in grid]
+```
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Critério de Avaliação da Resposta}
+    \begin{columns}
+        \column{0.48\textwidth}
+        \centering
+        \colorbox{green!10}{
+            \begin{minipage}{0.9\textwidth}
+                \centering
+                \vspace{0.5em}
+                \textbf{\large CORRETA}
+                
+                \vspace{0.5em}
+                Se a função \texttt{transform(grid)} retornada pela LLM passar em \textbf{todos} os casos de testes ocultos.
+                \vspace{0.5em}
+            \end{minipage}
+        }
+        
+        \column{0.48\textwidth}
+        \centering
+        \colorbox{red!10}{
+            \begin{minipage}{0.9\textwidth}
+                \centering
+                \vspace{0.5em}
+                \textbf{\large INCORRETA}
+                
+                \vspace{0.5em}
+                Se a função \texttt{transform(grid)} retornada pela LLM falhar em \textbf{algum} dos testes ocultos.
+                \vspace{0.5em}
+            \end{minipage}
+        }
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Efeitos Qualitativos Avaliados}
+    \centering
+    \textbf{Execução do Verificador}
+    
+    \vspace{0.5em}
+    \begin{columns}
+        \column{0.48\textwidth}
+        \centering
+        \colorbox{blue!10}{\parbox{0.9\textwidth}{\centering\textbf{Passou no treino}\\\small Validação com testes ocultos}}
+        
+        \column{0.48\textwidth}
+        \centering
+        \colorbox{orange!10}{\parbox{0.9\textwidth}{\centering\textbf{Falhou no treino}\\\small Investigação de falhas e recuperação}}
+    \end{columns}
+    
+    \vspace{1em}
+    \textbf{Principais Causas de Falha:}
+    \begin{itemize}
+        \item \textbf{Recuperação Semântica:} Dificuldade em corrigir o raciocínio fundamental.
+        \item \textbf{Falsa Convergência:} Falha por sobreajuste artificial (\textit{overfitting}).
+        \item \textbf{Reparo Destrutivo:} Corrompe código que já era válido e não encontra o erro.
+        \item \textbf{Esgotamento:} Esgota as tentativas sem solucionar o treino.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Comparação de Desempenho (Gemini Flash-Lite)}
+    \begin{columns}
+        \column{0.48\textwidth}
+        \centering
+        \textbf{Exp 1: CEGIS Padrão}
+        \small (100 tasks, Gemini Flash-Lite)
+        
+        \vspace{0.5em}
+        \begin{itemize}
+            \item Resolvido no Baseline: \textbf{39.0\%}
+            \item Ganho do CEGIS: \textbf{8.0\%}
+            \item Não Resolvido: \textbf{53.0\%}
+        \end{itemize}
+        
+        \column{0.48\textwidth}
+        \centering
+        \textbf{Exp 2: Com Ajuste de Prompt}
+        \small (100 tasks, Gemini Flash-Lite)
+        
+        \vspace{0.5em}
+        \begin{itemize}
+            \item Resolvido no Baseline: \textbf{39.0\%}
+            \item Ganho do CEGIS: \textbf{16.0\%}
+            \item Não Resolvido: \textbf{45.0\%}
+        \end{itemize}
+    \end{columns}
+    
+    \vspace{1em}
+    \begin{center}
+        \textit{A melhoria no prompt aumentou significativamente a eficácia do ganho por CEGIS.}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Eficiência e Custo de Execução}
+    \centering
+    \begin{table}
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Métrica} & \textbf{Baseline (1-Shot)} & \textbf{Exp 1: CEGIS Padrão} & \textbf{Exp 2: CEGIS (+ Anti-Cheat)} \\
+            \midrule
+            Total de Requisições & 100 & 341 & 300 \\
+            Acurácia (\%) & 39\% & 55\% & 60\% \\
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.5em}
+    Comparação direta entre precisão (mais acertos) e custo (número de chamadas de API). O experimento 2 otimizou o número de requisições mantendo alta acurácia.
+\end{frame}
+
+\begin{frame}{Onde está o gargalo?}
+    \centering
+    \vspace{1em}
+    {\Large\color{mainblue}\textbf{Onde está o gargalo?}}
+    
+    \vspace{1em}
+    {\large No método de síntese (CEGIS) ou na capacidade do modelo Gemini Flash-Lite?}
+    
+    \vspace{1.5em}
+    \textit{Analisando as causas das tarefas não resolvidas e testando com outros modelos de linguagem.}
+\end{frame}
+
+\begin{frame}{Comparação com Outros Modelos}
+    \begin{columns}
+        \column{0.48\textwidth}
+        \centering
+        \textbf{Nemotron-3 Ultra 550B}
+        \small (137 Tarefas)
+        
+        \vspace{0.5em}
+        \begin{itemize}
+            \item Resolvido no Baseline: \textbf{25.5\%}
+            \item Ganho do CEGIS: \textbf{19.7\%}
+            \item Não Resolvido: \textbf{54.7\%}
+        \end{itemize}
+        
+        \column{0.48\textwidth}
+        \centering
+        \textbf{DeepSeek-V4 Flash}
+        \small (96 Tarefas)
+        
+        \vspace{0.5em}
+        \begin{itemize}
+            \item Resolvido no Baseline: \textbf{32.3\%}
+            \item Ganho do CEGIS: \textbf{25.0\%}
+            \item Não Resolvido: \textbf{42.7\%}
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\end{document}
