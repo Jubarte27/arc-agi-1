@@ -18,6 +18,12 @@ envs
 # Experiment outputs & logs
 results_*.json
 *.log
+# Arquivos auxiliares do LaTeX
+*.aux
+*.nav
+*.out
+*.snm
+*.toc
 !experiments/**/results_*.json
 
 # IDE & OS
