@@ -1,0 +1,113 @@
+\documentclass{beamer}
+\usetheme{Madrid} % Tema clássico e limpo (outras opções: Metropolis, Frankfurt)
+\usecolortheme{default}
+\usepackage{booktabs}
+\usepackage{graphicx}
+% Informações da Capa
+\title[ARC-AGI-1 e CEGIS]{Análise do Impacto de Variações de Prompting e Feedback Semântico no ARC-AGI-1}
+\author[Cieslak, Machado]{Fabio Luiz da C. Cieslak \and Matheus Machado}
+\institute[UFRGS]{Universidade Federal do Rio Grande do Sul}
+\date{Setembro 2026}
+
+\begin{document}
+
+% 1º Slide: Capa automática
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% 2º Slide: Exemplo de conteúdo com tópicos
+\begin{frame}{Introdução ao Problema}
+    \begin{itemize}
+        \item O benchmark ARC-AGI-1 avalia raciocínio indutivo e generalização.
+        \item Modelos costumam recorrer a sobreajustes espúrios (ramificações \textit{if/else}).
+        \item \textbf{Nossa abordagem:} Utilizar a síntese indutiva guiada por contraexemplos (CEGIS) com regras Anti-Trapaça.
+    \end{itemize}
+\end{frame}
+% 3º Slide: Metodologia
+\begin{frame}{Metodologia}
+    \begin{itemize}
+        \item \textbf{Avaliação:} 100 tarefas do conjunto de treino do ARC-AGI-1.
+        \item \textbf{Modelos avaliados:} 9 modelos de linguagem (fronteira, intermediários e compactos).
+        \item \textbf{Métricas Analisadas:}
+        \begin{itemize}
+            \item Acurácia (sucesso estrito no teste cego).
+            \item Custo iterativo (requisições por tarefa).
+            \item Taxonomia de erros (Recuperação vs. Regressão).
+        \end{itemize}
+        \item \textbf{Inferência Estatística:} Reamostragem Bootstrap (10.000 iterações).
+    \end{itemize}
+\end{frame}
+
+% 4º Slide: Resultados (Tabela 1)
+\begin{frame}{Resultados: Desempenho e Eficiência}
+    \begin{table}[ht]
+        \centering
+        \resizebox{0.95\textwidth}{!}{%
+        \begin{tabular}{l ccccc}
+            \toprule
+            Modelo & CEGIS & Anti-Trapaça & $\Delta$ & Req./Tarefa & Recuperação \\
+            \midrule
+            \texttt{Grok 4.6} & 92 & 92 & +0 & 1.13 & 4 \\
+            \texttt{DeepSeek V4 Flash 0731} & 86 & 86 & +0 & 1.25 & 12 \\
+            \texttt{GPT-5.6 Luna} & 77 & 79 & +2 & 2.00 & 19 \\
+            \texttt{Claude Sonnet 5} & 62 & 60 & -2 & 2.90 & 30 \\
+            \texttt{Gemini 3.5 Flash Lite} & 43 & 45 & +2 & 3.23 & 22 \\
+            \texttt{Gemini 3.1 Flash Lite} & 31 & 24 & -7 & 4.07 & 19 \\
+            \texttt{GLM 5.3 Flash} & 19 & 17 & -2 & 4.42 & 9 \\
+            \texttt{Leanstral 1.5.1} & 7 & 9 & +2 & 4.69 & 4 \\
+            \texttt{GPT-5.4 Nano} & 5 & 3 & -2 & 4.89 & 4 \\
+            \bottomrule
+        \end{tabular}%
+        }
+    \end{table}
+    
+    \vspace{0.3cm}
+    \small \textbf{Destaque:} A regra Anti-Trapaça alavancou os modelos intermediários. Foram observadas \textbf{zero regressões} em todos os testes.
+\end{frame}
+% 5º Slide: Validação Estatística (Tabela 2)
+\begin{frame}{Resultados: Validação Estatística e Erros}
+    \begin{table}[ht]
+        \centering
+        \resizebox{0.95\textwidth}{!}{%
+        \begin{tabular}{lcccc}
+            \toprule
+            Modelo & $p_{\text{boot}}$ & IC 95\% Bootstrap & Sobreajuste Espúrio & Teto Repres. \\
+            \midrule
+            \texttt{Grok 4.6} & 0.0431 & [1.0\%, 8.0\%] & 8 & 0 \\
+            \texttt{DeepSeek V4 Flash 0731} & 0.0007 & [6.0\%, 19.0\%] & 10 & 4 \\
+            \texttt{GPT-5.6 Luna} & 0.0001 & [12.0\%, 27.0\%] & 10 & 13 \\
+            \texttt{Claude Sonnet 5} & 0.0001 & [21.0\%, 39.0\%] & 7 & 31 \\
+            \texttt{Gemini 3.5 Flash Lite} & 0.0001 & [14.0\%, 30.0\%] & 10 & 47 \\
+            \texttt{Gemini 3.1 Flash Lite} & 0.0001 & [12.0\%, 27.0\%] & 7 & 62 \\
+            \texttt{GLM 5.3 Flash} & 0.0052 & [4.0\%, 15.0\%] & 0 & 81 \\
+            \texttt{Leanstral 1.5.1} & 0.0457 & [1.0\%, 8.0\%] & 0 & 93 \\
+            \texttt{GPT-5.4 Nano} & 0.0496 & [1.0\%, 8.0\%] & 0 & 95 \\
+            \bottomrule
+        \end{tabular}%
+        }
+    \end{table}
+    
+    \vspace{0.3cm}
+    \small \textbf{Análise:} Ganhos estatisticamente significantes ($p < 0.05$) em toda a escala de modelos. Modelos compactos esbarram no \textbf{Teto de Representação}.
+\end{frame}
+
+% 6º Slide: Conclusão
+\begin{frame}{Conclusões}
+    \begin{itemize}
+        \item \textbf{Eficácia do CEGIS:} A retroalimentação semântica baseada em contraexemplos gera ganhos consistentes (com avanços de até +30\%).
+        \item \textbf{Segurança Estrutural:} Preservação total de acertos prévios ao longo dos ciclos iterativos (estrita monotonicidade).
+        \item \textbf{Impacto do Anti-Trapaça:} Mitigou o sobreajuste espúrio, trazendo benefícios visíveis para modelos intermediários.
+        \item \textbf{Rigor Metodológico:} O Bootstrap permitiu discernir aprimoramentos reais do ruído estocástico, criando um modelo de validação escalável.
+    \end{itemize}
+\end{frame}
+
+% 7º Slide: Encerramento
+\begin{frame}
+    \begin{center}
+        \Huge \textbf{Obrigado} \\
+        \vspace{0.8cm}
+        \normalsize Código e Dados: \texttt{github.com/Jubarte27/arc-agi-1}
+    \end{center}
+\end{frame}
+\end{document}
