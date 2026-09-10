@@ -146,15 +146,22 @@ def analyze_code_complexity(
 
     records = []
     for _, row in df.iterrows():
-        model = str(row["model"])
+        model = str(row.get("friendly_name") or row["model"])
+        raw_m = str(row.get("raw_model") or row.get("model"))
         task_id = str(row["task_id"])
         outcome_cat = str(row.get("outcome_category", "unknown"))
         failure_type = str(row.get(failure_col, "unknown"))
         success = bool(row.get(f"{strategy}_success", False))
 
         metrics = {}
-        if code_data and model in code_data and task_id in code_data[model]:
-            code_str = code_data[model][task_id].get(strategy, "")
+        code_str = ""
+        if code_data:
+            if model in code_data and task_id in code_data[model]:
+                code_str = code_data[model][task_id].get(strategy, "")
+            elif raw_m in code_data and task_id in code_data[raw_m]:
+                code_str = code_data[raw_m][task_id].get(strategy, "")
+
+        if code_str:
             metrics = extract_code_metrics(code_str)
         else:
             # Fallback to CSV recorded lines

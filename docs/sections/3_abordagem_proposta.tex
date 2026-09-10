@@ -1,0 +1,77 @@
+\section{Abordagem Proposta}
+\label{sec:proposta}
+
+Nesta se\c{c}\~{a}o, descrevemos como formulamos o problema de s\'{\i}ntese de c\'{o}digo para o ARC-AGI, o funcionamento do ciclo CEGIS b\'{a}sico e a inclus\~{a}o das regras anti-ajuste da estrat\'{e}gia AntiCheat.
+
+\subsection{Formula\c{c}\~{a}o do Problema}
+
+Cada tarefa do ARC \'{e} composta por um conjunto de exemplos de treino $D_{\text{train}} = \{(I_1, O_1), \dots, (I_K, O_K)\}$ e um ou mais pares de teste $(I_{\text{test}}, O_{\text{test}})$, onde cada $I$ e $O$ s\~{a}o matrizes bidimensionais com n\'{u}meros inteiros no intervalo $[0, 9]$.
+
+O objetivo \'{e} encontrar uma fun\c{c}\~{a}o em Python, denotada por $f(grid)$, que satisfa\c{c}a perfeitamente todos os exemplos de treino:
+\begin{equation}
+    f(I_k) = O_k, \quad \forall k \in \{1, \dots, K\}
+\end{equation}
+e que consiga generalizar para o exemplo de teste oculto:
+\begin{equation}
+    f(I_{\text{test}}) = O_{\text{test}}
+\end{equation}
+
+Para evitar o uso de bibliotecas externas complexas que poderiam mascarar o racioc\'{\i}nio do modelo, imp\~{o}e-se a regra de utilizar exclusivamente tipos e fun\c{c}\~{o}es nativas do Python (como listas, dicion\'{a}rios, conjuntos, la\c{c}os e fun\c{c}\~{o}es b\'{a}sicas como \texttt{len}, \texttt{range} e \texttt{min}).
+
+\subsection{O Ciclo CEGIS Padr\~{a}o}
+
+O algoritmo CEGIS opera em at\'{e} $T_{\max} = 5$ itera\c{c}\~{o}es. O processo funciona em quatro etapas simples:
+\begin{enumerate}
+    \item \textbf{Primeira Tentativa (\textit{Baseline})}: O modelo de linguagem recebe todos os pares de treino formatados em JSON e produz a primeira vers\~{a}o da fun\c{c}\~{a}o \texttt{transform(grid)}.
+    \item \textbf{Execu\c{c}\~{a}o e Avalia\c{c}\~{a}o}: O c\'{o}digo gerado \'{e} executado de forma segura em cada exemplo $(I_k, O_k)$. Se o c\'{o}digo produzir a sa\'{\i}da correta para todos os $K$ exemplos de treino, o ciclo \'{e} interrompido com sucesso no treino (\textit{converg\^{e}ncia}).
+    \item \textbf{Detec\c{c}\~{a}o do Contraexemplo}: Caso o c\'{o}digo erre em algum exemplo ou sofra um erro de execu\c{c}\~{a}o, o primeiro exemplo falho \'{e} selecionado como contraexemplo.
+    \item \textbf{Feedback e Reparo}: Uma nova mensagem \'{e} enviada ao modelo contendo a entrada $I_k$, a sa\'{\i}da esperada $O_k$, a sa\'{\i}da incorretamente produzida (ou a mensagem de erro) e a instru\c{c}\~{a}o para corrigir o c\'{o}digo. O ciclo se repete at\'{e} atingir a converg\^{e}ncia ou esgotar as 5 itera\c{c}\~{o}es.
+\end{enumerate}
+
+\subsection{A Estrat\'{e}gia AntiCheat}
+
+A estrat\'{e}gia AntiCheat introduz duas mudan\c{c}as fundamentais no prompt de feedback quando ocorre uma falha:
+
+\begin{enumerate}
+    \item \textbf{Proibi\c{c}\~{a}o de atalhos e regras pontuais}: A instru\c{c}\~{a}o pro\'{\i}be explicitamente que o modelo use desvios condicionais (\texttt{if/else}) voltados a \'{\i}ndices espec\'{\i}ficos de exemplos ou coordenadas fixas de uma grade isolada. O modelo \'{e} instru\'{\i}do a produzir uma regra matem\'{a}tica ou geom\'{e}trica uniforme que se aplique igualmente a todas as grades.
+    \item \textbf{Enuncia\c{c}\~{a}o pr\'{e}via de invariantes}: Antes de gerar o bloco de c\'{o}digo Python, o modelo \'{e} obrigado a explicar em texto qual \'{e} o \textit{invariante abstrato} que falhou na vers\~{a}o anterior e como a nova l\'{o}gica atende a todos os exemplos conhecidos sem criar casos especiais.
+\end{enumerate}
+
+\subsection{Algoritmo Resumido}
+
+O fluxo unificado de execu\c{c}\~{a}o \'{e} apresentado no Algoritmo~\ref{alg:cegis_anticheat}.
+
+\begin{algorithm}[h]
+\caption{Ciclo CEGIS com op\c{c}\~{a}o de regras AntiCheat}
+\label{alg:cegis_anticheat}
+\small
+\textbf{Entrada:} Pares de treino $D_{\text{train}} = \{(I_k, O_k)\}_{k=1}^K$, Modo $\text{AntiCheat} \in \{\text{verdadeiro}, \text{falso}\}$, Limite $T_{\max} = 5$\\
+\textbf{Sa\'{\i}da:} Programa final $f^*$ e status de converg\^{e}ncia
+
+$f_1 \gets \text{GerarPrimeiraTentativa}(D_{\text{train}})$\;
+\Para{$t \gets 1$ \Ate $T_{\max}$}{
+    $\text{falhas} \gets \emptyset$\;
+    \ParaCada{$(I_k, O_k) \in D_{\text{train}}$}{
+        $\hat{O}_k \gets \text{Executar}(f_t, I_k)$\;
+        \Se{$\hat{O}_k \neq O_k$}{
+            $\text{falhas} \gets \text{falhas} \cup \{(k, I_k, O_k, \hat{O}_k)\}$\;
+            \textbf{interromper}\; \tcp{Seleciona o primeiro contraexemplo}
+        }
+    }
+    \Se{$\text{falhas} = \emptyset$}{
+        \Retorna $f_t$, \text{convergiu} = verdadeiro\;
+    }
+    $(idx, I, O, \hat{O}) \gets \text{Primeiro}(\text{falhas})$\;
+    $\text{prompt} \gets \text{MontarFeedback}(idx, I, O, \hat{O})$\;
+    \Se{$\text{AntiCheat}$ \'{e} verdadeiro}{
+        $\text{prompt} \gets \text{prompt} + \text{RegrasDeInvarianteEAntiAtalhos}()$\;
+    }
+    $f_{t+1} \gets \text{ChamarModelo}(\text{prompt})$\;
+}
+\Retorna $f_{T_{\max}}$, \text{convergiu} = falso\;
+\end{algorithm}
+
+\subsection{O Que H\'{a} de Novo}
+
+A principal novidade desta proposta \'{e} o acoplamento entre um verificador determin\'{\i}stico estrito de c\'{o}digo (que n\~{a}o permite aproxima\c{c}\~{o}es) e restri\c{c}\~{o}es sem\^{a}nticas que impedem o modelo de trapacear na corre\c{c}\~{a}o de bugs. Em vez de permitir que o LLM resolva o erro por for\c{c}a bruta sint\'{a}tica, for\c{c}amos a gera\c{c}\~{a}o de uma hip\'{o}tese conceitual antes da escrita da l\'{o}gica em Python.
+

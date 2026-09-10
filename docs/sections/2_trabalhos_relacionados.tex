@@ -1,0 +1,23 @@
+\section{Trabalhos Relacionados}
+\label{sec:relacionados}
+
+\subsection{O Benchmark ARC-AGI e a S\'{\i}ntese de Programas}
+
+O \textit{Abstraction and Reasoning Corpus} (ARC) foi proposto por Chollet \cite{chollet2019measure} com o objetivo expl\'{\i}cito de medir a intelig\^{e}ncia geral artificial em contraste com a simples memoriza\c{c}\~{a}o de bases massivas de dados. No ARC, cada tarefa exige a indu\c{c}\~{a}o de conceitos como simetria, conectividade, trajet\'{o}ria e contagem a partir de 2 a 5 pares de treino. 
+
+Trabalhos recentes mostram que a gera\c{c}\~{a}o direta de texto pixel a pixel por LLMs atinge desempenho limitado, ao passo que a s\'{\i}ntese de programas em linguagens como Python \cite{greenblatt2024getting} permite ao modelo delegar a execu\c{c}\~{a}o precisa e determin\'{\i}stica a um interpretador. Isso transforma o desafio do ARC em um problema cl\'{a}ssico de s\'{\i}ntese de programas a partir de exemplos.
+
+\subsection{S\'{\i}ntese Indutiva Guiada por Contraexemplos (CEGIS)}
+
+O paradigma CEGIS, formalizado por Solar-Lezama \cite{solar2008program}, estrutura a s\'{\i}ntese de software em um ciclo cooperativo entre dois componentes: um sintetizador e um verificador. O sintetizador gera um programa candidato, e o verificador busca entradas em que o programa falha (contraexemplos). Caso um contraexemplo seja encontrado, ele \'{e} adicionado \`{a} especifica\c{c}\~{a}o para que o sintetizador corrija o programa.
+
+Com o advento dos LLMs, o CEGIS passou a ser empregado como um mecanismo interativo de corre\c{c}\~{a}o de c\'{o}digo \cite{poesia2024program}. Em vez de solucionadores formais (como SMT solvers), o pr\'{o}prio modelo atua como sintetizador probabil\'{\i}stico, recebendo mensagens de erro de execu\c{c}\~{a}o ou diverg\^{e}ncias de sa\'{\i}da para refinar sua solu\c{c}\~{a}o.
+
+\subsection{Reflex\~{a}o e Racioc\'{\i}nio em LLMs}
+
+Diversos m\'{e}todos prop\~{o}em que modelos de linguagem reflitam sobre seus pr\'{o}prios erros antes de gerar novas tentativas. Abordagens como \textit{Self-Refine} \cite{madaan2023self} e \textit{Reflexion} \cite{shinn2023reflexion} demonstraram que solicitar ao modelo um resumo verbal da falha pode aumentar a taxa de sucesso em problemas de racioc\'{\i}nio e programa\c{c}\~{a}o. A estrat\'{e}gia AntiCheat avaliada neste artigo segue essa linha, combinando a reflex\~{a}o verbal sobre invariantes com restri\c{c}\~{o}es expl\'{\i}citas contra regras pontuais.
+
+\subsection{Escalabilidade Psicom\'{e}trica e Escala de Guttman}
+
+A an\'{a}lise psicom\'{e}trica vem sendo progressivamente adotada para compreender a organiza\c{c}\~{a}o das habilidades de modelos de IA \cite{guttman1944basis}. A Escala de Guttman avalia se os itens de um teste seguem uma ordem cumulativa unidimensional de dificuldade: se uma tarefa \'{e} dominada por um modelo de habilidade m\'{e}dia, ela tamb\'{e}m deve ser dominada por modelos mais avan\c{c}ados. Aplicar essa an\'{a}lise ao ARC-AGI permite verificar se o benchmark reflete uma hierarquia de intelig\^{e}ncia consistente ou se o desempenho dos modelos \'{e} fragmentado e desordenado.
+

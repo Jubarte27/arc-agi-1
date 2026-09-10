@@ -82,7 +82,8 @@ def analyze_strategy_discrepancy(
 
     # Per-model breakdown
     per_model = {}
-    for m, grp in df.groupby("model"):
+    model_col = "friendly_name" if "friendly_name" in df.columns else "model"
+    for m, grp in df.groupby(model_col):
         m_s1 = grp[strat1_col].astype(bool).values
         m_s2 = grp[strat2_col].astype(bool).values
         m_n = len(grp)

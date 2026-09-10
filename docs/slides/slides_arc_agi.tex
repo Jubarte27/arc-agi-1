@@ -1,23 +1,39 @@
 
 \documentclass[aspectratio=169, 10pt]{beamer}
 \usepackage[sfdefault]{roboto}
+\usepackage{roboto-mono}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[portuguese]{babel}
-\usepackage{tikz}
 \usepackage{booktabs}
 \usepackage{adjustbox}
 \usepackage{listings}
 \usepackage{color}
 \usepackage{tcolorbox}
+\usepackage{minted}
+
+\usepackage{setspace}
+\setstretch{1.3}
+
+\usepackage{etoolbox}
+\AtBeginEnvironment{quote}{\normalfont}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!20]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!20]
+\tikzstyle{arrow} = [thick, ->, >=Stealth]
 
 % Theme configuration
 \usetheme{Madrid}
 \usecolortheme{whale}
 
+\setbeamertemplate{itemize item}{--}
+
 \lstset{
     language=Python,
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\footnotesize,
     keywordstyle=\color{blue},
     commentstyle=\color{gray},
     stringstyle=\color{red},
@@ -40,11 +56,10 @@
 \setbeamerfont{frametitle}{series=\bfseries, size=\Large}
 
 \setbeamertemplate{frametitle}{
-  \vspace{1em}% Space above the title
-  \begin{centering}
-    \usebeamerfont{frametitle}\insertframetitle\par
-  \end{centering}
-  \vspace{1em}% Space below the title
+    \Large
+    \begin{beamercolorbox}[wd=\paperwidth, leftskip=1.5em, center, rightskip=1.5cm, ht=2.5em, dp=1.1em]{frametitle}
+        \centering\usebeamerfont{frametitle}\insertframetitle
+    \end{beamercolorbox}
 }
 
 \setbeamersize{text margin left=3em, text margin right=3em}
@@ -69,20 +84,18 @@
     \titlepage
 \end{frame}
 
-\begin{frame}{CEGIS - Counterexample-Guided Inductive Synthesis}
+\begin{frame}{\LARGE CEGIS - Counterexample-Guided Inductive Synthesis}
     
     \vspace{0.3em}
     \textcolor{brightblue}{\indent Ciclo iterativo de geração e validação que permite que a LLM refine a resposta, baseando-se em feedbacks que recebe sobre o desempenho das tentativas anteriores.}
     
     \vspace{0.5em}
-    \indent mainblue O contra-exemplo fornece as seguintes informações:
-    \begin{quote}
-        \begin{itemize}
-            \item A \textbf{entrada} do exemplo de treino específico onde o código falhou.
-            \item O \textbf{gabarito} oficial correspondente à entrada.
-            \item O \textbf{resultado} real gerado pela execução do código da LLM dentro do sandbox (verificador).
-        \end{itemize}
-    \end{quote}
+    \indent O contra-exemplo fornece as seguintes informações:
+    \begin{itemize}
+        \normalfont\item A \textbf{entrada} do exemplo de treino específico onde o código falhou.
+        \normalfont\item O \textbf{gabarito} oficial correspondente à entrada.
+        \normalfont\item O \textbf{resultado} real gerado pela execução do código da LLM dentro do sandbox (verificador).
+    \end{itemize}
     
     \vspace{0.5em}
     \begin{tcolorbox}[colback=lightblue, opacityframe=0, arc=3pt, boxrule=0.5pt]
@@ -90,57 +103,79 @@
     \end{tcolorbox}
 \end{frame}
 
-\begin{frame}{Fluxo do Experimento}
-    \centering
-    \begin{tikzpicture}[scale=0.8, transform shape]
-        \node[draw, fill=blue!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (base) at (0, 2) {Execução\\Baseline};
-        \node[draw, fill=purple!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (val1) at (3.5, 2) {Verificação com\\teste de treino};
-        \node[draw, fill=purple!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (feed) at (7, 2) {Feedback\\para a LLM};
-        \node[draw, fill=purple!20, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center] (cegis) at (10.5, 2) {Execução\\CEGIS};
-        
-        \node[draw, fill=blue!30, rounded corners, minimum width=3cm, minimum height=1cm, align=center] (hidden) at (10.5, 0) {Verificação com\\testes ocultos};
-        
-        \draw[->, thick] (base) -- (val1);
-        \draw[->, thick] (val1) -- (feed);
-        \draw[->, thick] (feed) -- (cegis);
-        \draw[->, thick] (base) -- (12.5, 2) -- (12.5, 0.5) -- (hidden);
-        \draw[->, thick] (cegis) |- (3.5, 0.8) node[midway, below] {Máx. 5 iterações};
-    \end{tikzpicture}
+\begin{frame}{Custom Graph Layout}
+  \centering
+  \begin{tikzpicture}[
+      node distance=1.8cm,
+      every node/.style={
+        rectangle,
+        draw=none,
+        thick,
+        text width=2.0cm,
+        minimum height=0.8cm,
+        fill=lightblue,
+        rounded corners=2pt,
+        text=mainblue,
+        font=\small, align=center
+      },
+      edge label/.style={
+        draw=none,
+        fill=none,
+        text width=, 
+        minimum height=0,
+        inner sep=2pt,
+        font=\normalsize
+      },
+      >=Stealth
+    ]
     
-    \vspace{1em}
-    \small Fluxo iterativo comparando a execução direta (Baseline) com o ciclo de refinamento guiado por contra-exemplos (CEGIS).
+    % Define nodes
+    \node (inicio) {Tentaiva 1};
+    \node (oculto) [right=of inicio] {Testes\\ocultos};
+    \node (treino) [below=of inicio] {Testes\\de treino};
+    \node (feedback) [right=of treino] {Feedback\\para LLM};
+    \node (cegis) [right=of feedback] {Execução\\CEGIS};
+    
+    % Draw connections with arrows
+    \draw [thick, ->] (inicio.east) -- node[above, edge label] {Baseline} (oculto.west);
+    \draw [thick, ->] (inicio.south) -- node[left, edge label] {CEGIS} (treino);
+    \draw [thick, ->] (treino) -- (feedback);
+    \draw [thick, ->] (treino) -- node[above, sloped, edge label] {Passou} (oculto);
+    \draw [thick, ->] (feedback) -- (cegis);
+    \draw [thick, ->] (cegis) -- ++(0,-0.8cm) -| (treino);
+    
+  \end{tikzpicture}
 \end{frame}
 
 \begin{frame}[fragile]
     \frametitle{Como a LLM Recebe as Informações}
-    \begin{columns}
-        % \column{0.48\textwidth}
-        \textbf{Fase Inicial (Prompt Inicial)}
-        % \begin{itemize}
-        %     \item Apresenta a \textit{task} e os casos de exemplo.
-        %     \item Solicita que a LLM retorne:
-        %     \begin{itemize}
-        %         \item Uma estratégia em linguagem natural.
-        %         \item Um bloco de código Python que implemente a solução encontrada.
-        %     \end{itemize}
-        % \end{itemize}
-        
-        \column{0.48\textwidth}
-        \textbf{Ciclo de Feedback (Prompt com Contraexemplo)}
+    \textbf{Fase Inicial (Prompt Inicial)}
+    \begin{itemize}
+        \item Apresenta a \textit{task} e os casos de exemplo.
+        \item Solicita que a LLM retorne:
         \begin{itemize}
-            \item Recebe o histórico das respostas anteriores.
-            \item Mensagem de erro estruturada:
+            \item Uma estratégia em linguagem natural.
+            \item Um bloco de código Python que implemente a solução encontrada.
         \end{itemize}
-        \tiny
-        \begin{lstlisting}
+    \end{itemize}
+    
+    
+\end{frame}
+
+\begin{frame}[fragile]
+    \textbf{Ciclo de Feedback (Prompt com Contraexemplo)}
+    \begin{itemize}
+        \item Recebe o histórico das respostas anteriores.
+        \item Mensagem de erro estruturada:
+    \end{itemize}
+    \begin{lstlisting}[language={}]
 Your code failed on Training Example [idx]
 Input: [input_grid]
 Expected Output: [expected_grid]
 Produced Output: [output_string]
 [CODE_RULES]
 Analyze discrepancy, fix logic, and provide updated `transform(grid)` function.
-        \end{lstlisting}
-    \end{columns}
+    \end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -150,20 +185,37 @@ Analyze discrepancy, fix logic, and provide updated `transform(grid)` function.
         \item \textbf{Linguagem Natural:} String de texto contendo a estratégia detalhada.
         \item \textbf{Código Python:} No padrão obrigatório:
         \begin{center}
-            \texttt{transform(grid: list[list[int]]) -> list[list[int]]}
+            \begin{minted}[fontsize=\small, frame=none]{python}
+def transform(grid: list[list[int]]) -> list[list[int]]:
+            \end{minted}
         \end{center}
     \end{itemize}
-    
+\end{frame}
+
+
+\begin{frame}[fragile]
     \vspace{0.5em}
     \textbf{Exemplo de Estrutura da Resposta:}
-    \begin{lstlisting}
-The strategy to solve the task is to double each element...
-
+    \begin{tcolorbox}[
+        colback=lightblue,   % Background color
+        boxrule=0pt, % Border color
+        arc=2pt,                % Corner rounding
+        left=6mm, right=6mm,    % Inner horizontal padding
+        top=0.25em, bottom=0.25em     % Inner vertical padding
+    ]
+        \begin{lstlisting}[language={}]
+The strategy to solve the task is to double each element [...]
 ```python
+        \end{lstlisting}
+    
+        \begin{minted}[fontsize=\small, frame=none]{python}
 def transform(grid):
     return [[cell * 2 for cell in row] for row in grid]
+        \end{minted}
+        \begin{lstlisting}
 ```
-    \end{lstlisting}
+        \end{lstlisting}
+    \end{tcolorbox}
 \end{frame}
 
 \begin{frame}{Critério de Avaliação da Resposta}
@@ -218,7 +270,6 @@ def transform(grid):
     \begin{itemize}
         \item \textbf{Recuperação Semântica:} Dificuldade em corrigir o raciocínio fundamental.
         \item \textbf{Falsa Convergência:} Falha por sobreajuste artificial (\textit{overfitting}).
-        \item \textbf{Reparo Destrutivo:} Corrompe código que já era válido e não encontra o erro.
         \item \textbf{Esgotamento:} Esgota as tentativas sem solucionar o treino.
     \end{itemize}
 \end{frame}

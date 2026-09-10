@@ -42,7 +42,8 @@ def analyze_task_topology(
         Dictionary containing summary statistics, universally solved/unsolved task lists,
         solve count distribution, and inductive trap hotspots.
     """
-    total_models = df["model"].nunique()
+    model_col = "friendly_name" if "friendly_name" in df.columns else "model"
+    total_models = df[model_col].nunique()
     total_tasks = df["task_id"].nunique()
 
     # Per-task aggregation

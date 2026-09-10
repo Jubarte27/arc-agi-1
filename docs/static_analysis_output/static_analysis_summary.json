@@ -1,0 +1,687 @@
+{
+  "task_topology": {
+    "strategy": "cegis_success",
+    "total_models": 8,
+    "total_tasks": 100,
+    "universally_solved_count": 3,
+    "universally_solved_percentage": 3.0,
+    "universally_solved_tasks": [
+      "0c786b71",
+      "2072aba6",
+      "332efdb3"
+    ],
+    "universally_unsolved_count": 7,
+    "universally_unsolved_percentage": 7.000000000000001,
+    "universally_unsolved_tasks": [
+      "0934a4d8",
+      "0d87d2a6",
+      "16b78196",
+      "1acc24af",
+      "1da012fc",
+      "351d6448",
+      "3ed85e70"
+    ],
+    "solve_count_distribution": [
+      {
+        "models_solving": 0,
+        "task_count": 7,
+        "percentage": 7.000000000000001
+      },
+      {
+        "models_solving": 1,
+        "task_count": 6,
+        "percentage": 6.0
+      },
+      {
+        "models_solving": 2,
+        "task_count": 7,
+        "percentage": 7.000000000000001
+      },
+      {
+        "models_solving": 3,
+        "task_count": 15,
+        "percentage": 15.0
+      },
+      {
+        "models_solving": 4,
+        "task_count": 21,
+        "percentage": 21.0
+      },
+      {
+        "models_solving": 5,
+        "task_count": 18,
+        "percentage": 18.0
+      },
+      {
+        "models_solving": 6,
+        "task_count": 21,
+        "percentage": 21.0
+      },
+      {
+        "models_solving": 7,
+        "task_count": 2,
+        "percentage": 2.0
+      },
+      {
+        "models_solving": 8,
+        "task_count": 3,
+        "percentage": 3.0
+      }
+    ],
+    "inductive_traps_count": 5,
+    "inductive_traps": [
+      {
+        "task_id": "351d6448",
+        "train_converged_models": 6,
+        "solved_models": 0,
+        "train_convergence_rate": 0.75,
+        "test_success_rate": 0.0
+      },
+      {
+        "task_id": "0d87d2a6",
+        "train_converged_models": 5,
+        "solved_models": 0,
+        "train_convergence_rate": 0.625,
+        "test_success_rate": 0.0
+      },
+      {
+        "task_id": "11e1fe23",
+        "train_converged_models": 5,
+        "solved_models": 1,
+        "train_convergence_rate": 0.625,
+        "test_success_rate": 0.125
+      },
+      {
+        "task_id": "1da012fc",
+        "train_converged_models": 5,
+        "solved_models": 0,
+        "train_convergence_rate": 0.625,
+        "test_success_rate": 0.0
+      },
+      {
+        "task_id": "25094a63",
+        "train_converged_models": 4,
+        "solved_models": 1,
+        "train_convergence_rate": 0.5,
+        "test_success_rate": 0.125
+      }
+    ],
+    "difficulty_tiers": {
+      "easy_ge_70pct": 26,
+      "moderate_30_to_70pct": 54,
+      "hard_lt_30pct": 13,
+      "unsolved_0pct": 7
+    }
+  },
+  "guttman_hierarchy": {
+    "strategy": "cegis_success",
+    "n_models": 8,
+    "n_tasks": 100,
+    "ordered_models": [
+      "Grok 4.6",
+      "DeepSeek V4 Flash 0731",
+      "GPT-5.6 Luna",
+      "Claude Sonnet 5",
+      "Gemini 3.5 Flash Lite",
+      "Gemini 3.1 Flash Lite",
+      "Leanstral 1.5.1",
+      "GPT-5.4 Nano"
+    ],
+    "model_accuracies": {
+      "Grok 4.6": 0.92,
+      "DeepSeek V4 Flash 0731": 0.86,
+      "GPT-5.6 Luna": 0.77,
+      "Claude Sonnet 5": 0.62,
+      "Gemini 3.5 Flash Lite": 0.43,
+      "Gemini 3.1 Flash Lite": 0.31,
+      "Leanstral 1.5.1": 0.07,
+      "GPT-5.4 Nano": 0.05
+    },
+    "pairwise_subsumption": {
+      "Grok 4.6": {
+        "Grok 4.6": 1.0,
+        "DeepSeek V4 Flash 0731": 1.0,
+        "GPT-5.6 Luna": 0.987012987012987,
+        "Claude Sonnet 5": 1.0,
+        "Gemini 3.5 Flash Lite": 1.0,
+        "Gemini 3.1 Flash Lite": 1.0,
+        "Leanstral 1.5.1": 1.0,
+        "GPT-5.4 Nano": 1.0
+      },
+      "DeepSeek V4 Flash 0731": {
+        "Grok 4.6": 0.9347826086956522,
+        "DeepSeek V4 Flash 0731": 1.0,
+        "GPT-5.6 Luna": 0.974025974025974,
+        "Claude Sonnet 5": 1.0,
+        "Gemini 3.5 Flash Lite": 1.0,
+        "Gemini 3.1 Flash Lite": 1.0,
+        "Leanstral 1.5.1": 1.0,
+        "GPT-5.4 Nano": 1.0
+      },
+      "GPT-5.6 Luna": {
+        "Grok 4.6": 0.8260869565217391,
+        "DeepSeek V4 Flash 0731": 0.872093023255814,
+        "GPT-5.6 Luna": 1.0,
+        "Claude Sonnet 5": 0.9193548387096774,
+        "Gemini 3.5 Flash Lite": 0.9767441860465116,
+        "Gemini 3.1 Flash Lite": 0.967741935483871,
+        "Leanstral 1.5.1": 1.0,
+        "GPT-5.4 Nano": 1.0
+      },
+      "Claude Sonnet 5": {
+        "Grok 4.6": 0.6739130434782609,
+        "DeepSeek V4 Flash 0731": 0.7209302325581395,
+        "GPT-5.6 Luna": 0.7402597402597403,
+        "Claude Sonnet 5": 1.0,
+        "Gemini 3.5 Flash Lite": 0.8604651162790697,
+        "Gemini 3.1 Flash Lite": 0.967741935483871,
+        "Leanstral 1.5.1": 0.7142857142857143,
+        "GPT-5.4 Nano": 0.8
+      },
+      "Gemini 3.5 Flash Lite": {
+        "Grok 4.6": 0.4673913043478261,
+        "DeepSeek V4 Flash 0731": 0.5,
+        "GPT-5.6 Luna": 0.5454545454545454,
+        "Claude Sonnet 5": 0.5967741935483871,
+        "Gemini 3.5 Flash Lite": 1.0,
+        "Gemini 3.1 Flash Lite": 0.7741935483870968,
+        "Leanstral 1.5.1": 1.0,
+        "GPT-5.4 Nano": 1.0
+      },
+      "Gemini 3.1 Flash Lite": {
+        "Grok 4.6": 0.33695652173913043,
+        "DeepSeek V4 Flash 0731": 0.36046511627906974,
+        "GPT-5.6 Luna": 0.38961038961038963,
+        "Claude Sonnet 5": 0.4838709677419355,
+        "Gemini 3.5 Flash Lite": 0.5581395348837209,
+        "Gemini 3.1 Flash Lite": 1.0,
+        "Leanstral 1.5.1": 0.8571428571428571,
+        "GPT-5.4 Nano": 0.6
+      },
+      "Leanstral 1.5.1": {
+        "Grok 4.6": 0.07608695652173914,
+        "DeepSeek V4 Flash 0731": 0.08139534883720931,
+        "GPT-5.6 Luna": 0.09090909090909091,
+        "Claude Sonnet 5": 0.08064516129032258,
+        "Gemini 3.5 Flash Lite": 0.16279069767441862,
+        "Gemini 3.1 Flash Lite": 0.1935483870967742,
+        "Leanstral 1.5.1": 1.0,
+        "GPT-5.4 Nano": 0.8
+      },
+      "GPT-5.4 Nano": {
+        "Grok 4.6": 0.05434782608695652,
+        "DeepSeek V4 Flash 0731": 0.05813953488372093,
+        "GPT-5.6 Luna": 0.06493506493506493,
+        "Claude Sonnet 5": 0.06451612903225806,
+        "Gemini 3.5 Flash Lite": 0.11627906976744186,
+        "Gemini 3.1 Flash Lite": 0.0967741935483871,
+        "Leanstral 1.5.1": 0.5714285714285714,
+        "GPT-5.4 Nano": 1.0
+      }
+    },
+    "consecutive_subsumption": [
+      {
+        "stronger_model": "Grok 4.6",
+        "weaker_model": "DeepSeek V4 Flash 0731",
+        "subsumption_probability": 1.0,
+        "subsumption_percentage": 100.0,
+        "weaker_model_solved_count": 86
+      },
+      {
+        "stronger_model": "DeepSeek V4 Flash 0731",
+        "weaker_model": "GPT-5.6 Luna",
+        "subsumption_probability": 0.974025974025974,
+        "subsumption_percentage": 97.40259740259741,
+        "weaker_model_solved_count": 77
+      },
+      {
+        "stronger_model": "GPT-5.6 Luna",
+        "weaker_model": "Claude Sonnet 5",
+        "subsumption_probability": 0.9193548387096774,
+        "subsumption_percentage": 91.93548387096774,
+        "weaker_model_solved_count": 62
+      },
+      {
+        "stronger_model": "Claude Sonnet 5",
+        "weaker_model": "Gemini 3.5 Flash Lite",
+        "subsumption_probability": 0.8604651162790697,
+        "subsumption_percentage": 86.04651162790698,
+        "weaker_model_solved_count": 43
+      },
+      {
+        "stronger_model": "Gemini 3.5 Flash Lite",
+        "weaker_model": "Gemini 3.1 Flash Lite",
+        "subsumption_probability": 0.7741935483870968,
+        "subsumption_percentage": 77.41935483870968,
+        "weaker_model_solved_count": 31
+      },
+      {
+        "stronger_model": "Gemini 3.1 Flash Lite",
+        "weaker_model": "Leanstral 1.5.1",
+        "subsumption_probability": 0.8571428571428571,
+        "subsumption_percentage": 85.71428571428571,
+        "weaker_model_solved_count": 7
+      },
+      {
+        "stronger_model": "Leanstral 1.5.1",
+        "weaker_model": "GPT-5.4 Nano",
+        "subsumption_probability": 0.8,
+        "subsumption_percentage": 80.0,
+        "weaker_model_solved_count": 5
+      }
+    ],
+    "guttman_metrics": {
+      "scale_errors": 21.0,
+      "total_evaluations": 800,
+      "coefficient_of_reproducibility_cr": 0.97375,
+      "minimum_marginal_reproducibility_mmr": 0.78875,
+      "coefficient_of_scalability_cs": 0.8757396449704142,
+      "is_valid_guttman_scale": true,
+      "cr_threshold": 0.9,
+      "cs_threshold": 0.6
+    }
+  },
+  "code_complexity": {
+    "strategy": "cegis",
+    "total_programs_analyzed": 800,
+    "valid_syntax_count": 797,
+    "outcome_category_summary": {
+      "both_correct": {
+        "count": 289,
+        "mean_sloc": 34.62629757785467,
+        "median_sloc": 29.0,
+        "std_sloc": 21.106676811761247,
+        "mean_char_count": 1796.4290657439446,
+        "mean_ast_nodes": 379.8062283737024,
+        "mean_ast_depth": 12.217993079584774,
+        "mean_loops": 6.242214532871972,
+        "mean_conditionals": 4.896193771626297,
+        "mean_cyclomatic": 13.820069204152249
+      },
+      "both_failed": {
+        "count": 394,
+        "mean_sloc": 45.91370558375635,
+        "median_sloc": 41.0,
+        "std_sloc": 25.517297729868005,
+        "mean_char_count": 2594.022842639594,
+        "mean_ast_nodes": 525.0812182741116,
+        "mean_ast_depth": 12.738578680203046,
+        "mean_loops": 8.01522842639594,
+        "mean_conditionals": 7.634517766497462,
+        "mean_cyclomatic": 19.428934010152282
+      },
+      "semantic_recovery": {
+        "count": 114,
+        "mean_sloc": 44.53508771929825,
+        "median_sloc": 42.0,
+        "std_sloc": 24.906614902901616,
+        "mean_char_count": 2816.6140350877195,
+        "mean_ast_nodes": 507.2631578947368,
+        "mean_ast_depth": 12.68421052631579,
+        "mean_loops": 7.605263157894737,
+        "mean_conditionals": 7.0,
+        "mean_cyclomatic": 18.149122807017545
+      }
+    },
+    "failure_type_summary": {
+      "none": {
+        "count": 403,
+        "mean_sloc": 37.42928039702233,
+        "median_sloc": 31.0,
+        "std_sloc": 22.66052381412739,
+        "mean_char_count": 2085.017369727047,
+        "mean_ast_nodes": 415.8610421836228,
+        "mean_ast_depth": 12.349875930521092,
+        "mean_loops": 6.6277915632754345,
+        "mean_conditionals": 5.491315136476427,
+        "mean_cyclomatic": 15.044665012406949
+      },
+      "representation_ceiling": {
+        "count": 342,
+        "mean_sloc": 44.39766081871345,
+        "median_sloc": 40.0,
+        "std_sloc": 24.720959925027667,
+        "mean_char_count": 2486.2105263157896,
+        "mean_ast_nodes": 515.1111111111111,
+        "mean_ast_depth": 12.75438596491228,
+        "mean_loops": 7.891812865497076,
+        "mean_conditionals": 7.4678362573099415,
+        "mean_cyclomatic": 19.13157894736842
+      },
+      "spurious_overfitting": {
+        "count": 52,
+        "mean_sloc": 55.88461538461539,
+        "median_sloc": 50.5,
+        "std_sloc": 28.541441384761185,
+        "mean_char_count": 3303.096153846154,
+        "mean_ast_nodes": 590.6538461538462,
+        "mean_ast_depth": 12.634615384615385,
+        "mean_loops": 8.826923076923077,
+        "mean_conditionals": 8.73076923076923,
+        "mean_cyclomatic": 21.384615384615383
+      }
+    },
+    "occams_razor_metrics": {
+      "mean_sloc_both_correct": 34.62629757785467,
+      "mean_sloc_all_solved": 37.42928039702233,
+      "mean_sloc_spurious_overfitting": 55.88461538461539,
+      "bloat_factor_vs_both_correct": 1.6139356296746123,
+      "bloat_factor_vs_all_solved": 1.493072129408645,
+      "mann_whitney_u_pvalue_greater": 5.145276840720154e-09,
+      "is_statistically_significant": true
+    },
+    "per_model_breakdown": {
+      "Claude Sonnet 5": {
+        "mean_sloc_solved": 39.37096774193548,
+        "mean_sloc_overfit": 42.0,
+        "mean_sloc_ceiling": 55.064516129032256
+      },
+      "DeepSeek V4 Flash 0731": {
+        "mean_sloc_solved": 42.33720930232558,
+        "mean_sloc_overfit": 65.5,
+        "mean_sloc_ceiling": 101.0
+      },
+      "GPT-5.4 Nano": {
+        "mean_sloc_solved": 29.6,
+        "mean_sloc_overfit": null,
+        "mean_sloc_ceiling": 44.90526315789474
+      },
+      "GPT-5.6 Luna": {
+        "mean_sloc_solved": 40.532467532467535,
+        "mean_sloc_overfit": 62.0,
+        "mean_sloc_ceiling": 88.3076923076923
+      },
+      "Gemini 3.1 Flash Lite": {
+        "mean_sloc_solved": 28.903225806451612,
+        "mean_sloc_overfit": 39.285714285714285,
+        "mean_sloc_ceiling": 37.87096774193548
+      },
+      "Gemini 3.5 Flash Lite": {
+        "mean_sloc_solved": 36.25581395348837,
+        "mean_sloc_overfit": 50.0,
+        "mean_sloc_ceiling": 51.851063829787236
+      },
+      "Grok 4.6": {
+        "mean_sloc_solved": 33.75,
+        "mean_sloc_overfit": 70.25,
+        "mean_sloc_ceiling": null
+      },
+      "Leanstral 1.5.1": {
+        "mean_sloc_solved": 24.714285714285715,
+        "mean_sloc_overfit": null,
+        "mean_sloc_ceiling": 31.933333333333334
+      }
+    }
+  },
+  "iteration_dynamics": {
+    "strategy": "cegis",
+    "total_evaluations": 800,
+    "total_solved": 403,
+    "baseline_solved_iter_1": 289,
+    "total_recovered_iter_ge_2": 114,
+    "max_iterations_allowed": 5,
+    "recommended_iteration_cap": 3,
+    "recommended_cap_recovery_retention_pct": 85.96491228070175,
+    "iteration_table": [
+      {
+        "iteration": 1,
+        "tasks_solved": 289,
+        "pct_of_all_solved": 71.712158808933,
+        "recovered_tasks": 0,
+        "pct_of_recoveries": 0.0,
+        "cumulative_recovered": 0,
+        "cumulative_pct_of_recoveries": 0.0,
+        "mean_latency_sec": 7.832813148788928
+      },
+      {
+        "iteration": 2,
+        "tasks_solved": 69,
+        "pct_of_all_solved": 17.121588089330025,
+        "recovered_tasks": 69,
+        "pct_of_recoveries": 60.526315789473685,
+        "cumulative_recovered": 69,
+        "cumulative_pct_of_recoveries": 60.526315789473685,
+        "mean_latency_sec": 67.62507246376813
+      },
+      {
+        "iteration": 3,
+        "tasks_solved": 29,
+        "pct_of_all_solved": 7.196029776674938,
+        "recovered_tasks": 29,
+        "pct_of_recoveries": 25.438596491228072,
+        "cumulative_recovered": 98,
+        "cumulative_pct_of_recoveries": 85.96491228070175,
+        "mean_latency_sec": 147.2099310344828
+      },
+      {
+        "iteration": 4,
+        "tasks_solved": 9,
+        "pct_of_all_solved": 2.2332506203473943,
+        "recovered_tasks": 9,
+        "pct_of_recoveries": 7.894736842105263,
+        "cumulative_recovered": 107,
+        "cumulative_pct_of_recoveries": 93.85964912280701,
+        "mean_latency_sec": 89.66644444444444
+      },
+      {
+        "iteration": 5,
+        "tasks_solved": 7,
+        "pct_of_all_solved": 1.7369727047146404,
+        "recovered_tasks": 7,
+        "pct_of_recoveries": 6.140350877192982,
+        "cumulative_recovered": 114,
+        "cumulative_pct_of_recoveries": 100.0,
+        "mean_latency_sec": 226.5687142857143
+      }
+    ],
+    "per_model_breakdown": {
+      "Claude Sonnet 5": {
+        "total_solved": 62,
+        "recovered_count": 30,
+        "iteration_distribution": {
+          "1": 32,
+          "2": 19,
+          "3": 6,
+          "4": 2,
+          "5": 3
+        }
+      },
+      "DeepSeek V4 Flash 0731": {
+        "total_solved": 86,
+        "recovered_count": 12,
+        "iteration_distribution": {
+          "1": 74,
+          "2": 10,
+          "3": 2,
+          "4": 0,
+          "5": 0
+        }
+      },
+      "GPT-5.4 Nano": {
+        "total_solved": 5,
+        "recovered_count": 4,
+        "iteration_distribution": {
+          "1": 1,
+          "2": 2,
+          "3": 1,
+          "4": 0,
+          "5": 1
+        }
+      },
+      "GPT-5.6 Luna": {
+        "total_solved": 77,
+        "recovered_count": 19,
+        "iteration_distribution": {
+          "1": 58,
+          "2": 10,
+          "3": 6,
+          "4": 2,
+          "5": 1
+        }
+      },
+      "Gemini 3.1 Flash Lite": {
+        "total_solved": 31,
+        "recovered_count": 19,
+        "iteration_distribution": {
+          "1": 12,
+          "2": 10,
+          "3": 5,
+          "4": 4,
+          "5": 0
+        }
+      },
+      "Gemini 3.5 Flash Lite": {
+        "total_solved": 43,
+        "recovered_count": 22,
+        "iteration_distribution": {
+          "1": 21,
+          "2": 13,
+          "3": 7,
+          "4": 1,
+          "5": 1
+        }
+      },
+      "Grok 4.6": {
+        "total_solved": 92,
+        "recovered_count": 4,
+        "iteration_distribution": {
+          "1": 88,
+          "2": 3,
+          "3": 1,
+          "4": 0,
+          "5": 0
+        }
+      },
+      "Leanstral 1.5.1": {
+        "total_solved": 7,
+        "recovered_count": 4,
+        "iteration_distribution": {
+          "1": 3,
+          "2": 2,
+          "3": 1,
+          "4": 0,
+          "5": 1
+        }
+      }
+    }
+  },
+  "strategy_discrepancy": {
+    "strategy_1": "CEGIS",
+    "strategy_2": "Anticheat",
+    "total_evaluations": 800,
+    "contingency_table": {
+      "both_succeeded": 378,
+      "CEGIS_only_succeeded": 25,
+      "Anticheat_only_succeeded": 20,
+      "both_failed": 377
+    },
+    "agreement_rate": 0.94375,
+    "discrepancy_rate": 0.05625,
+    "jaccard_similarity": 0.8936170212765957,
+    "cohens_kappa": 0.8875042185918027,
+    "oracle_ensemble_metrics": {
+      "CEGIS_accuracy": 0.50375,
+      "Anticheat_accuracy": 0.4975,
+      "oracle_ensemble_accuracy": 0.52875,
+      "oracle_lift_over_CEGIS": 0.025000000000000022,
+      "oracle_lift_over_Anticheat": 0.031250000000000056
+    },
+    "per_model_breakdown": {
+      "Claude Sonnet 5": {
+        "CEGIS_solved": 62,
+        "Anticheat_solved": 60,
+        "both_solved": 57,
+        "CEGIS_only_solved": 5,
+        "Anticheat_only_solved": 3,
+        "oracle_ensemble_solved": 65,
+        "oracle_lift": 0.030000000000000027,
+        "jaccard_similarity": 0.8769230769230769
+      },
+      "DeepSeek V4 Flash 0731": {
+        "CEGIS_solved": 86,
+        "Anticheat_solved": 86,
+        "both_solved": 86,
+        "CEGIS_only_solved": 0,
+        "Anticheat_only_solved": 0,
+        "oracle_ensemble_solved": 86,
+        "oracle_lift": 0.0,
+        "jaccard_similarity": 1.0
+      },
+      "GPT-5.4 Nano": {
+        "CEGIS_solved": 5,
+        "Anticheat_solved": 3,
+        "both_solved": 2,
+        "CEGIS_only_solved": 3,
+        "Anticheat_only_solved": 1,
+        "oracle_ensemble_solved": 6,
+        "oracle_lift": 0.009999999999999995,
+        "jaccard_similarity": 0.3333333333333333
+      },
+      "GPT-5.6 Luna": {
+        "CEGIS_solved": 77,
+        "Anticheat_solved": 79,
+        "both_solved": 75,
+        "CEGIS_only_solved": 2,
+        "Anticheat_only_solved": 4,
+        "oracle_ensemble_solved": 81,
+        "oracle_lift": 0.040000000000000036,
+        "jaccard_similarity": 0.9259259259259259
+      },
+      "Gemini 3.1 Flash Lite": {
+        "CEGIS_solved": 31,
+        "Anticheat_solved": 24,
+        "both_solved": 24,
+        "CEGIS_only_solved": 7,
+        "Anticheat_only_solved": 0,
+        "oracle_ensemble_solved": 31,
+        "oracle_lift": 0.0,
+        "jaccard_similarity": 0.7741935483870968
+      },
+      "Gemini 3.5 Flash Lite": {
+        "CEGIS_solved": 43,
+        "Anticheat_solved": 45,
+        "both_solved": 37,
+        "CEGIS_only_solved": 6,
+        "Anticheat_only_solved": 8,
+        "oracle_ensemble_solved": 51,
+        "oracle_lift": 0.08000000000000002,
+        "jaccard_similarity": 0.7254901960784313
+      },
+      "Grok 4.6": {
+        "CEGIS_solved": 92,
+        "Anticheat_solved": 92,
+        "both_solved": 92,
+        "CEGIS_only_solved": 0,
+        "Anticheat_only_solved": 0,
+        "oracle_ensemble_solved": 92,
+        "oracle_lift": 0.0,
+        "jaccard_similarity": 1.0
+      },
+      "Leanstral 1.5.1": {
+        "CEGIS_solved": 7,
+        "Anticheat_solved": 9,
+        "both_solved": 5,
+        "CEGIS_only_solved": 2,
+        "Anticheat_only_solved": 4,
+        "oracle_ensemble_solved": 11,
+        "oracle_lift": 0.039999999999999994,
+        "jaccard_similarity": 0.45454545454545453
+      }
+    }
+  },
+  "coordinate_leakage": {
+    "total_snippets_scanned": 2398,
+    "flagged_snippets_count": 7,
+    "leakage_rate_pct": 0.2919099249374479,
+    "strategy_counts": {
+      "cegis": 5,
+      "baseline": 2
+    },
+    "model_counts": {
+      "Gemini 3.1 Flash Lite": 1,
+      "Gemini 3.5 Flash Lite": 4,
+      "Claude Sonnet 5": 1,
+      "DeepSeek V4 Flash 0731": 1
+    }
+  }
+}

@@ -1,0 +1,33 @@
+\section{Introdu\c{c}\~{a}o}
+
+O \textit{Abstraction and Reasoning Corpus} (ARC-AGI) \cite{chollet2019measure} foi criado para medir a capacidade de sistemas artificiais de aprender novas regras a partir de poucos exemplos. Cada tarefa do ARC apresenta grades bidimensionais com n\'{u}meros que representam cores e desafia o sistema a descobrir a regra de transforma\c{c}\~{a}o para gerar a grade de sa\'{\i}da a partir de uma grade de entrada in\'{e}dita.
+
+Uma das abordagens mais promissoras para resolver o ARC \'{e} a s\'{\i}ntese de programas com Modelos de Linguagem (LLMs) \cite{greenblatt2024getting}. Em vez de gerar a grade diretamente como texto, o modelo escreve uma fun\c{c}\~{a}o em Python (\texttt{transform(grid)}) que executa a l\'{o}gica da tarefa. Para melhorar o c\'{o}digo gerado, \'{e} comum utilizar a S\'{\i}ntese Indutiva Guiada por Contraexemplos (CEGIS) \cite{solar2008program}: o c\'{o}digo \'{e} testado nos exemplos de treino; se falhar em algum exemplo (chamado de contraexemplo), o erro \'{e} devolvido ao modelo para que ele fa\c{c}a uma corre\c{c}\~{a}o iterativa.
+
+No entanto, essa abordagem enfrenta um desafio cr\'{\i}tico: o ajuste excessivo aos dados de treino (\textit{overfitting}). O modelo pode consertar o c\'{o}digo inserindo regras pontuais (\textit{hardcoding}) ou condicionais especiais para os exemplos de treino conhecidos, sem aprender o padr\~{a}o l\'{o}gico real. Quando o programa resultante \'{e} executado na grade de teste, ele falha.
+
+Para enfrentar esse problema, avaliamos neste trabalho uma estrat\'{e}gia com regras expl\'{\i}citas contra trapa\c{c}as l\'{o}gicas, denominada \textit{AntiCheat}. Essa estrat\'{e}gia imp\~{o}e duas restri\c{c}\~{o}es ao modelo no momento do feedback: (1) pro\'{\i}be o uso de condicionais direcionadas a coordenadas fixas ou \'{\i}ndices espec\'{\i}ficos de exemplos; e (2) exige que o modelo descreva em linguagem natural a regra abstrata geral antes de escrever a nova fun\c{c}\~{a}o em Python. 
+
+A hip\'{o}tese central investigada neste trabalho \'{e}: \textit{adicionar regras que for\c{c}am explica\c{c}\~{o}es pr\'{e}vias e pro\'{\i}bem regras pontuais melhora a generaliza\c{c}\~{a}o e a acur\'{a}cia dos modelos no ARC-AGI?}
+
+Compreender o impacto dessas restri\c{c}\~{o}es \'{e} fundamental para a engenharia de sistemas aut\^{o}nomos baseados em c\'{o}digo, pois ajuda a distinguir o racioc\'{\i}nio genu\'{\i}no da memoriza\c{c}\~{a}o superficial em modelos de linguagem.
+
+\subsection*{Principais Contribui\c{c}\~{o}es}
+
+As principais contribui\c{c}\~{o}es deste artigo s\~{a}o:
+\begin{enumerate}
+    \item \textbf{Avalia\c{c}\~{a}o estat\'{\i}stica rigorosa de CEGIS versus AntiCheat}: Realizamos 800 avalia\c{c}\~{o}es pareadas (8 modelos em 100 tarefas) utilizando testes de permuta\c{c}\~{a}o e o teste binomial exato para comparar diretamente a acur\'{a}cia das duas abordagens.
+    \item \textbf{Inspe\c{c}\~{a}o qualitativa do c\'{o}digo gerado}: Analisamos as diferen\c{c}as reais no c\'{o}digo e os motivos de falha de cada abordagem, verificando se as restri\c{c}\~{o}es provocam mudan\c{c}as significativas na l\'{o}gica produzida.
+    \item \textbf{Valida\c{c}\~{a}o da Escala de Guttman}: Demonstramos que o desempenho dos modelos no ARC-AGI forma uma escala psicom\'{e}trica unidimensional v\'{a}lida ($CR = 0,9738$), indicando que modelos mais fortes absorvem quase integralmente as capacidades dos modelos mais simples.
+    \item \textbf{Comprova\c{c}\~{a}o emp\'{\i}rica da Navalha de Occam}: Mostramos, a partir da \'{a}rvore sint\'{a}tica abstrata (AST), que solu\c{c}\~{o}es com sobreajuste s\~{a}o 1,61 vezes mais extensas do que solu\c{c}\~{o}es corretas ($p = 5,15 \times 10^{-9}$).
+    \item \textbf{Determina\c{c}\~{a}o do horizonte \'{o}timo de itera\c{c}\~{o}es}: Mapeamos a recupera\c{c}\~{a}o do CEGIS e mostramos que 86\% de todas as corre\c{c}\~{o}es acontecem at\'{e} a terceira itera\c{c}\~{a}o.
+\end{enumerate}
+
+\subsection*{Resultados Obtidos}
+
+Adiantando os resultados, constatamos que a estrat\'{e}gia AntiCheat \textbf{n\~{a}o produz diferen\c{c}a estatisticamente significante} na acur\'{a}cia global em rela\c{c}\~{a}o ao CEGIS padr\~{a}o (50,4\% contra 49,8\%, com $p = 0,5515$). Al\'{e}m disso, a inspe\c{c}\~{a}o minuciosa do c\'{o}digo gerado revelou que, mesmo em n\'{\i}vel qualitativo, n\~{a}o h\'{a} diferen\c{c}a substancial: em mais de 88\% dos casos de discord\^{a}ncia, a estrat\'{e}gia perdedora falha simplesmente por n\~{a}o conseguir encontrar um algoritmo v\'{a}lido para os exemplos de treino, e n\~{a}o por tentar criar regras pontuais.
+
+\subsection*{Estrutura do Artigo}
+
+O restante do artigo est\'{a} organizado da seguinte forma: a Se\c{c}\~{a}o~\ref{sec:relacionados} aborda os trabalhos relacionados. A Se\c{c}\~{a}o~\ref{sec:proposta} descreve a abordagem do CEGIS e o mecanismo AntiCheat. A Se\c{c}\~{a}o~\ref{sec:metodologia} apresenta a metodologia experimental. A Se\c{c}\~{a}o~\ref{sec:resultados} detalha os resultados emp\'{\i}ricos e estruturais. Por fim, a Se\c{c}\~{a}o~\ref{sec:conclusao} discute as conclus\~{o}es e os trabalhos futuros.
+

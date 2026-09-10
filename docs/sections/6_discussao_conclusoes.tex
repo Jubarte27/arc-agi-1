@@ -1,0 +1,42 @@
+\section{Discuss\~{a}o e Conclus\~{o}es}
+\label{sec:conclusao}
+
+\subsection{S\'{\i}ntese dos Resultados e Interpreta\c{c}\~{a}o}
+
+Neste trabalho, investigamos se a introdu\c{c}\~{a}o de restri\c{c}\~{o}es sem\^{a}nticas expl\'{\i}citas contra regras pontuais e a obrigatoriedade de explicar invariantes (\textit{AntiCheat}) trariam ganhos reais sobre a s\'{\i}ntese iterativa de programas por CEGIS no benchmark ARC-AGI.
+
+A principal conclus\~{a}o emp\'{\i}rica \'{e} que a estrat\'{e}gia AntiCheat \textbf{n\~{a}o produziu diferen\c{c}a estatisticamente significante} na acur\'{a}cia geral (50,4\% contra 49,8\%, com $p = 0,5515$). Al\'{e}m disso, a inspe\c{c}\~{a}o qualitativa confirmou que essa equival\^{e}ncia ocorre porque as falhas em ambos os m\'{e}todos s\~{a}o causadas quase que exclusivamente pelo mesmo motivo: o esgotamento da capacidade do modelo de formular o algoritmo correto (\textit{representation ceiling}), e n\~{a}o pela tentativa deliberada de criar atalhos com coordenadas fixas. Em modelos avan\c{c}ados de linguagem, a cria\c{c}\~{a}o de atalhos pontuais de coordenadas \'{e} um fen\^{o}meno residual (presente em menos de 0,3\% dos c\'{o}digos analisados).
+
+Por outro lado, nossa an\'{a}lise estrutural produziu descobertas relevantes e independentes de estrat\'{e}gias espec\'{\i}ficas:
+\begin{enumerate}
+    \item \textbf{Consist\^{e}ncia Psicom\'{e}trica}: O ARC-AGI exibe uma organiza\c{c}\~{a}o hier\'{a}rquica de dificuldade quase perfeita na Escala de Guttman ($CR = 0,9738$), mostrando que o benchmark reflete uma dimens\~{a}o est\'{a}vel de avan\c{c}o de capacidades dos modelos.
+    \item \textbf{Valida\c{c}\~{a}o da Navalha de Occam}: Programas que caem em sobreajuste sofrem uma infla\c{c}\~{a}o sistem\'{a}tica no n\'{u}mero de linhas (1,61 vezes maiores, $p = 5,15 \times 10^{-9}$), la\c{c}os e desvios condicionais, confirmando numericamente que solu\c{c}\~{o}es simples t\^{e}m maior probabilidade de generaliza\c{c}\~{a}o.
+    \item \textbf{Horizonte de Efici\^{e}ncia}: Estabelecemos que limitar o ciclo de corre\c{c}\~{a}o do CEGIS a 3 itera\c{c}\~{o}es preserva 86,0\% dos reparos vi\'{a}veis, otimizando o custo computacional.
+\end{enumerate}
+
+\subsection{Aplica\c{c}\~{o}es e Impactos}
+
+Estes achados trazem orienta\c{c}\~{o}es diretas para o desenvolvimento de sistemas de programa\c{c}\~{a}o assistida por IA:
+\begin{itemize}
+    \item \textbf{Crit\'{e}rios de sele\c{c}\~{a}o por simplicidade}: Sistemas de busca e gera\c{c}\~{a}o de c\'{o}digo devem usar o tamanho da AST e o n\'{u}mero de linhas como fun\c{c}\~{a}o de penalidade para descartar programas que se tornam excessivamente complexos ap\'{o}s m\'{u}ltiplas tentativas de corre\c{c}\~{a}o.
+    \item \textbf{Crit\'{e}rios de parada precoce}: Encerrar o ciclo CEGIS ap\'{o}s 3 itera\c{c}\~{o}es \'{e} uma pol\'{\i}tica eficiente para evitar gasto de recursos em solu\c{c}\~{o}es que raramente convergem.
+\end{itemize}
+
+\subsection{Limita\c{c}\~{o}es}
+
+As principais limita\c{c}\~{o}es deste estudo incluem:
+\begin{enumerate}
+    \item \textbf{Amostragem de tarefas}: A avalia\c{c}\~{a}o utilizou uma amostra representativa de 100 tarefas do conjunto de treino/avalia\c{c}\~{a}o do ARC-AGI.
+    \item \textbf{Dom\'{\i}nio restrito ao Python nativo}: A regra de n\~{a}o permitir bibliotecas externas padroniza o teste, mas pode restringir o estilo de solu\c{c}\~{a}o dos modelos.
+    \item \textbf{Temperatura e amostragem \'{u}nica}: Cada tarefa foi executada com par\^{a}metros fixos de amostragem, sem explora\c{c}\~{a}o massiva de sementes aleat\'{o}rias (\textit{pass@k}).
+\end{enumerate}
+
+\subsection{Trabalhos Futuros}
+
+Como perspectivas de trabalhos futuros, sugerimos:
+\begin{itemize}
+    \item \textbf{Varia\c{c}\~{a}o sistem\'{a}tica entre prompts}: Investigar como diferentes estilos de instru\c{c}\~{a}o, exemplos no prompt (\textit{few-shot prompting}) e formula\c{c}\~{o}es alternativas de regras afetam a capacidade do modelo de se autorregular.
+    \item \textbf{Pol\'{\i}ticas adaptativas de corre\c{c}\~{a}o}: Desenvolver mecanismos que decidem o tipo de feedback com base na complexidade do erro observado na execu\c{c}\~{a}o anterior.
+    \item \textbf{Filtros de sele\c{c}\~{a}o sint\'{a}tica}: Aplicar limites r\'{\i}gidos de linhas de c\'{o}digo durante a s\'{\i}ntese para barrar automaticamente c\'{o}digos que sofram o incha\c{c}o caracter\'{\i}stico do sobreajuste.
+\end{itemize}
+

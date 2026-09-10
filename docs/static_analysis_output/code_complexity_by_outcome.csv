@@ -1,0 +1,801 @@
+model,task_id,outcome_category,failure_type,success,sloc,raw_lines,char_count,valid_syntax,ast_nodes,ast_depth,num_loops,num_conditionals,num_functions,num_assignments,cyclomatic_complexity
+Gemini 3.1 Flash Lite,00576224,both_correct,none,True,16.0,58.0,1706.0,True,230,13,4,0,1,10,5
+Gemini 3.1 Flash Lite,009d5c81,both_failed,spurious_overfitting,False,19.0,32.0,1074.0,True,231,11,1,3,1,11,5
+Gemini 3.1 Flash Lite,00dbd492,semantic_recovery,none,True,47.0,65.0,2821.0,True,577,14,8,10,1,22,24
+Gemini 3.1 Flash Lite,03560426,both_correct,none,True,36.0,89.0,3975.0,True,478,12,7,3,1,22,12
+Gemini 3.1 Flash Lite,05a7bcf2,both_failed,representation_ceiling,False,32.0,57.0,2046.0,True,288,11,8,5,1,12,14
+Gemini 3.1 Flash Lite,0607ce86,both_failed,representation_ceiling,False,26.0,54.0,2418.0,True,263,13,6,3,1,13,11
+Gemini 3.1 Flash Lite,0692e18c,both_failed,representation_ceiling,False,12.0,16.0,685.0,True,176,15,4,2,1,4,9
+Gemini 3.1 Flash Lite,070dd51e,both_failed,representation_ceiling,False,34.0,58.0,2386.0,True,433,12,8,5,1,17,16
+Gemini 3.1 Flash Lite,08573cc6,both_failed,representation_ceiling,False,40.0,77.0,2504.0,True,470,14,4,9,1,24,15
+Gemini 3.1 Flash Lite,0934a4d8,both_failed,representation_ceiling,False,24.0,63.0,2391.0,True,258,10,3,6,1,15,10
+Gemini 3.1 Flash Lite,09c534e7,both_failed,representation_ceiling,False,35.0,59.0,2388.0,True,456,14,8,5,1,15,17
+Gemini 3.1 Flash Lite,0a1d4ef5,both_failed,representation_ceiling,False,36.0,56.0,2141.0,True,422,12,7,3,1,16,14
+Gemini 3.1 Flash Lite,0a2355a6,both_failed,representation_ceiling,False,45.0,75.0,3041.0,True,566,14,6,7,4,19,17
+Gemini 3.1 Flash Lite,0b17323b,both_correct,none,True,23.0,42.0,1364.0,True,247,10,3,3,1,11,8
+Gemini 3.1 Flash Lite,0bb8deee,both_correct,none,True,66.0,87.0,2968.0,True,903,12,5,12,4,33,18
+Gemini 3.1 Flash Lite,0becf7df,semantic_recovery,none,True,18.0,73.0,2093.0,True,227,10,2,1,1,12,5
+Gemini 3.1 Flash Lite,0c786b71,semantic_recovery,none,True,6.0,11.0,379.0,True,70,10,1,0,1,2,2
+Gemini 3.1 Flash Lite,0c9aba6e,semantic_recovery,none,True,20.0,57.0,1917.0,True,185,11,3,2,1,8,7
+Gemini 3.1 Flash Lite,0d87d2a6,both_failed,representation_ceiling,False,27.0,46.0,1531.0,True,284,10,7,5,1,8,13
+Gemini 3.1 Flash Lite,0e671a1a,both_correct,none,True,26.0,63.0,2197.0,True,353,12,4,5,2,10,10
+Gemini 3.1 Flash Lite,0f63c0b9,both_failed,representation_ceiling,False,21.0,77.0,2636.0,True,286,12,5,2,1,10,9
+Gemini 3.1 Flash Lite,103eff5b,both_failed,representation_ceiling,False,51.0,76.0,3024.0,True,668,14,13,9,1,23,26
+Gemini 3.1 Flash Lite,11e1fe23,both_failed,representation_ceiling,False,23.0,66.0,2392.0,True,321,12,5,3,1,12,10
+Gemini 3.1 Flash Lite,12422b43,both_failed,representation_ceiling,False,32.0,52.0,1911.0,True,302,12,5,5,1,13,11
+Gemini 3.1 Flash Lite,12997ef3,semantic_recovery,none,True,51.0,69.0,2399.0,True,534,15,10,8,1,18,19
+Gemini 3.1 Flash Lite,12eac192,both_failed,representation_ceiling,False,34.0,42.0,1561.0,True,333,13,7,7,1,12,17
+Gemini 3.1 Flash Lite,136b0064,both_failed,representation_ceiling,False,45.0,67.0,2864.0,True,565,15,8,5,2,22,18
+Gemini 3.1 Flash Lite,13713586,both_failed,representation_ceiling,False,64.0,87.0,3470.0,True,796,14,13,9,1,27,25
+Gemini 3.1 Flash Lite,137f0df0,both_failed,representation_ceiling,False,36.0,55.0,2044.0,True,398,11,8,10,1,18,20
+Gemini 3.1 Flash Lite,140c817e,both_correct,none,True,23.0,37.0,1072.0,True,267,11,8,2,1,10,12
+Gemini 3.1 Flash Lite,14754a24,both_failed,representation_ceiling,False,41.0,61.0,2730.0,True,486,16,9,11,1,16,28
+Gemini 3.1 Flash Lite,15113be4,both_failed,representation_ceiling,False,55.0,82.0,3623.0,True,705,16,15,9,1,19,26
+Gemini 3.1 Flash Lite,15663ba9,both_failed,representation_ceiling,False,38.0,44.0,1957.0,True,526,15,6,7,1,18,16
+Gemini 3.1 Flash Lite,15696249,both_failed,spurious_overfitting,False,48.0,65.0,3031.0,True,207,12,4,3,1,7,8
+Gemini 3.1 Flash Lite,16b78196,both_failed,representation_ceiling,False,69.0,94.0,3908.0,True,976,15,13,8,1,36,28
+Gemini 3.1 Flash Lite,17b80ad2,both_failed,representation_ceiling,False,19.0,42.0,1595.0,True,200,12,3,3,1,9,8
+Gemini 3.1 Flash Lite,17cae0c1,both_correct,none,True,34.0,87.0,3161.0,True,358,11,6,0,1,7,7
+Gemini 3.1 Flash Lite,18419cfa,semantic_recovery,none,True,41.0,61.0,2892.0,True,579,15,9,6,1,20,19
+Gemini 3.1 Flash Lite,184a9768,both_failed,representation_ceiling,False,82.0,99.0,4164.0,True,1041,15,14,10,3,36,31
+Gemini 3.1 Flash Lite,195ba7dc,both_correct,none,True,29.0,39.0,1362.0,True,137,10,2,1,1,6,5
+Gemini 3.1 Flash Lite,1990f7a8,both_failed,representation_ceiling,False,37.0,56.0,2317.0,True,570,14,8,2,1,21,13
+Gemini 3.1 Flash Lite,19bb5feb,semantic_recovery,none,True,31.0,49.0,2108.0,True,400,12,4,2,1,19,8
+Gemini 3.1 Flash Lite,1a2e2828,both_correct,none,True,53.0,123.0,4829.0,True,488,13,11,11,1,19,25
+Gemini 3.1 Flash Lite,1a6449f1,semantic_recovery,none,True,31.0,51.0,2266.0,True,330,16,8,6,1,13,17
+Gemini 3.1 Flash Lite,1acc24af,both_failed,representation_ceiling,False,40.0,63.0,2411.0,True,432,14,10,7,1,15,18
+Gemini 3.1 Flash Lite,1c02dbbe,both_failed,representation_ceiling,False,32.0,61.0,2653.0,True,438,15,8,8,1,17,18
+Gemini 3.1 Flash Lite,1c0d0a4b,semantic_recovery,none,True,13.0,46.0,1775.0,True,158,12,4,1,1,5,6
+Gemini 3.1 Flash Lite,1c56ad9f,both_failed,representation_ceiling,False,24.0,27.0,950.0,True,310,13,4,10,1,15,15
+Gemini 3.1 Flash Lite,1d0a4b61,both_failed,representation_ceiling,False,38.0,50.0,1920.0,True,362,13,7,4,1,18,12
+Gemini 3.1 Flash Lite,1d398264,both_failed,representation_ceiling,False,47.0,74.0,2324.0,True,564,11,12,9,1,25,24
+Gemini 3.1 Flash Lite,1da012fc,both_failed,spurious_overfitting,False,72.0,118.0,4711.0,True,856,15,18,10,3,25,34
+Gemini 3.1 Flash Lite,1e81d6f9,both_failed,representation_ceiling,False,17.0,66.0,2995.0,True,190,11,4,3,1,6,10
+Gemini 3.1 Flash Lite,1e97544e,both_failed,representation_ceiling,False,30.0,43.0,1711.0,True,250,11,5,2,1,12,8
+Gemini 3.1 Flash Lite,2037f2c7,both_failed,representation_ceiling,False,42.0,63.0,2522.0,True,565,15,6,4,2,23,15
+Gemini 3.1 Flash Lite,2072aba6,both_correct,none,True,24.0,31.0,1080.0,True,201,12,2,1,1,9,4
+Gemini 3.1 Flash Lite,20818e16,both_failed,representation_ceiling,False,64.0,93.0,3642.0,True,803,14,13,5,1,36,21
+Gemini 3.1 Flash Lite,20981f0e,both_failed,representation_ceiling,False,28.0,77.0,3270.0,True,312,13,8,3,1,12,12
+Gemini 3.1 Flash Lite,212895b5,both_failed,representation_ceiling,False,40.0,62.0,2350.0,True,503,12,6,11,1,14,24
+Gemini 3.1 Flash Lite,21f83797,both_correct,none,True,23.0,34.0,927.0,True,287,10,6,1,1,13,8
+Gemini 3.1 Flash Lite,22a4bbc2,both_failed,representation_ceiling,False,54.0,73.0,3248.0,True,494,14,8,6,1,17,19
+Gemini 3.1 Flash Lite,25094a63,both_failed,representation_ceiling,False,36.0,60.0,2459.0,True,446,16,10,4,2,17,19
+Gemini 3.1 Flash Lite,2546ccf6,both_failed,representation_ceiling,False,33.0,55.0,2239.0,True,491,12,7,2,1,19,11
+Gemini 3.1 Flash Lite,256b0a75,both_failed,representation_ceiling,False,44.0,71.0,2975.0,True,599,14,11,4,1,22,19
+Gemini 3.1 Flash Lite,2685904e,both_failed,representation_ceiling,False,34.0,67.0,2379.0,True,283,10,6,7,1,20,14
+Gemini 3.1 Flash Lite,2697da3f,both_failed,representation_ceiling,False,36.0,60.0,2100.0,True,445,14,7,11,1,22,19
+Gemini 3.1 Flash Lite,2753e76c,both_failed,representation_ceiling,False,41.0,59.0,2299.0,True,533,14,7,4,1,24,15
+Gemini 3.1 Flash Lite,27a77e38,both_failed,spurious_overfitting,False,16.0,39.0,1397.0,True,195,11,1,1,1,11,3
+Gemini 3.1 Flash Lite,27f8ce4f,semantic_recovery,none,True,20.0,46.0,1746.0,True,214,14,7,2,1,9,10
+Gemini 3.1 Flash Lite,281123b4,semantic_recovery,none,True,21.0,48.0,1705.0,True,275,13,4,3,1,9,8
+Gemini 3.1 Flash Lite,292dd178,both_failed,representation_ceiling,False,53.0,73.0,3341.0,True,786,14,12,6,1,27,25
+Gemini 3.1 Flash Lite,29700607,semantic_recovery,none,True,32.0,49.0,1845.0,True,344,12,9,4,1,13,15
+Gemini 3.1 Flash Lite,2a5f8217,both_failed,representation_ceiling,False,51.0,69.0,2574.0,True,528,14,12,6,1,23,21
+Gemini 3.1 Flash Lite,2b01abd0,both_failed,spurious_overfitting,False,32.0,52.0,1718.0,True,324,12,4,6,1,17,13
+Gemini 3.1 Flash Lite,2c0b0aff,both_failed,representation_ceiling,False,45.0,70.0,2802.0,True,571,14,10,3,1,23,16
+Gemini 3.1 Flash Lite,2c737e39,both_failed,spurious_overfitting,False,43.0,73.0,2513.0,True,558,11,6,4,1,26,13
+Gemini 3.1 Flash Lite,2f0c5170,both_failed,representation_ceiling,False,40.0,64.0,2619.0,True,525,14,7,4,1,21,14
+Gemini 3.1 Flash Lite,310f3251,semantic_recovery,none,True,21.0,43.0,1842.0,True,296,13,9,2,1,7,12
+Gemini 3.1 Flash Lite,3194b014,both_failed,representation_ceiling,False,33.0,58.0,2248.0,True,426,13,6,5,1,16,18
+Gemini 3.1 Flash Lite,319f2597,both_failed,representation_ceiling,False,27.0,84.0,3745.0,True,382,12,8,5,1,8,18
+Gemini 3.1 Flash Lite,31adaf00,both_failed,representation_ceiling,False,31.0,57.0,2461.0,True,332,13,9,6,1,9,18
+Gemini 3.1 Flash Lite,31d5ba1a,semantic_recovery,none,True,40.0,50.0,1505.0,True,164,13,2,1,1,5,7
+Gemini 3.1 Flash Lite,32e9702f,both_failed,representation_ceiling,False,13.0,21.0,718.0,True,161,11,2,1,1,7,4
+Gemini 3.1 Flash Lite,332efdb3,both_correct,none,True,22.0,26.0,833.0,True,121,11,2,2,1,4,5
+Gemini 3.1 Flash Lite,3391f8c0,both_failed,representation_ceiling,False,22.0,32.0,910.0,True,240,11,4,3,1,10,8
+Gemini 3.1 Flash Lite,33b52de3,both_failed,representation_ceiling,False,20.0,40.0,1666.0,True,256,14,5,2,1,9,8
+Gemini 3.1 Flash Lite,3490cc26,both_failed,representation_ceiling,False,58.0,82.0,3250.0,True,709,13,11,13,1,25,32
+Gemini 3.1 Flash Lite,34b99a2b,semantic_recovery,none,True,28.0,39.0,1217.0,True,266,11,4,2,1,13,7
+Gemini 3.1 Flash Lite,351d6448,both_failed,spurious_overfitting,False,45.0,75.0,2929.0,True,348,10,7,10,1,18,18
+Gemini 3.1 Flash Lite,358ba94e,both_failed,representation_ceiling,False,34.0,57.0,2102.0,True,295,13,10,6,1,10,17
+Gemini 3.1 Flash Lite,37d3e8b2,both_failed,representation_ceiling,False,43.0,64.0,2568.0,True,539,15,7,6,2,20,17
+Gemini 3.1 Flash Lite,3979b1a8,both_failed,representation_ceiling,False,17.0,70.0,2143.0,True,274,11,8,0,1,7,9
+Gemini 3.1 Flash Lite,3a301edc,both_failed,representation_ceiling,False,30.0,56.0,2317.0,True,378,11,6,8,1,15,18
+Gemini 3.1 Flash Lite,3b4c2228,semantic_recovery,none,True,21.0,68.0,2044.0,True,240,13,2,4,2,10,8
+Gemini 3.1 Flash Lite,3d31c5b3,semantic_recovery,none,True,19.0,46.0,1754.0,True,210,13,2,4,1,10,7
+Gemini 3.1 Flash Lite,3ed85e70,both_failed,representation_ceiling,False,37.0,55.0,2084.0,True,464,13,8,8,1,15,24
+Gemini 3.1 Flash Lite,3ee1011a,both_failed,representation_ceiling,False,45.0,67.0,2775.0,True,626,14,7,5,1,23,17
+Gemini 3.1 Flash Lite,3f23242b,semantic_recovery,none,True,34.0,59.0,2200.0,True,495,14,6,17,1,16,24
+Gemini 3.1 Flash Lite,40f6cd08,both_failed,representation_ceiling,False,52.0,74.0,3345.0,True,686,15,10,4,3,27,19
+Gemini 3.1 Flash Lite,414297c0,both_failed,representation_ceiling,False,59.0,86.0,3488.0,True,694,15,9,5,2,28,18
+Gemini 3.1 Flash Lite,423a55dc,semantic_recovery,none,True,27.0,45.0,1526.0,True,299,11,4,8,1,16,14
+Gemini 3.5 Flash Lite,00576224,both_correct,none,True,14.0,24.0,609.0,True,108,8,0,0,1,5,1
+Gemini 3.5 Flash Lite,009d5c81,semantic_recovery,none,True,26.0,41.0,1495.0,True,320,10,4,6,1,11,11
+Gemini 3.5 Flash Lite,00dbd492,both_correct,none,True,36.0,118.0,6233.0,True,431,14,8,8,1,17,22
+Gemini 3.5 Flash Lite,03560426,both_correct,none,True,42.0,107.0,5031.0,True,421,12,6,4,1,19,12
+Gemini 3.5 Flash Lite,05a7bcf2,both_failed,representation_ceiling,False,60.0,79.0,3180.0,True,718,15,12,13,1,28,29
+Gemini 3.5 Flash Lite,0607ce86,both_failed,representation_ceiling,False,98.0,147.0,6069.0,True,1033,12,13,21,1,46,35
+Gemini 3.5 Flash Lite,0692e18c,semantic_recovery,none,True,15.0,196.0,15097.0,True,201,15,4,2,1,6,8
+Gemini 3.5 Flash Lite,070dd51e,both_failed,representation_ceiling,False,43.0,49.0,1664.0,True,460,13,7,8,1,25,16
+Gemini 3.5 Flash Lite,08573cc6,both_failed,spurious_overfitting,False,63.0,233.0,11636.0,True,717,10,2,7,1,8,15
+Gemini 3.5 Flash Lite,0934a4d8,both_failed,representation_ceiling,False,27.0,39.0,1321.0,True,298,11,5,3,1,12,9
+Gemini 3.5 Flash Lite,09c534e7,both_failed,representation_ceiling,False,44.0,150.0,9812.0,True,627,17,8,9,1,21,22
+Gemini 3.5 Flash Lite,0a1d4ef5,both_failed,representation_ceiling,False,57.0,70.0,2545.0,True,606,14,5,8,1,23,17
+Gemini 3.5 Flash Lite,0a2355a6,both_failed,representation_ceiling,False,78.0,94.0,3289.0,True,750,18,7,14,1,39,35
+Gemini 3.5 Flash Lite,0b17323b,both_correct,none,True,23.0,59.0,2179.0,True,278,10,3,3,1,12,8
+Gemini 3.5 Flash Lite,0bb8deee,semantic_recovery,none,True,108.0,145.0,5500.0,True,1489,13,17,23,5,59,44
+Gemini 3.5 Flash Lite,0becf7df,both_failed,representation_ceiling,False,24.0,95.0,5238.0,True,275,10,2,3,1,4,8
+Gemini 3.5 Flash Lite,0c786b71,semantic_recovery,none,True,8.0,26.0,1374.0,True,80,8,1,0,1,4,2
+Gemini 3.5 Flash Lite,0c9aba6e,both_failed,representation_ceiling,False,19.0,26.0,906.0,True,179,10,3,2,1,7,7
+Gemini 3.5 Flash Lite,0d87d2a6,both_failed,spurious_overfitting,False,50.0,132.0,7104.0,True,585,14,14,7,1,20,24
+Gemini 3.5 Flash Lite,0e671a1a,both_failed,representation_ceiling,False,29.0,47.0,1440.0,True,379,11,5,5,1,16,11
+Gemini 3.5 Flash Lite,0f63c0b9,both_failed,representation_ceiling,False,44.0,141.0,6086.0,True,454,12,6,6,1,25,18
+Gemini 3.5 Flash Lite,103eff5b,both_failed,representation_ceiling,False,35.0,51.0,1984.0,True,438,14,8,4,1,14,16
+Gemini 3.5 Flash Lite,11e1fe23,both_failed,spurious_overfitting,False,32.0,253.0,13565.0,True,440,12,3,2,1,23,6
+Gemini 3.5 Flash Lite,12422b43,both_correct,none,True,17.0,292.0,16741.0,True,195,11,3,1,1,9,5
+Gemini 3.5 Flash Lite,12997ef3,both_failed,representation_ceiling,False,48.0,61.0,2058.0,True,603,15,8,6,1,25,16
+Gemini 3.5 Flash Lite,12eac192,both_failed,representation_ceiling,False,36.0,46.0,1904.0,True,447,15,8,7,1,16,21
+Gemini 3.5 Flash Lite,136b0064,both_failed,spurious_overfitting,False,52.0,87.0,3688.0,True,443,9,1,4,1,5,9
+Gemini 3.5 Flash Lite,13713586,both_failed,representation_ceiling,False,59.0,72.0,2574.0,True,670,16,15,9,1,30,31
+Gemini 3.5 Flash Lite,137f0df0,both_correct,none,True,110.0,196.0,7928.0,True,1435,14,36,11,1,53,59
+Gemini 3.5 Flash Lite,140c817e,both_correct,none,True,29.0,125.0,6027.0,True,319,11,8,4,1,14,13
+Gemini 3.5 Flash Lite,14754a24,both_failed,representation_ceiling,False,43.0,74.0,3427.0,True,377,12,8,11,1,13,23
+Gemini 3.5 Flash Lite,15113be4,both_failed,representation_ceiling,False,47.0,64.0,2553.0,True,694,16,12,5,1,23,20
+Gemini 3.5 Flash Lite,15663ba9,both_failed,representation_ceiling,False,50.0,75.0,3014.0,True,576,15,7,7,1,24,17
+Gemini 3.5 Flash Lite,15696249,both_failed,spurious_overfitting,False,32.0,73.0,2876.0,True,397,12,6,3,1,18,11
+Gemini 3.5 Flash Lite,16b78196,both_failed,representation_ceiling,False,56.0,70.0,2342.0,True,620,14,10,6,1,26,19
+Gemini 3.5 Flash Lite,17b80ad2,semantic_recovery,none,True,24.0,35.0,1088.0,True,205,12,5,4,1,9,10
+Gemini 3.5 Flash Lite,17cae0c1,both_correct,none,True,34.0,179.0,6430.0,True,303,15,6,7,2,8,15
+Gemini 3.5 Flash Lite,18419cfa,both_failed,representation_ceiling,False,64.0,78.0,4013.0,True,764,18,11,11,1,31,26
+Gemini 3.5 Flash Lite,184a9768,both_failed,representation_ceiling,False,57.0,69.0,1867.0,True,589,13,24,5,1,25,33
+Gemini 3.5 Flash Lite,195ba7dc,semantic_recovery,none,True,24.0,32.0,1033.0,True,244,10,3,2,1,12,7
+Gemini 3.5 Flash Lite,1990f7a8,semantic_recovery,none,True,90.0,273.0,12319.0,True,1108,16,14,6,1,48,26
+Gemini 3.5 Flash Lite,19bb5feb,both_correct,none,True,29.0,53.0,1935.0,True,365,12,3,5,1,18,14
+Gemini 3.5 Flash Lite,1a2e2828,both_correct,none,True,20.0,65.0,2367.0,True,293,12,4,4,1,6,13
+Gemini 3.5 Flash Lite,1a6449f1,both_failed,representation_ceiling,False,29.0,60.0,3231.0,True,415,15,6,3,1,14,11
+Gemini 3.5 Flash Lite,1acc24af,both_failed,representation_ceiling,False,50.0,99.0,4869.0,True,694,14,10,5,2,25,20
+Gemini 3.5 Flash Lite,1c02dbbe,semantic_recovery,none,True,68.0,229.0,12118.0,True,1076,11,9,8,1,51,25
+Gemini 3.5 Flash Lite,1c0d0a4b,both_correct,none,True,15.0,71.0,2893.0,True,189,14,4,2,1,6,8
+Gemini 3.5 Flash Lite,1c56ad9f,both_failed,spurious_overfitting,False,48.0,84.0,3148.0,True,553,14,9,3,1,25,15
+Gemini 3.5 Flash Lite,1d0a4b61,both_failed,representation_ceiling,False,23.0,48.0,2084.0,True,256,12,5,2,1,14,8
+Gemini 3.5 Flash Lite,1d398264,both_failed,spurious_overfitting,False,67.0,119.0,4574.0,True,1015,10,6,4,1,31,14
+Gemini 3.5 Flash Lite,1da012fc,both_failed,representation_ceiling,False,59.0,81.0,3309.0,True,775,16,16,6,2,22,28
+Gemini 3.5 Flash Lite,1e81d6f9,semantic_recovery,none,True,23.0,228.0,14574.0,True,238,13,5,6,1,7,13
+Gemini 3.5 Flash Lite,1e97544e,both_failed,representation_ceiling,False,70.0,139.0,6870.0,True,653,14,10,12,1,37,25
+Gemini 3.5 Flash Lite,2037f2c7,both_failed,representation_ceiling,False,97.0,279.0,14744.0,True,1162,14,18,12,1,47,38
+Gemini 3.5 Flash Lite,2072aba6,both_correct,none,True,12.0,15.0,452.0,True,154,14,4,1,1,5,6
+Gemini 3.5 Flash Lite,20818e16,both_failed,representation_ceiling,False,74.0,110.0,4097.0,True,767,14,9,7,1,38,21
+Gemini 3.5 Flash Lite,20981f0e,both_failed,representation_ceiling,False,40.0,59.0,2089.0,True,426,12,8,6,1,18,15
+Gemini 3.5 Flash Lite,212895b5,both_failed,representation_ceiling,False,38.0,58.0,2972.0,True,603,14,4,5,1,19,21
+Gemini 3.5 Flash Lite,21f83797,both_correct,none,True,28.0,43.0,1253.0,True,320,10,6,2,1,17,9
+Gemini 3.5 Flash Lite,22a4bbc2,semantic_recovery,none,True,21.0,125.0,5309.0,True,212,12,5,3,1,9,10
+Gemini 3.5 Flash Lite,25094a63,both_failed,representation_ceiling,False,49.0,91.0,3823.0,True,487,14,11,13,1,20,27
+Gemini 3.5 Flash Lite,2546ccf6,both_failed,spurious_overfitting,False,61.0,270.0,15933.0,True,738,14,9,8,3,33,21
+Gemini 3.5 Flash Lite,256b0a75,both_failed,representation_ceiling,False,96.0,119.0,4365.0,True,1006,14,23,21,1,44,54
+Gemini 3.5 Flash Lite,2685904e,both_correct,none,True,23.0,70.0,3014.0,True,230,10,5,4,1,11,10
+Gemini 3.5 Flash Lite,2697da3f,both_failed,representation_ceiling,False,25.0,138.0,7210.0,True,395,11,2,1,1,20,4
+Gemini 3.5 Flash Lite,2753e76c,both_failed,representation_ceiling,False,60.0,132.0,5600.0,True,654,15,8,3,1,33,15
+Gemini 3.5 Flash Lite,27a77e38,semantic_recovery,none,True,26.0,147.0,7245.0,True,253,11,3,4,1,14,8
+Gemini 3.5 Flash Lite,27f8ce4f,both_correct,none,True,22.0,275.0,14463.0,True,219,12,8,2,1,9,11
+Gemini 3.5 Flash Lite,281123b4,semantic_recovery,none,True,61.0,80.0,4238.0,True,1141,16,11,11,1,19,24
+Gemini 3.5 Flash Lite,292dd178,semantic_recovery,none,True,65.0,99.0,4761.0,True,827,15,14,11,1,28,32
+Gemini 3.5 Flash Lite,29700607,semantic_recovery,none,True,43.0,73.0,3382.0,True,451,12,11,6,1,18,19
+Gemini 3.5 Flash Lite,2a5f8217,semantic_recovery,none,True,51.0,64.0,2719.0,True,754,14,10,5,1,29,20
+Gemini 3.5 Flash Lite,2b01abd0,both_correct,none,True,95.0,228.0,11805.0,True,1078,15,15,18,1,45,42
+Gemini 3.5 Flash Lite,2c0b0aff,both_failed,representation_ceiling,False,33.0,54.0,2325.0,True,493,14,5,2,1,21,10
+Gemini 3.5 Flash Lite,2c737e39,both_failed,spurious_overfitting,False,40.0,66.0,3053.0,True,496,13,7,6,1,21,18
+Gemini 3.5 Flash Lite,2f0c5170,both_failed,representation_ceiling,False,70.0,115.0,5044.0,True,706,14,10,8,1,33,22
+Gemini 3.5 Flash Lite,310f3251,semantic_recovery,none,True,21.0,96.0,4875.0,True,258,13,8,2,1,9,11
+Gemini 3.5 Flash Lite,3194b014,semantic_recovery,none,True,30.0,108.0,5235.0,True,344,11,3,5,1,17,10
+Gemini 3.5 Flash Lite,319f2597,semantic_recovery,none,True,32.0,88.0,4920.0,True,337,13,4,6,1,9,15
+Gemini 3.5 Flash Lite,31adaf00,both_failed,representation_ceiling,False,43.0,78.0,3774.0,True,424,15,12,12,1,14,28
+Gemini 3.5 Flash Lite,31d5ba1a,both_correct,none,True,15.0,76.0,3042.0,True,131,10,2,1,1,6,4
+Gemini 3.5 Flash Lite,32e9702f,semantic_recovery,none,True,31.0,121.0,7137.0,True,307,12,5,6,1,15,12
+Gemini 3.5 Flash Lite,332efdb3,both_correct,none,True,13.0,13.0,354.0,True,113,10,2,1,1,4,5
+Gemini 3.5 Flash Lite,3391f8c0,both_failed,representation_ceiling,False,92.0,133.0,6062.0,True,1070,14,14,10,1,48,29
+Gemini 3.5 Flash Lite,33b52de3,both_failed,representation_ceiling,False,52.0,84.0,3864.0,True,765,15,12,7,1,21,24
+Gemini 3.5 Flash Lite,3490cc26,both_failed,representation_ceiling,False,68.0,91.0,3930.0,True,784,15,20,14,1,27,41
+Gemini 3.5 Flash Lite,34b99a2b,both_correct,none,True,13.0,75.0,2542.0,True,125,11,2,1,1,4,4
+Gemini 3.5 Flash Lite,351d6448,both_failed,spurious_overfitting,False,55.0,67.0,2370.0,True,555,12,9,12,1,25,22
+Gemini 3.5 Flash Lite,358ba94e,both_failed,representation_ceiling,False,38.0,61.0,2770.0,True,558,14,6,4,1,21,14
+Gemini 3.5 Flash Lite,37d3e8b2,both_failed,representation_ceiling,False,75.0,98.0,4013.0,True,999,14,13,10,1,42,33
+Gemini 3.5 Flash Lite,3979b1a8,semantic_recovery,none,True,53.0,87.0,3136.0,True,583,13,9,6,1,24,16
+Gemini 3.5 Flash Lite,3a301edc,both_failed,representation_ceiling,False,59.0,91.0,3469.0,True,621,12,8,19,1,32,29
+Gemini 3.5 Flash Lite,3b4c2228,semantic_recovery,none,True,47.0,81.0,3524.0,True,576,17,10,7,2,19,22
+Gemini 3.5 Flash Lite,3d31c5b3,both_failed,representation_ceiling,False,15.0,49.0,2314.0,True,153,12,3,1,1,9,5
+Gemini 3.5 Flash Lite,3ed85e70,both_failed,representation_ceiling,False,22.0,47.0,2504.0,True,377,15,6,5,1,5,16
+Gemini 3.5 Flash Lite,3ee1011a,both_correct,none,True,52.0,308.0,16089.0,True,705,12,6,4,1,28,15
+Gemini 3.5 Flash Lite,3f23242b,both_correct,none,True,26.0,106.0,5179.0,True,344,11,6,2,1,15,9
+Gemini 3.5 Flash Lite,40f6cd08,both_failed,representation_ceiling,False,82.0,112.0,5050.0,True,1017,16,14,7,1,40,27
+Gemini 3.5 Flash Lite,414297c0,both_failed,representation_ceiling,False,60.0,85.0,3408.0,True,739,14,10,7,1,35,22
+Gemini 3.5 Flash Lite,423a55dc,semantic_recovery,none,True,24.0,30.0,881.0,True,279,11,4,8,1,13,13
+Leanstral 1.5.1,00576224,both_failed,representation_ceiling,False,10.0,11.0,357.0,True,89,9,2,1,1,3,4
+Leanstral 1.5.1,009d5c81,both_failed,representation_ceiling,False,44.0,59.0,2201.0,True,419,16,8,14,1,11,27
+Leanstral 1.5.1,00dbd492,both_failed,representation_ceiling,False,51.0,67.0,2120.0,True,518,13,9,10,1,18,24
+Leanstral 1.5.1,03560426,both_failed,representation_ceiling,False,35.0,56.0,1997.0,True,528,13,6,5,1,19,13
+Leanstral 1.5.1,05a7bcf2,both_failed,representation_ceiling,False,21.0,29.0,754.0,True,208,13,3,6,1,7,12
+Leanstral 1.5.1,0607ce86,both_failed,representation_ceiling,False,31.0,48.0,1439.0,True,346,12,6,6,1,12,13
+Leanstral 1.5.1,0692e18c,both_failed,representation_ceiling,False,63.0,87.0,3424.0,True,1213,13,8,24,1,26,53
+Leanstral 1.5.1,070dd51e,both_failed,representation_ceiling,False,2.0,3.0,361.0,False,0,0,0,0,0,0,1
+Leanstral 1.5.1,08573cc6,both_failed,representation_ceiling,False,27.0,36.0,1245.0,True,329,13,7,6,1,8,17
+Leanstral 1.5.1,0934a4d8,both_failed,representation_ceiling,False,23.0,32.0,822.0,True,239,10,4,3,1,10,10
+Leanstral 1.5.1,09c534e7,both_failed,representation_ceiling,False,43.0,59.0,1891.0,True,535,13,7,8,1,18,19
+Leanstral 1.5.1,0a1d4ef5,both_failed,representation_ceiling,False,51.0,76.0,3031.0,True,662,15,9,9,1,21,23
+Leanstral 1.5.1,0a2355a6,both_failed,representation_ceiling,False,42.0,60.0,2366.0,True,543,15,5,6,1,26,16
+Leanstral 1.5.1,0b17323b,both_failed,representation_ceiling,False,13.0,21.0,1777.0,False,0,0,0,0,0,0,1
+Leanstral 1.5.1,0bb8deee,both_failed,representation_ceiling,False,56.0,79.0,2919.0,True,717,12,14,9,1,23,27
+Leanstral 1.5.1,0becf7df,both_failed,representation_ceiling,False,30.0,42.0,1484.0,True,345,14,5,8,1,12,15
+Leanstral 1.5.1,0c786b71,both_correct,none,True,11.0,113.0,4950.0,True,123,10,2,0,1,5,3
+Leanstral 1.5.1,0c9aba6e,both_failed,representation_ceiling,False,19.0,26.0,674.0,True,132,10,3,3,1,5,7
+Leanstral 1.5.1,0d87d2a6,both_failed,representation_ceiling,False,29.0,41.0,1598.0,True,449,15,6,3,1,16,13
+Leanstral 1.5.1,0e671a1a,both_failed,representation_ceiling,False,19.0,28.0,888.0,True,195,10,5,3,1,4,9
+Leanstral 1.5.1,0f63c0b9,both_failed,representation_ceiling,False,20.0,32.0,1084.0,True,248,12,5,3,1,7,9
+Leanstral 1.5.1,103eff5b,both_failed,representation_ceiling,False,41.0,69.0,1909.0,True,425,11,4,8,1,22,14
+Leanstral 1.5.1,11e1fe23,both_failed,representation_ceiling,False,18.0,29.0,1014.0,True,233,12,5,3,1,4,9
+Leanstral 1.5.1,12422b43,both_failed,representation_ceiling,False,40.0,59.0,2056.0,True,487,12,9,4,1,20,14
+Leanstral 1.5.1,12997ef3,both_failed,representation_ceiling,False,26.0,37.0,1016.0,True,274,11,5,4,1,11,11
+Leanstral 1.5.1,12eac192,both_failed,representation_ceiling,False,19.0,27.0,1579.0,False,0,0,0,0,0,0,1
+Leanstral 1.5.1,136b0064,both_failed,representation_ceiling,False,55.0,91.0,3213.0,True,697,13,10,6,1,32,17
+Leanstral 1.5.1,13713586,both_failed,representation_ceiling,False,36.0,52.0,1965.0,True,516,14,8,4,1,19,16
+Leanstral 1.5.1,137f0df0,both_failed,representation_ceiling,False,57.0,75.0,2635.0,True,608,16,7,13,1,23,28
+Leanstral 1.5.1,140c817e,both_failed,representation_ceiling,False,31.0,46.0,1254.0,True,325,11,8,3,1,11,14
+Leanstral 1.5.1,14754a24,both_failed,representation_ceiling,False,39.0,49.0,2176.0,True,419,16,5,7,1,14,16
+Leanstral 1.5.1,15113be4,both_failed,representation_ceiling,False,22.0,31.0,976.0,True,235,13,3,6,1,10,12
+Leanstral 1.5.1,15663ba9,both_failed,representation_ceiling,False,33.0,36.0,1342.0,True,364,15,4,8,1,14,15
+Leanstral 1.5.1,15696249,both_failed,representation_ceiling,False,24.0,35.0,1266.0,True,319,12,6,3,1,10,11
+Leanstral 1.5.1,16b78196,both_failed,representation_ceiling,False,22.0,30.0,993.0,True,278,13,5,5,1,8,14
+Leanstral 1.5.1,17b80ad2,both_failed,representation_ceiling,False,31.0,45.0,1629.0,True,351,17,5,8,1,12,17
+Leanstral 1.5.1,17cae0c1,both_correct,none,True,41.0,640.0,25612.0,True,456,12,4,5,1,14,15
+Leanstral 1.5.1,18419cfa,both_failed,representation_ceiling,False,45.0,62.0,1935.0,True,481,11,11,10,1,12,23
+Leanstral 1.5.1,184a9768,both_failed,representation_ceiling,False,36.0,48.0,1768.0,True,486,15,7,5,1,17,16
+Leanstral 1.5.1,195ba7dc,both_failed,representation_ceiling,False,17.0,31.0,1104.0,True,143,12,3,2,1,5,6
+Leanstral 1.5.1,1990f7a8,both_failed,representation_ceiling,False,46.0,64.0,2008.0,True,503,12,7,8,1,19,19
+Leanstral 1.5.1,19bb5feb,both_failed,representation_ceiling,False,55.0,74.0,2378.0,True,646,13,6,8,1,29,17
+Leanstral 1.5.1,1a2e2828,semantic_recovery,none,True,25.0,35.0,1136.0,True,264,13,2,6,1,7,12
+Leanstral 1.5.1,1a6449f1,both_failed,representation_ceiling,False,19.0,26.0,750.0,True,230,12,4,2,1,7,7
+Leanstral 1.5.1,1acc24af,both_failed,representation_ceiling,False,29.0,40.0,1054.0,True,345,12,6,5,1,10,14
+Leanstral 1.5.1,1c02dbbe,both_failed,representation_ceiling,False,28.0,38.0,1387.0,True,379,13,6,3,1,15,10
+Leanstral 1.5.1,1c0d0a4b,both_failed,representation_ceiling,False,33.0,48.0,1772.0,True,381,12,8,8,1,12,19
+Leanstral 1.5.1,1c56ad9f,both_failed,representation_ceiling,False,27.0,40.0,1241.0,True,355,12,6,3,1,15,11
+Leanstral 1.5.1,1d0a4b61,both_failed,representation_ceiling,False,23.0,26.0,907.0,True,209,13,3,5,1,6,9
+Leanstral 1.5.1,1d398264,both_failed,representation_ceiling,False,42.0,64.0,1956.0,True,462,11,11,9,1,17,22
+Leanstral 1.5.1,1da012fc,both_failed,representation_ceiling,False,45.0,60.0,2068.0,True,508,15,8,5,1,20,18
+Leanstral 1.5.1,1e81d6f9,both_failed,representation_ceiling,False,25.0,31.0,1106.0,True,283,14,4,7,1,9,17
+Leanstral 1.5.1,1e97544e,both_failed,representation_ceiling,False,31.0,48.0,1449.0,True,266,10,5,4,1,16,10
+Leanstral 1.5.1,2037f2c7,both_failed,representation_ceiling,False,32.0,45.0,1541.0,True,373,12,4,5,1,13,16
+Leanstral 1.5.1,2072aba6,both_correct,none,True,18.0,24.0,791.0,True,287,13,2,2,1,12,5
+Leanstral 1.5.1,20818e16,both_failed,representation_ceiling,False,55.0,73.0,2522.0,True,745,14,11,6,1,28,21
+Leanstral 1.5.1,20981f0e,both_failed,representation_ceiling,False,39.0,60.0,2302.0,True,726,17,9,11,1,16,27
+Leanstral 1.5.1,212895b5,both_failed,representation_ceiling,False,39.0,50.0,1854.0,True,518,14,4,11,1,18,23
+Leanstral 1.5.1,21f83797,both_failed,representation_ceiling,False,29.0,47.0,1569.0,True,370,12,7,2,1,16,10
+Leanstral 1.5.1,22a4bbc2,both_failed,representation_ceiling,False,13.0,18.0,638.0,True,190,12,2,3,1,5,8
+Leanstral 1.5.1,25094a63,both_failed,representation_ceiling,False,32.0,46.0,1577.0,True,291,14,9,5,1,10,15
+Leanstral 1.5.1,2546ccf6,both_failed,representation_ceiling,False,30.0,44.0,1366.0,True,374,11,4,7,1,15,13
+Leanstral 1.5.1,256b0a75,both_failed,representation_ceiling,False,23.0,36.0,1092.0,True,290,12,5,3,1,10,10
+Leanstral 1.5.1,2685904e,both_failed,representation_ceiling,False,41.0,58.0,2206.0,True,374,12,9,10,1,15,21
+Leanstral 1.5.1,2697da3f,both_failed,representation_ceiling,False,42.0,71.0,2444.0,True,492,13,10,6,1,20,20
+Leanstral 1.5.1,2753e76c,both_failed,representation_ceiling,False,28.0,36.0,1101.0,True,271,11,7,3,1,12,11
+Leanstral 1.5.1,27a77e38,both_failed,representation_ceiling,False,12.0,22.0,685.0,True,145,10,1,2,1,6,4
+Leanstral 1.5.1,27f8ce4f,semantic_recovery,none,True,30.0,45.0,1534.0,True,368,14,8,3,1,14,14
+Leanstral 1.5.1,281123b4,both_failed,representation_ceiling,False,37.0,83.0,2731.0,True,203,9,1,9,1,21,11
+Leanstral 1.5.1,292dd178,both_failed,representation_ceiling,False,29.0,47.0,1830.0,True,525,12,5,5,1,11,15
+Leanstral 1.5.1,29700607,both_failed,representation_ceiling,False,27.0,40.0,1109.0,True,321,12,5,5,1,10,14
+Leanstral 1.5.1,2a5f8217,both_failed,representation_ceiling,False,23.0,31.0,738.0,True,170,10,4,4,1,6,10
+Leanstral 1.5.1,2b01abd0,both_failed,representation_ceiling,False,25.0,36.0,914.0,True,220,12,5,4,1,11,10
+Leanstral 1.5.1,2c0b0aff,both_failed,representation_ceiling,False,31.0,43.0,1160.0,True,319,10,6,4,1,12,13
+Leanstral 1.5.1,2c737e39,both_failed,representation_ceiling,False,53.0,73.0,2844.0,True,592,14,15,12,1,15,28
+Leanstral 1.5.1,2f0c5170,both_failed,representation_ceiling,False,23.0,34.0,1049.0,True,322,10,6,2,1,12,10
+Leanstral 1.5.1,310f3251,both_failed,representation_ceiling,False,19.0,26.0,769.0,True,152,11,4,3,1,3,9
+Leanstral 1.5.1,3194b014,semantic_recovery,none,True,33.0,46.0,1420.0,True,413,12,5,6,1,10,14
+Leanstral 1.5.1,319f2597,both_failed,representation_ceiling,False,25.0,35.0,1085.0,True,287,12,6,3,1,11,13
+Leanstral 1.5.1,31adaf00,both_failed,representation_ceiling,False,19.0,23.0,715.0,True,251,13,2,6,1,9,13
+Leanstral 1.5.1,31d5ba1a,both_failed,representation_ceiling,False,14.0,63.0,2656.0,True,160,10,2,2,1,7,6
+Leanstral 1.5.1,32e9702f,both_failed,representation_ceiling,False,28.0,38.0,1193.0,True,286,13,4,6,1,10,15
+Leanstral 1.5.1,332efdb3,semantic_recovery,none,True,15.0,18.0,407.0,True,130,10,2,2,1,4,7
+Leanstral 1.5.1,3391f8c0,both_failed,representation_ceiling,False,20.0,32.0,652.0,True,137,10,2,1,1,6,4
+Leanstral 1.5.1,33b52de3,both_failed,representation_ceiling,False,19.0,23.0,609.0,True,173,12,2,4,1,10,7
+Leanstral 1.5.1,3490cc26,both_failed,representation_ceiling,False,50.0,73.0,2496.0,True,606,14,8,8,1,24,22
+Leanstral 1.5.1,34b99a2b,both_failed,representation_ceiling,False,14.0,17.0,634.0,True,179,10,1,0,1,10,6
+Leanstral 1.5.1,351d6448,both_failed,representation_ceiling,False,16.0,24.0,932.0,True,189,12,2,3,1,5,7
+Leanstral 1.5.1,358ba94e,both_failed,representation_ceiling,False,60.0,84.0,2863.0,True,679,15,10,10,1,28,25
+Leanstral 1.5.1,37d3e8b2,both_failed,representation_ceiling,False,53.0,64.0,2156.0,True,634,15,6,8,1,32,24
+Leanstral 1.5.1,3979b1a8,both_failed,representation_ceiling,False,29.0,39.0,1067.0,True,263,10,3,2,1,10,6
+Leanstral 1.5.1,3a301edc,both_failed,representation_ceiling,False,27.0,39.0,1235.0,True,324,11,6,4,1,13,12
+Leanstral 1.5.1,3b4c2228,both_failed,representation_ceiling,False,12.0,20.0,602.0,True,114,10,3,2,1,4,6
+Leanstral 1.5.1,3d31c5b3,both_failed,representation_ceiling,False,32.0,38.0,1385.0,True,283,14,2,7,1,8,15
+Leanstral 1.5.1,3ed85e70,both_failed,representation_ceiling,False,28.0,47.0,1541.0,True,379,10,6,3,1,15,12
+Leanstral 1.5.1,3ee1011a,both_failed,representation_ceiling,False,36.0,48.0,1454.0,True,425,12,6,4,1,16,12
+Leanstral 1.5.1,3f23242b,both_failed,representation_ceiling,False,29.0,40.0,1145.0,True,281,13,4,8,1,11,14
+Leanstral 1.5.1,40f6cd08,both_failed,representation_ceiling,False,28.0,44.0,1235.0,True,313,10,3,2,1,19,6
+Leanstral 1.5.1,414297c0,both_failed,representation_ceiling,False,24.0,38.0,1368.0,True,266,13,4,4,1,7,9
+Leanstral 1.5.1,423a55dc,both_failed,representation_ceiling,False,39.0,55.0,1888.0,True,500,11,8,6,1,22,17
+Claude Sonnet 5,00576224,both_correct,none,True,6.0,12.0,469.0,True,103,9,0,0,1,4,1
+Claude Sonnet 5,009d5c81,both_correct,none,True,40.0,61.0,1923.0,True,392,13,4,8,1,22,13
+Claude Sonnet 5,00dbd492,semantic_recovery,none,True,45.0,65.0,3030.0,True,443,19,10,10,1,15,25
+Claude Sonnet 5,03560426,both_correct,none,True,40.0,59.0,1829.0,True,403,11,5,3,1,21,10
+Claude Sonnet 5,05a7bcf2,both_failed,representation_ceiling,False,45.0,65.0,2235.0,True,447,14,5,10,1,18,20
+Claude Sonnet 5,0607ce86,both_correct,none,True,66.0,86.0,2909.0,True,668,13,14,14,1,25,32
+Claude Sonnet 5,0692e18c,both_correct,none,True,28.0,38.0,1246.0,True,245,14,8,4,1,8,13
+Claude Sonnet 5,070dd51e,semantic_recovery,none,True,33.0,46.0,1700.0,True,382,12,10,4,1,16,15
+Claude Sonnet 5,08573cc6,both_failed,representation_ceiling,False,55.0,86.0,2540.0,True,614,10,6,10,2,30,19
+Claude Sonnet 5,0934a4d8,both_failed,representation_ceiling,False,26.0,38.0,1385.0,True,311,11,5,2,1,13,9
+Claude Sonnet 5,09c534e7,semantic_recovery,none,True,48.0,69.0,2467.0,True,521,13,13,8,1,16,26
+Claude Sonnet 5,0a1d4ef5,semantic_recovery,none,True,67.0,98.0,3477.0,True,663,13,13,7,1,26,25
+Claude Sonnet 5,0a2355a6,both_failed,representation_ceiling,False,33.0,54.0,1733.0,True,423,12,7,2,2,17,12
+Claude Sonnet 5,0b17323b,both_correct,none,True,31.0,46.0,1255.0,True,333,10,4,4,1,16,10
+Claude Sonnet 5,0bb8deee,semantic_recovery,none,True,82.0,108.0,3515.0,True,810,12,10,13,4,34,26
+Claude Sonnet 5,0becf7df,semantic_recovery,none,True,16.0,26.0,829.0,True,229,11,2,2,1,4,6
+Claude Sonnet 5,0c786b71,semantic_recovery,none,True,8.0,15.0,512.0,True,86,9,1,0,1,4,2
+Claude Sonnet 5,0c9aba6e,semantic_recovery,none,True,18.0,24.0,734.0,True,162,10,3,2,1,6,7
+Claude Sonnet 5,0d87d2a6,both_failed,spurious_overfitting,False,57.0,78.0,3051.0,True,719,14,14,6,1,27,25
+Claude Sonnet 5,0e671a1a,both_correct,none,True,36.0,64.0,1867.0,True,386,11,6,5,1,23,12
+Claude Sonnet 5,0f63c0b9,semantic_recovery,none,True,37.0,59.0,1806.0,True,375,13,6,6,1,18,15
+Claude Sonnet 5,103eff5b,both_failed,representation_ceiling,False,63.0,86.0,2924.0,True,607,13,13,10,2,33,29
+Claude Sonnet 5,11e1fe23,both_failed,spurious_overfitting,False,30.0,51.0,1551.0,True,366,12,3,5,1,18,12
+Claude Sonnet 5,12422b43,both_correct,none,True,17.0,26.0,926.0,True,175,11,3,3,1,8,7
+Claude Sonnet 5,12997ef3,both_correct,none,True,40.0,56.0,1815.0,True,507,14,12,3,1,13,17
+Claude Sonnet 5,12eac192,semantic_recovery,none,True,46.0,65.0,2427.0,True,582,14,7,6,2,20,21
+Claude Sonnet 5,136b0064,both_failed,representation_ceiling,False,58.0,80.0,2619.0,True,475,12,11,11,1,24,23
+Claude Sonnet 5,13713586,both_correct,none,True,87.0,113.0,4172.0,True,773,16,14,19,1,28,44
+Claude Sonnet 5,137f0df0,semantic_recovery,none,True,57.0,84.0,3251.0,True,675,14,6,12,1,30,25
+Claude Sonnet 5,140c817e,semantic_recovery,none,True,29.0,48.0,1416.0,True,397,11,6,9,1,11,20
+Claude Sonnet 5,14754a24,both_failed,representation_ceiling,False,48.0,67.0,2546.0,True,529,15,11,11,1,18,27
+Claude Sonnet 5,15113be4,both_failed,representation_ceiling,False,39.0,56.0,2070.0,True,478,14,8,6,1,18,16
+Claude Sonnet 5,15663ba9,both_failed,representation_ceiling,False,43.0,61.0,2613.0,True,530,19,2,17,1,15,35
+Claude Sonnet 5,15696249,both_correct,none,True,21.0,28.0,1099.0,True,273,14,8,2,1,7,11
+Claude Sonnet 5,16b78196,both_failed,representation_ceiling,False,69.0,99.0,2819.0,True,656,12,14,14,1,32,33
+Claude Sonnet 5,17b80ad2,both_failed,representation_ceiling,False,31.0,46.0,1440.0,True,290,12,6,7,1,9,16
+Claude Sonnet 5,17cae0c1,both_failed,spurious_overfitting,False,44.0,57.0,1707.0,True,346,15,6,9,1,11,16
+Claude Sonnet 5,18419cfa,semantic_recovery,none,True,61.0,84.0,3410.0,True,729,13,9,11,2,25,27
+Claude Sonnet 5,184a9768,both_failed,representation_ceiling,False,111.0,143.0,5934.0,True,1453,14,16,16,1,59,42
+Claude Sonnet 5,195ba7dc,both_correct,none,True,23.0,31.0,1030.0,True,223,11,4,2,1,8,8
+Claude Sonnet 5,1990f7a8,semantic_recovery,none,True,79.0,106.0,3581.0,True,878,13,12,11,1,38,29
+Claude Sonnet 5,19bb5feb,both_correct,none,True,33.0,48.0,1679.0,True,415,11,6,3,1,21,11
+Claude Sonnet 5,1a2e2828,both_correct,none,True,26.0,38.0,1306.0,True,328,12,5,5,1,11,14
+Claude Sonnet 5,1a6449f1,both_correct,none,True,47.0,66.0,2849.0,True,528,18,13,10,1,11,27
+Claude Sonnet 5,1acc24af,both_failed,representation_ceiling,False,54.0,78.0,3548.0,True,618,18,11,16,1,17,30
+Claude Sonnet 5,1c02dbbe,semantic_recovery,none,True,55.0,87.0,3424.0,True,612,11,10,8,1,32,21
+Claude Sonnet 5,1c0d0a4b,semantic_recovery,none,True,28.0,40.0,1297.0,True,239,12,5,7,1,8,14
+Claude Sonnet 5,1c56ad9f,both_failed,representation_ceiling,False,51.0,71.0,2506.0,True,510,12,9,10,1,21,21
+Claude Sonnet 5,1d0a4b61,both_failed,representation_ceiling,False,45.0,69.0,2572.0,True,478,14,8,8,1,21,17
+Claude Sonnet 5,1d398264,semantic_recovery,none,True,58.0,75.0,3391.0,True,522,18,11,15,1,20,29
+Claude Sonnet 5,1da012fc,both_failed,spurious_overfitting,False,50.0,64.0,2283.0,True,579,14,9,9,2,18,23
+Claude Sonnet 5,1e81d6f9,both_failed,representation_ceiling,False,27.0,36.0,1369.0,True,292,12,7,6,1,8,16
+Claude Sonnet 5,1e97544e,both_failed,representation_ceiling,False,41.0,59.0,2010.0,True,406,12,7,9,1,15,19
+Claude Sonnet 5,2037f2c7,semantic_recovery,none,True,66.0,100.0,3013.0,True,909,11,9,6,3,37,20
+Claude Sonnet 5,2072aba6,both_correct,none,True,15.0,22.0,807.0,True,242,11,2,1,1,9,4
+Claude Sonnet 5,20818e16,both_failed,representation_ceiling,False,56.0,80.0,2712.0,True,559,12,8,7,1,25,17
+Claude Sonnet 5,20981f0e,both_correct,none,True,53.0,78.0,2638.0,True,578,13,10,7,1,28,19
+Claude Sonnet 5,212895b5,both_failed,representation_ceiling,False,61.0,92.0,3236.0,True,620,12,9,15,1,29,31
+Claude Sonnet 5,21f83797,both_correct,none,True,30.0,46.0,1533.0,True,336,12,10,3,1,13,15
+Claude Sonnet 5,22a4bbc2,both_failed,representation_ceiling,False,33.0,47.0,1503.0,True,316,11,6,5,1,15,14
+Claude Sonnet 5,25094a63,both_failed,spurious_overfitting,False,40.0,55.0,2007.0,True,331,13,8,6,1,16,16
+Claude Sonnet 5,2546ccf6,both_failed,representation_ceiling,False,80.0,107.0,3656.0,True,852,13,13,13,3,34,35
+Claude Sonnet 5,256b0a75,both_failed,representation_ceiling,False,70.0,95.0,3269.0,True,696,13,16,16,1,22,34
+Claude Sonnet 5,2685904e,semantic_recovery,none,True,21.0,38.0,1192.0,True,200,10,4,3,1,10,8
+Claude Sonnet 5,2697da3f,semantic_recovery,none,True,51.0,74.0,2281.0,True,599,11,17,1,1,24,19
+Claude Sonnet 5,2753e76c,semantic_recovery,none,True,47.0,69.0,2510.0,True,527,14,7,7,1,21,18
+Claude Sonnet 5,27a77e38,both_failed,spurious_overfitting,False,22.0,37.0,1073.0,True,219,11,2,4,1,10,8
+Claude Sonnet 5,27f8ce4f,both_correct,none,True,22.0,31.0,1000.0,True,252,11,7,1,1,11,9
+Claude Sonnet 5,281123b4,both_correct,none,True,35.0,50.0,1568.0,True,327,11,7,2,1,17,11
+Claude Sonnet 5,292dd178,semantic_recovery,none,True,61.0,91.0,2977.0,True,699,12,12,10,4,20,26
+Claude Sonnet 5,29700607,semantic_recovery,none,True,48.0,70.0,2688.0,True,649,13,10,9,1,22,23
+Claude Sonnet 5,2a5f8217,semantic_recovery,none,True,47.0,61.0,2114.0,True,501,13,6,7,3,18,16
+Claude Sonnet 5,2b01abd0,semantic_recovery,none,True,62.0,82.0,2830.0,True,588,14,12,19,1,22,37
+Claude Sonnet 5,2c0b0aff,both_failed,representation_ceiling,False,74.0,104.0,4355.0,True,829,16,10,12,1,39,29
+Claude Sonnet 5,2c737e39,semantic_recovery,none,True,58.0,83.0,2697.0,True,658,11,7,11,3,23,23
+Claude Sonnet 5,2f0c5170,both_correct,none,True,76.0,101.0,3707.0,True,742,14,13,10,1,42,27
+Claude Sonnet 5,310f3251,semantic_recovery,none,True,27.0,39.0,1537.0,True,317,14,8,4,1,13,13
+Claude Sonnet 5,3194b014,both_failed,representation_ceiling,False,42.0,60.0,2377.0,True,410,16,10,8,1,18,25
+Claude Sonnet 5,319f2597,both_correct,none,True,17.0,26.0,768.0,True,175,11,4,3,1,6,9
+Claude Sonnet 5,31adaf00,both_failed,representation_ceiling,False,45.0,58.0,2110.0,True,579,13,8,6,4,19,18
+Claude Sonnet 5,31d5ba1a,both_correct,none,True,13.0,23.0,683.0,True,133,10,2,0,1,7,3
+Claude Sonnet 5,32e9702f,both_correct,none,True,7.0,9.0,340.0,True,77,9,1,0,1,3,2
+Claude Sonnet 5,332efdb3,both_correct,none,True,13.0,15.0,422.0,True,120,12,2,1,1,4,4
+Claude Sonnet 5,3391f8c0,both_failed,representation_ceiling,False,44.0,63.0,2043.0,True,430,12,7,7,4,14,15
+Claude Sonnet 5,33b52de3,both_correct,none,True,52.0,74.0,2455.0,True,590,12,6,8,1,20,15
+Claude Sonnet 5,3490cc26,both_failed,representation_ceiling,False,54.0,71.0,2654.0,True,688,14,10,11,2,22,29
+Claude Sonnet 5,34b99a2b,both_correct,none,True,15.0,24.0,733.0,True,115,10,2,1,1,6,4
+Claude Sonnet 5,351d6448,both_failed,spurious_overfitting,False,51.0,69.0,2422.0,True,543,12,8,8,1,24,18
+Claude Sonnet 5,358ba94e,both_failed,representation_ceiling,False,46.0,65.0,2047.0,True,416,14,11,9,1,15,23
+Claude Sonnet 5,37d3e8b2,both_failed,representation_ceiling,False,55.0,79.0,2664.0,True,568,11,5,7,2,22,20
+Claude Sonnet 5,3979b1a8,both_correct,none,True,28.0,48.0,1487.0,True,252,9,3,0,1,10,4
+Claude Sonnet 5,3a301edc,semantic_recovery,none,True,50.0,75.0,2697.0,True,631,12,8,7,1,30,17
+Claude Sonnet 5,3b4c2228,both_correct,none,True,23.0,32.0,976.0,True,308,12,5,3,1,10,11
+Claude Sonnet 5,3d31c5b3,both_correct,none,True,24.0,33.0,844.0,True,183,10,3,1,1,10,5
+Claude Sonnet 5,3ed85e70,both_failed,representation_ceiling,False,129.0,176.0,5251.0,True,1464,13,24,23,8,41,62
+Claude Sonnet 5,3ee1011a,both_correct,none,True,46.0,61.0,2177.0,True,491,13,11,6,1,23,23
+Claude Sonnet 5,3f23242b,both_correct,none,True,36.0,50.0,1628.0,True,431,12,9,8,1,16,18
+Claude Sonnet 5,40f6cd08,both_failed,representation_ceiling,False,79.0,99.0,3564.0,True,918,14,20,8,5,34,33
+Claude Sonnet 5,414297c0,semantic_recovery,none,True,66.0,92.0,3489.0,True,691,15,13,10,1,33,29
+Claude Sonnet 5,423a55dc,semantic_recovery,none,True,24.0,37.0,1318.0,True,288,12,4,7,1,10,15
+Grok 4.6,00576224,both_correct,none,True,11.0,11.0,322.0,True,108,8,1,0,1,7,2
+Grok 4.6,009d5c81,both_correct,none,True,32.0,93.0,2729.0,True,377,12,4,7,1,16,13
+Grok 4.6,00dbd492,both_correct,none,True,25.0,37.0,1662.0,True,438,16,5,5,1,12,17
+Grok 4.6,03560426,both_correct,none,True,27.0,36.0,1190.0,True,354,12,5,2,1,17,8
+Grok 4.6,05a7bcf2,both_correct,none,True,108.0,140.0,4605.0,True,1246,14,28,14,1,53,47
+Grok 4.6,0607ce86,both_correct,none,True,82.0,94.0,4031.0,True,1034,14,25,5,1,42,31
+Grok 4.6,0692e18c,both_correct,none,True,18.0,24.0,710.0,True,190,14,6,3,1,5,10
+Grok 4.6,070dd51e,both_correct,none,True,25.0,33.0,1158.0,True,310,11,6,6,1,10,13
+Grok 4.6,08573cc6,both_correct,none,True,35.0,43.0,1086.0,True,352,10,4,3,1,22,9
+Grok 4.6,0934a4d8,both_failed,spurious_overfitting,False,66.0,80.0,2940.0,True,764,13,8,16,1,35,36
+Grok 4.6,09c534e7,both_correct,none,True,45.0,55.0,1984.0,True,530,15,9,8,1,20,22
+Grok 4.6,0a1d4ef5,both_correct,none,True,47.0,56.0,2002.0,True,595,14,6,6,1,19,15
+Grok 4.6,0a2355a6,both_correct,none,True,61.0,78.0,3408.0,True,839,15,13,8,1,31,29
+Grok 4.6,0b17323b,both_correct,none,True,19.0,29.0,860.0,True,243,10,3,2,1,11,7
+Grok 4.6,0bb8deee,both_correct,none,True,42.0,50.0,1436.0,True,495,12,4,3,2,18,10
+Grok 4.6,0becf7df,both_correct,none,True,17.0,20.0,479.0,True,196,10,2,1,1,5,5
+Grok 4.6,0c786b71,both_correct,none,True,3.0,3.0,130.0,True,58,9,0,0,1,1,1
+Grok 4.6,0c9aba6e,semantic_recovery,none,True,25.0,29.0,685.0,True,193,11,4,3,1,10,9
+Grok 4.6,0d87d2a6,both_failed,spurious_overfitting,False,45.0,58.0,1985.0,True,574,15,13,7,1,17,24
+Grok 4.6,0e671a1a,both_correct,none,True,28.0,36.0,1072.0,True,331,12,4,5,2,12,10
+Grok 4.6,0f63c0b9,both_correct,none,True,20.0,26.0,768.0,True,302,13,4,2,1,9,8
+Grok 4.6,103eff5b,both_correct,none,True,31.0,43.0,1293.0,True,452,12,2,0,1,25,3
+Grok 4.6,11e1fe23,both_correct,none,True,25.0,33.0,943.0,True,340,12,3,2,1,16,6
+Grok 4.6,12422b43,both_correct,none,True,14.0,22.0,644.0,True,171,11,2,1,1,8,4
+Grok 4.6,12997ef3,both_correct,none,True,40.0,48.0,1546.0,True,463,14,8,3,1,17,12
+Grok 4.6,12eac192,both_correct,none,True,22.0,26.0,971.0,True,337,14,5,3,1,10,11
+Grok 4.6,136b0064,both_correct,none,True,55.0,69.0,2116.0,True,493,14,10,8,1,31,19
+Grok 4.6,13713586,both_correct,none,True,45.0,56.0,1892.0,True,460,13,7,12,1,21,21
+Grok 4.6,137f0df0,both_correct,none,True,28.0,40.0,1189.0,True,336,12,6,3,1,13,10
+Grok 4.6,140c817e,both_correct,none,True,22.0,30.0,781.0,True,271,10,8,2,1,9,12
+Grok 4.6,14754a24,both_correct,none,True,53.0,66.0,2323.0,True,674,13,10,8,2,24,23
+Grok 4.6,15113be4,both_correct,none,True,38.0,51.0,1801.0,True,452,14,8,7,1,13,18
+Grok 4.6,15663ba9,both_correct,none,True,38.0,47.0,1772.0,True,546,13,7,8,1,15,22
+Grok 4.6,15696249,both_correct,none,True,14.0,19.0,584.0,True,183,12,5,2,1,3,8
+Grok 4.6,16b78196,both_failed,spurious_overfitting,False,105.0,132.0,4799.0,True,1051,15,20,16,2,41,41
+Grok 4.6,17b80ad2,both_correct,none,True,13.0,15.0,466.0,True,180,12,3,1,1,7,5
+Grok 4.6,17cae0c1,both_correct,none,True,21.0,23.0,771.0,True,252,12,3,0,1,6,4
+Grok 4.6,18419cfa,both_correct,none,True,45.0,54.0,1977.0,True,546,16,8,7,1,23,22
+Grok 4.6,184a9768,both_correct,none,True,97.0,128.0,4435.0,True,1109,15,18,17,2,33,45
+Grok 4.6,195ba7dc,both_correct,none,True,21.0,25.0,635.0,True,178,10,3,2,1,9,7
+Grok 4.6,1990f7a8,both_correct,none,True,45.0,55.0,1944.0,True,622,16,8,4,2,19,17
+Grok 4.6,19bb5feb,both_correct,none,True,22.0,30.0,902.0,True,268,10,2,1,1,12,4
+Grok 4.6,1a2e2828,both_correct,none,True,12.0,17.0,525.0,True,171,12,2,2,1,4,7
+Grok 4.6,1a6449f1,both_correct,none,True,27.0,34.0,1255.0,True,335,14,4,7,1,8,12
+Grok 4.6,1acc24af,both_failed,spurious_overfitting,False,63.0,79.0,2735.0,True,684,14,10,7,3,26,20
+Grok 4.6,1c02dbbe,both_correct,none,True,27.0,38.0,1372.0,True,439,11,7,1,1,16,10
+Grok 4.6,1c0d0a4b,both_correct,none,True,11.0,13.0,366.0,True,139,12,2,1,1,5,5
+Grok 4.6,1c56ad9f,both_correct,none,True,17.0,21.0,639.0,True,221,11,2,3,1,9,6
+Grok 4.6,1d0a4b61,both_correct,none,True,25.0,28.0,902.0,True,223,13,4,5,1,8,11
+Grok 4.6,1d398264,both_correct,none,True,22.0,31.0,925.0,True,267,10,3,1,1,15,7
+Grok 4.6,1da012fc,both_failed,spurious_overfitting,False,44.0,60.0,2184.0,True,665,15,8,7,1,19,21
+Grok 4.6,1e81d6f9,both_correct,none,True,18.0,23.0,735.0,True,201,12,4,4,1,6,12
+Grok 4.6,1e97544e,both_correct,none,True,23.0,26.0,655.0,True,216,13,4,1,1,10,6
+Grok 4.6,2037f2c7,both_correct,none,True,42.0,51.0,2026.0,True,706,16,7,5,1,21,19
+Grok 4.6,2072aba6,both_correct,none,True,12.0,12.0,408.0,True,185,12,2,1,1,7,4
+Grok 4.6,20818e16,both_correct,none,True,24.0,36.0,1416.0,True,429,12,6,0,1,14,7
+Grok 4.6,20981f0e,both_correct,none,True,44.0,63.0,2007.0,True,565,12,7,4,1,27,13
+Grok 4.6,212895b5,both_correct,none,True,56.0,67.0,2216.0,True,664,13,6,6,1,24,19
+Grok 4.6,21f83797,both_correct,none,True,27.0,38.0,952.0,True,344,10,6,2,1,15,9
+Grok 4.6,22a4bbc2,both_correct,none,True,16.0,22.0,771.0,True,185,12,4,3,1,5,8
+Grok 4.6,25094a63,both_failed,spurious_overfitting,False,12.0,14.0,477.0,True,170,13,4,1,1,5,6
+Grok 4.6,2546ccf6,semantic_recovery,none,True,81.0,105.0,3368.0,True,1083,15,9,16,5,33,37
+Grok 4.6,256b0a75,both_correct,none,True,76.0,103.0,3911.0,True,979,16,17,16,1,23,46
+Grok 4.6,2685904e,both_correct,none,True,21.0,32.0,1073.0,True,228,12,4,4,1,10,10
+Grok 4.6,2697da3f,both_correct,none,True,33.0,54.0,1507.0,True,474,11,10,5,1,20,16
+Grok 4.6,2753e76c,both_correct,none,True,28.0,32.0,1156.0,True,381,14,5,3,1,15,11
+Grok 4.6,27a77e38,both_correct,none,True,17.0,26.0,701.0,True,185,10,3,1,1,10,5
+Grok 4.6,27f8ce4f,both_correct,none,True,15.0,21.0,693.0,True,184,14,6,1,1,6,8
+Grok 4.6,281123b4,both_correct,none,True,11.0,12.0,389.0,True,121,12,3,1,1,4,5
+Grok 4.6,292dd178,both_correct,none,True,55.0,70.0,2297.0,True,685,14,15,7,1,28,25
+Grok 4.6,29700607,both_correct,none,True,29.0,35.0,1006.0,True,278,11,7,4,1,12,12
+Grok 4.6,2a5f8217,both_correct,none,True,44.0,54.0,1937.0,True,565,12,9,5,3,22,18
+Grok 4.6,2b01abd0,both_correct,none,True,43.0,58.0,1656.0,True,415,12,6,8,1,22,17
+Grok 4.6,2c0b0aff,both_correct,none,True,41.0,52.0,1943.0,True,560,15,7,5,1,20,17
+Grok 4.6,2c737e39,both_correct,none,True,48.0,55.0,1588.0,True,473,14,9,10,1,18,25
+Grok 4.6,2f0c5170,both_correct,none,True,58.0,76.0,2396.0,True,690,14,8,7,1,35,19
+Grok 4.6,310f3251,both_correct,none,True,13.0,17.0,541.0,True,185,11,2,2,1,7,5
+Grok 4.6,3194b014,both_correct,none,True,24.0,32.0,994.0,True,286,10,3,3,1,15,8
+Grok 4.6,319f2597,both_correct,none,True,17.0,22.0,570.0,True,175,11,4,3,1,6,9
+Grok 4.6,31adaf00,both_correct,none,True,12.0,14.0,487.0,True,185,14,5,1,1,4,7
+Grok 4.6,31d5ba1a,both_correct,none,True,12.0,12.0,352.0,True,134,11,2,0,1,6,3
+Grok 4.6,32e9702f,both_correct,none,True,10.0,12.0,375.0,True,131,11,2,2,1,4,5
+Grok 4.6,332efdb3,semantic_recovery,none,True,12.0,12.0,359.0,True,125,9,2,2,1,4,5
+Grok 4.6,3391f8c0,both_correct,none,True,61.0,71.0,2575.0,True,860,17,12,7,3,31,24
+Grok 4.6,33b52de3,both_correct,none,True,33.0,43.0,1434.0,True,460,12,6,4,1,14,13
+Grok 4.6,3490cc26,semantic_recovery,none,True,115.0,145.0,5725.0,True,1450,15,17,19,3,47,46
+Grok 4.6,34b99a2b,both_correct,none,True,18.0,22.0,611.0,True,170,11,3,1,1,9,5
+Grok 4.6,351d6448,both_failed,spurious_overfitting,False,68.0,89.0,3117.0,True,899,13,10,13,1,32,29
+Grok 4.6,358ba94e,both_correct,none,True,33.0,44.0,1327.0,True,358,13,7,6,1,12,16
+Grok 4.6,37d3e8b2,both_correct,none,True,45.0,58.0,2728.0,True,708,19,9,6,1,25,22
+Grok 4.6,3979b1a8,both_correct,none,True,24.0,34.0,877.0,True,306,12,8,2,1,11,11
+Grok 4.6,3a301edc,both_correct,none,True,44.0,65.0,2240.0,True,543,11,5,4,2,23,11
+Grok 4.6,3b4c2228,both_correct,none,True,25.0,26.0,820.0,True,289,13,3,2,1,7,8
+Grok 4.6,3d31c5b3,both_correct,none,True,21.0,22.0,607.0,True,179,13,2,4,1,6,7
+Grok 4.6,3ed85e70,both_failed,spurious_overfitting,False,159.0,196.0,7282.0,True,1674,16,27,28,1,67,66
+Grok 4.6,3ee1011a,both_correct,none,True,14.0,21.0,617.0,True,172,11,5,1,1,6,7
+Grok 4.6,3f23242b,both_correct,none,True,42.0,58.0,1546.0,True,520,12,7,17,1,15,25
+Grok 4.6,40f6cd08,both_correct,none,True,103.0,133.0,4550.0,True,1255,16,23,11,1,48,40
+Grok 4.6,414297c0,both_correct,none,True,52.0,67.0,2110.0,True,546,14,11,10,1,23,25
+Grok 4.6,423a55dc,both_correct,none,True,13.0,17.0,456.0,True,191,10,1,2,1,7,4
+DeepSeek V4 Flash 0731,00576224,both_correct,none,True,4.0,4.0,204.0,True,66,8,0,0,1,2,1
+DeepSeek V4 Flash 0731,009d5c81,both_correct,none,True,38.0,45.0,1236.0,True,444,14,5,8,1,18,14
+DeepSeek V4 Flash 0731,00dbd492,both_correct,none,True,51.0,62.0,2121.0,True,576,14,8,11,1,21,23
+DeepSeek V4 Flash 0731,03560426,both_correct,none,True,65.0,77.0,2407.0,True,680,15,8,10,1,33,23
+DeepSeek V4 Flash 0731,05a7bcf2,both_failed,spurious_overfitting,False,77.0,102.0,3016.0,True,620,11,15,16,1,34,33
+DeepSeek V4 Flash 0731,0607ce86,semantic_recovery,none,True,114.0,137.0,4401.0,True,1185,14,16,17,5,59,40
+DeepSeek V4 Flash 0731,0692e18c,both_correct,none,True,17.0,21.0,493.0,True,174,11,2,2,1,10,6
+DeepSeek V4 Flash 0731,070dd51e,both_correct,none,True,23.0,29.0,882.0,True,260,12,6,5,1,9,12
+DeepSeek V4 Flash 0731,08573cc6,both_correct,none,True,31.0,38.0,869.0,True,312,10,4,3,1,20,9
+DeepSeek V4 Flash 0731,0934a4d8,both_failed,spurious_overfitting,False,42.0,52.0,1426.0,True,407,11,6,9,2,17,17
+DeepSeek V4 Flash 0731,09c534e7,both_correct,none,True,43.0,48.0,1768.0,True,446,17,7,8,1,17,21
+DeepSeek V4 Flash 0731,0a1d4ef5,both_correct,none,True,52.0,65.0,1838.0,True,590,14,6,10,1,24,21
+DeepSeek V4 Flash 0731,0a2355a6,both_correct,none,True,52.0,67.0,2340.0,True,681,16,10,8,1,26,26
+DeepSeek V4 Flash 0731,0b17323b,both_correct,none,True,25.0,32.0,596.0,True,224,10,3,4,1,10,10
+DeepSeek V4 Flash 0731,0bb8deee,semantic_recovery,none,True,69.0,83.0,2205.0,True,751,12,8,6,3,33,20
+DeepSeek V4 Flash 0731,0becf7df,both_correct,none,True,19.0,24.0,532.0,True,221,10,2,2,1,12,8
+DeepSeek V4 Flash 0731,0c786b71,both_correct,none,True,10.0,13.0,311.0,True,131,9,0,1,1,6,2
+DeepSeek V4 Flash 0731,0c9aba6e,both_correct,none,True,18.0,22.0,532.0,True,154,11,3,2,1,6,7
+DeepSeek V4 Flash 0731,0d87d2a6,both_failed,spurious_overfitting,False,43.0,53.0,1609.0,True,495,14,11,4,1,19,19
+DeepSeek V4 Flash 0731,0e671a1a,both_correct,none,True,30.0,39.0,1009.0,True,326,12,4,7,2,12,12
+DeepSeek V4 Flash 0731,0f63c0b9,both_correct,none,True,29.0,37.0,916.0,True,355,12,6,4,1,13,14
+DeepSeek V4 Flash 0731,103eff5b,both_correct,none,True,55.0,68.0,2064.0,True,566,14,12,11,1,27,25
+DeepSeek V4 Flash 0731,11e1fe23,both_failed,spurious_overfitting,False,56.0,71.0,1475.0,True,534,12,4,10,1,30,19
+DeepSeek V4 Flash 0731,12422b43,both_correct,none,True,22.0,28.0,611.0,True,189,9,3,4,1,10,9
+DeepSeek V4 Flash 0731,12997ef3,both_correct,none,True,49.0,63.0,1670.0,True,576,14,10,7,1,21,19
+DeepSeek V4 Flash 0731,12eac192,both_correct,none,True,29.0,34.0,1092.0,True,324,14,5,3,1,12,11
+DeepSeek V4 Flash 0731,136b0064,semantic_recovery,none,True,80.0,107.0,2878.0,True,713,12,10,16,4,31,28
+DeepSeek V4 Flash 0731,13713586,both_correct,none,True,83.0,93.0,2767.0,True,807,14,15,16,1,42,36
+DeepSeek V4 Flash 0731,137f0df0,semantic_recovery,none,True,52.0,65.0,1734.0,True,475,10,11,5,2,22,17
+DeepSeek V4 Flash 0731,140c817e,both_correct,none,True,27.0,34.0,773.0,True,302,10,10,2,1,12,14
+DeepSeek V4 Flash 0731,14754a24,both_failed,representation_ceiling,False,63.0,75.0,2222.0,True,594,13,11,11,4,22,28
+DeepSeek V4 Flash 0731,15113be4,both_correct,none,True,64.0,81.0,2395.0,True,554,13,14,13,1,20,31
+DeepSeek V4 Flash 0731,15663ba9,semantic_recovery,none,True,118.0,143.0,4761.0,True,1306,14,17,18,1,64,40
+DeepSeek V4 Flash 0731,15696249,both_correct,none,True,26.0,30.0,809.0,True,289,12,5,5,1,12,11
+DeepSeek V4 Flash 0731,16b78196,both_failed,spurious_overfitting,False,137.0,171.0,5866.0,True,1356,15,28,20,3,54,52
+DeepSeek V4 Flash 0731,17b80ad2,both_correct,none,True,18.0,21.0,449.0,True,145,11,3,3,1,8,7
+DeepSeek V4 Flash 0731,17cae0c1,both_correct,none,True,18.0,21.0,604.0,True,232,13,3,0,1,7,4
+DeepSeek V4 Flash 0731,18419cfa,both_correct,none,True,41.0,54.0,1843.0,True,624,15,6,7,1,22,21
+DeepSeek V4 Flash 0731,184a9768,both_failed,representation_ceiling,False,186.0,212.0,7703.0,True,1815,15,32,22,4,74,61
+DeepSeek V4 Flash 0731,195ba7dc,both_correct,none,True,17.0,20.0,468.0,True,162,11,3,1,1,8,6
+DeepSeek V4 Flash 0731,1990f7a8,both_correct,none,True,52.0,65.0,1969.0,True,626,16,9,4,1,25,18
+DeepSeek V4 Flash 0731,19bb5feb,both_correct,none,True,35.0,46.0,1123.0,True,347,12,4,8,1,17,15
+DeepSeek V4 Flash 0731,1a2e2828,both_correct,none,True,12.0,15.0,367.0,True,144,12,2,2,1,4,7
+DeepSeek V4 Flash 0731,1a6449f1,both_correct,none,True,47.0,57.0,1741.0,True,363,13,8,12,1,14,21
+DeepSeek V4 Flash 0731,1acc24af,both_failed,spurious_overfitting,False,76.0,88.0,2887.0,True,698,15,12,15,3,35,32
+DeepSeek V4 Flash 0731,1c02dbbe,both_correct,none,True,36.0,46.0,1374.0,True,472,11,7,4,1,20,14
+DeepSeek V4 Flash 0731,1c0d0a4b,both_correct,none,True,37.0,45.0,1416.0,True,413,13,11,6,1,14,21
+DeepSeek V4 Flash 0731,1c56ad9f,both_correct,none,True,18.0,23.0,573.0,True,216,11,2,3,1,10,6
+DeepSeek V4 Flash 0731,1d0a4b61,both_correct,none,True,65.0,76.0,2260.0,True,587,14,12,15,1,26,32
+DeepSeek V4 Flash 0731,1d398264,both_correct,none,True,29.0,38.0,846.0,True,323,12,4,3,1,17,10
+DeepSeek V4 Flash 0731,1da012fc,both_failed,spurious_overfitting,False,69.0,86.0,2518.0,True,738,15,12,14,1,27,33
+DeepSeek V4 Flash 0731,1e81d6f9,semantic_recovery,none,True,8.0,8.0,245.0,True,98,11,2,1,1,3,5
+DeepSeek V4 Flash 0731,1e97544e,both_correct,none,True,39.0,47.0,1039.0,True,338,13,7,6,1,16,14
+DeepSeek V4 Flash 0731,2037f2c7,semantic_recovery,none,True,64.0,85.0,2751.0,True,846,15,10,15,1,36,29
+DeepSeek V4 Flash 0731,2072aba6,both_correct,none,True,12.0,14.0,386.0,True,169,12,2,1,1,7,4
+DeepSeek V4 Flash 0731,20818e16,both_correct,none,True,58.0,78.0,2378.0,True,658,15,11,11,1,29,26
+DeepSeek V4 Flash 0731,20981f0e,both_correct,none,True,73.0,90.0,2914.0,True,861,15,10,11,2,40,26
+DeepSeek V4 Flash 0731,212895b5,both_failed,representation_ceiling,False,0.0,0.0,0.0,True,0,10,0,0,1,0,0
+DeepSeek V4 Flash 0731,21f83797,both_correct,none,True,25.0,33.0,710.0,True,281,10,7,3,1,12,13
+DeepSeek V4 Flash 0731,22a4bbc2,both_correct,none,True,31.0,40.0,1234.0,True,275,11,6,6,1,9,14
+DeepSeek V4 Flash 0731,25094a63,both_failed,spurious_overfitting,False,41.0,50.0,1489.0,True,502,14,12,6,2,16,20
+DeepSeek V4 Flash 0731,2546ccf6,semantic_recovery,none,True,89.0,124.0,4215.0,True,1101,16,13,17,1,46,36
+DeepSeek V4 Flash 0731,256b0a75,semantic_recovery,none,True,91.0,115.0,3609.0,True,985,16,20,20,1,33,54
+DeepSeek V4 Flash 0731,2685904e,both_correct,none,True,32.0,48.0,1219.0,True,265,11,6,7,1,13,14
+DeepSeek V4 Flash 0731,2697da3f,both_correct,none,True,45.0,55.0,1402.0,True,605,12,2,3,5,21,6
+DeepSeek V4 Flash 0731,2753e76c,both_correct,none,True,30.0,40.0,1169.0,True,392,14,5,4,1,16,13
+DeepSeek V4 Flash 0731,27a77e38,both_correct,none,True,19.0,23.0,503.0,True,173,11,3,3,1,9,8
+DeepSeek V4 Flash 0731,27f8ce4f,both_correct,none,True,18.0,23.0,526.0,True,192,14,6,1,1,9,8
+DeepSeek V4 Flash 0731,281123b4,both_correct,none,True,35.0,43.0,1197.0,True,245,11,7,2,1,14,10
+DeepSeek V4 Flash 0731,292dd178,semantic_recovery,none,True,68.0,85.0,3029.0,True,790,15,10,15,1,30,31
+DeepSeek V4 Flash 0731,29700607,both_correct,none,True,33.0,41.0,1088.0,True,315,12,9,5,1,13,16
+DeepSeek V4 Flash 0731,2a5f8217,both_correct,none,True,44.0,51.0,1772.0,True,495,14,7,5,1,18,16
+DeepSeek V4 Flash 0731,2b01abd0,both_correct,none,True,42.0,53.0,1395.0,True,400,12,6,9,1,20,17
+DeepSeek V4 Flash 0731,2c0b0aff,both_correct,none,True,49.0,62.0,2115.0,True,569,15,4,9,1,28,18
+DeepSeek V4 Flash 0731,2c737e39,both_correct,none,True,50.0,59.0,1489.0,True,494,12,7,8,2,22,18
+DeepSeek V4 Flash 0731,2f0c5170,both_correct,none,True,84.0,108.0,2947.0,True,876,14,11,11,1,39,29
+DeepSeek V4 Flash 0731,310f3251,both_correct,none,True,22.0,27.0,632.0,True,230,11,4,4,1,10,9
+DeepSeek V4 Flash 0731,3194b014,both_correct,none,True,29.0,34.0,1098.0,True,333,15,4,4,1,18,12
+DeepSeek V4 Flash 0731,319f2597,both_correct,none,True,40.0,43.0,1270.0,True,340,14,8,8,1,14,20
+DeepSeek V4 Flash 0731,31adaf00,both_failed,spurious_overfitting,False,32.0,49.0,1669.0,True,469,13,7,6,2,14,18
+DeepSeek V4 Flash 0731,31d5ba1a,both_correct,none,True,15.0,15.0,379.0,True,126,11,2,1,1,6,4
+DeepSeek V4 Flash 0731,32e9702f,both_correct,none,True,14.0,16.0,345.0,True,115,11,2,3,1,6,6
+DeepSeek V4 Flash 0731,332efdb3,both_correct,none,True,13.0,13.0,360.0,True,113,10,2,1,1,4,5
+DeepSeek V4 Flash 0731,3391f8c0,semantic_recovery,none,True,56.0,71.0,1991.0,True,584,14,9,6,1,25,19
+DeepSeek V4 Flash 0731,33b52de3,both_correct,none,True,59.0,73.0,2342.0,True,744,15,9,9,1,33,23
+DeepSeek V4 Flash 0731,3490cc26,both_correct,none,True,92.0,108.0,3201.0,True,909,14,15,15,3,38,35
+DeepSeek V4 Flash 0731,34b99a2b,both_correct,none,True,11.0,13.0,317.0,True,98,11,2,0,1,5,3
+DeepSeek V4 Flash 0731,351d6448,both_failed,spurious_overfitting,False,82.0,107.0,3169.0,True,810,12,6,18,3,33,27
+DeepSeek V4 Flash 0731,358ba94e,both_correct,none,True,43.0,50.0,1606.0,True,471,13,5,8,1,19,17
+DeepSeek V4 Flash 0731,37d3e8b2,both_correct,none,True,55.0,73.0,2482.0,True,706,16,10,10,1,29,29
+DeepSeek V4 Flash 0731,3979b1a8,both_correct,none,True,33.0,44.0,1037.0,True,348,11,6,1,1,16,9
+DeepSeek V4 Flash 0731,3a301edc,semantic_recovery,none,True,53.0,70.0,2108.0,True,618,11,9,8,1,32,18
+DeepSeek V4 Flash 0731,3b4c2228,both_correct,none,True,13.0,16.0,415.0,True,172,12,3,1,1,6,6
+DeepSeek V4 Flash 0731,3d31c5b3,both_correct,none,True,23.0,27.0,622.0,True,212,12,3,1,1,9,5
+DeepSeek V4 Flash 0731,3ed85e70,both_failed,representation_ceiling,False,155.0,181.0,6608.0,True,1506,16,25,29,4,66,64
+DeepSeek V4 Flash 0731,3ee1011a,both_correct,none,True,52.0,62.0,1914.0,True,569,14,7,7,1,21,17
+DeepSeek V4 Flash 0731,3f23242b,both_correct,none,True,35.0,48.0,1124.0,True,346,12,9,9,1,13,19
+DeepSeek V4 Flash 0731,40f6cd08,both_correct,none,True,104.0,126.0,4186.0,True,1082,15,12,14,1,45,30
+DeepSeek V4 Flash 0731,414297c0,both_correct,none,True,97.0,123.0,4079.0,True,1047,16,15,18,1,39,44
+DeepSeek V4 Flash 0731,423a55dc,both_correct,none,True,23.0,28.0,569.0,True,184,11,4,5,1,9,10
+GPT-5.6 Luna,00576224,both_correct,none,True,15.0,19.0,492.0,True,150,10,2,1,1,8,4
+GPT-5.6 Luna,009d5c81,both_correct,none,True,47.0,53.0,1293.0,True,414,13,6,7,1,17,14
+GPT-5.6 Luna,00dbd492,both_correct,none,True,59.0,73.0,2219.0,True,592,13,8,11,1,22,25
+GPT-5.6 Luna,03560426,both_correct,none,True,52.0,66.0,1653.0,True,506,10,6,10,1,29,18
+GPT-5.6 Luna,05a7bcf2,both_failed,representation_ceiling,False,102.0,127.0,3370.0,True,899,14,23,18,1,42,46
+GPT-5.6 Luna,0607ce86,both_correct,none,True,71.0,84.0,2298.0,True,593,13,15,11,1,32,28
+GPT-5.6 Luna,0692e18c,both_correct,none,True,13.0,15.0,469.0,True,170,15,4,2,1,5,7
+GPT-5.6 Luna,070dd51e,both_correct,none,True,35.0,43.0,1043.0,True,333,11,6,6,1,18,13
+GPT-5.6 Luna,08573cc6,semantic_recovery,none,True,39.0,51.0,1065.0,True,331,11,4,4,1,23,10
+GPT-5.6 Luna,0934a4d8,both_failed,representation_ceiling,False,50.0,65.0,1511.0,True,422,13,7,11,1,19,21
+GPT-5.6 Luna,09c534e7,both_failed,representation_ceiling,False,38.0,48.0,1372.0,True,375,13,8,6,1,18,16
+GPT-5.6 Luna,0a1d4ef5,both_failed,representation_ceiling,False,64.0,78.0,2343.0,True,598,13,6,6,1,21,16
+GPT-5.6 Luna,0a2355a6,both_failed,representation_ceiling,False,83.0,113.0,3462.0,True,800,18,10,16,1,37,37
+GPT-5.6 Luna,0b17323b,both_correct,none,True,25.0,33.0,735.0,True,301,10,4,4,1,13,12
+GPT-5.6 Luna,0bb8deee,both_correct,none,True,81.0,94.0,2604.0,True,721,12,12,10,2,36,26
+GPT-5.6 Luna,0becf7df,both_correct,none,True,20.0,24.0,529.0,True,182,10,2,2,1,8,6
+GPT-5.6 Luna,0c786b71,both_correct,none,True,7.0,10.0,219.0,True,84,10,2,0,1,1,3
+GPT-5.6 Luna,0c9aba6e,both_correct,none,True,22.0,25.0,629.0,True,181,11,4,3,1,8,9
+GPT-5.6 Luna,0d87d2a6,both_failed,spurious_overfitting,False,67.0,83.0,2204.0,True,579,13,13,9,1,23,25
+GPT-5.6 Luna,0e671a1a,semantic_recovery,none,True,31.0,42.0,1145.0,True,380,10,5,3,3,15,10
+GPT-5.6 Luna,0f63c0b9,both_correct,none,True,30.0,38.0,1132.0,True,294,10,5,4,1,15,11
+GPT-5.6 Luna,103eff5b,semantic_recovery,none,True,46.0,59.0,1736.0,True,538,12,7,3,1,27,12
+GPT-5.6 Luna,11e1fe23,both_failed,spurious_overfitting,False,21.0,27.0,830.0,True,298,10,3,1,1,14,5
+GPT-5.6 Luna,12422b43,both_correct,none,True,16.0,22.0,585.0,True,187,10,3,2,1,6,6
+GPT-5.6 Luna,12997ef3,both_correct,none,True,55.0,65.0,1779.0,True,516,13,9,13,1,29,24
+GPT-5.6 Luna,12eac192,semantic_recovery,none,True,31.0,38.0,1115.0,True,321,13,5,3,1,11,11
+GPT-5.6 Luna,136b0064,both_failed,spurious_overfitting,False,74.0,82.0,2513.0,True,704,13,8,10,1,12,23
+GPT-5.6 Luna,13713586,both_correct,none,True,94.0,109.0,3099.0,True,699,13,17,14,1,47,38
+GPT-5.6 Luna,137f0df0,both_correct,none,True,42.0,50.0,1325.0,True,359,11,8,6,1,17,18
+GPT-5.6 Luna,140c817e,both_correct,none,True,34.0,42.0,1058.0,True,359,10,9,5,1,13,18
+GPT-5.6 Luna,14754a24,semantic_recovery,none,True,71.0,90.0,2287.0,True,657,13,12,12,1,21,30
+GPT-5.6 Luna,15113be4,semantic_recovery,none,True,52.0,64.0,1791.0,True,482,14,10,10,1,22,26
+GPT-5.6 Luna,15663ba9,semantic_recovery,none,True,79.0,98.0,3607.0,True,1018,16,6,14,1,28,39
+GPT-5.6 Luna,15696249,both_correct,none,True,35.0,40.0,1119.0,True,354,13,10,5,1,13,16
+GPT-5.6 Luna,16b78196,both_failed,representation_ceiling,False,133.0,189.0,5607.0,True,1379,14,24,17,2,59,49
+GPT-5.6 Luna,17b80ad2,both_correct,none,True,30.0,38.0,1050.0,True,293,10,7,3,1,14,11
+GPT-5.6 Luna,17cae0c1,both_correct,none,True,41.0,45.0,1005.0,True,248,12,3,0,1,7,4
+GPT-5.6 Luna,18419cfa,both_failed,representation_ceiling,False,117.0,157.0,4532.0,True,1016,14,11,11,2,66,29
+GPT-5.6 Luna,184a9768,both_failed,representation_ceiling,False,154.0,209.0,6155.0,True,1313,14,26,21,6,49,54
+GPT-5.6 Luna,195ba7dc,both_correct,none,True,13.0,13.0,383.0,True,111,10,2,1,1,4,5
+GPT-5.6 Luna,1990f7a8,both_failed,spurious_overfitting,False,54.0,66.0,1791.0,True,507,12,8,8,1,27,20
+GPT-5.6 Luna,19bb5feb,both_correct,none,True,66.0,81.0,2281.0,True,578,13,10,4,1,25,17
+GPT-5.6 Luna,1a2e2828,both_correct,none,True,24.0,27.0,734.0,True,187,11,4,6,1,8,11
+GPT-5.6 Luna,1a6449f1,both_correct,none,True,54.0,68.0,1967.0,True,484,14,9,9,1,29,22
+GPT-5.6 Luna,1acc24af,both_failed,spurious_overfitting,False,80.0,104.0,2828.0,True,670,13,13,12,1,34,29
+GPT-5.6 Luna,1c02dbbe,both_correct,none,True,68.0,80.0,2854.0,True,820,18,15,19,1,25,48
+GPT-5.6 Luna,1c0d0a4b,both_correct,none,True,60.0,66.0,2077.0,True,602,15,15,6,1,31,25
+GPT-5.6 Luna,1c56ad9f,both_correct,none,True,26.0,32.0,808.0,True,232,11,4,5,1,12,10
+GPT-5.6 Luna,1d0a4b61,both_correct,none,True,56.0,63.0,1861.0,True,460,12,12,12,3,18,27
+GPT-5.6 Luna,1d398264,both_correct,none,True,38.0,43.0,997.0,True,341,10,4,5,1,18,11
+GPT-5.6 Luna,1da012fc,both_failed,spurious_overfitting,False,116.0,142.0,4127.0,True,1272,12,16,19,1,50,44
+GPT-5.6 Luna,1e81d6f9,both_correct,none,True,28.0,35.0,969.0,True,288,11,6,6,1,7,16
+GPT-5.6 Luna,1e97544e,semantic_recovery,none,True,27.0,34.0,837.0,True,217,12,5,3,1,12,9
+GPT-5.6 Luna,2037f2c7,both_failed,spurious_overfitting,False,22.0,26.0,608.0,True,181,8,0,3,1,2,7
+GPT-5.6 Luna,2072aba6,both_correct,none,True,15.0,15.0,420.0,True,114,10,2,1,1,3,4
+GPT-5.6 Luna,20818e16,both_correct,none,True,51.0,62.0,1702.0,True,416,11,11,9,1,26,21
+GPT-5.6 Luna,20981f0e,semantic_recovery,none,True,54.0,69.0,1958.0,True,611,12,11,7,1,26,22
+GPT-5.6 Luna,212895b5,both_failed,representation_ceiling,False,53.0,69.0,1857.0,True,636,10,4,8,2,23,18
+GPT-5.6 Luna,21f83797,semantic_recovery,none,True,29.0,36.0,915.0,True,366,11,7,3,1,16,12
+GPT-5.6 Luna,22a4bbc2,semantic_recovery,none,True,17.0,23.0,517.0,True,170,12,4,2,1,9,8
+GPT-5.6 Luna,25094a63,both_correct,none,True,23.0,29.0,911.0,True,284,13,7,4,1,9,12
+GPT-5.6 Luna,2546ccf6,both_failed,spurious_overfitting,False,91.0,112.0,3127.0,True,678,12,10,17,1,48,29
+GPT-5.6 Luna,256b0a75,semantic_recovery,none,True,60.0,77.0,2281.0,True,704,15,15,15,1,26,38
+GPT-5.6 Luna,2685904e,both_correct,none,True,42.0,49.0,1331.0,True,309,10,9,8,1,18,19
+GPT-5.6 Luna,2697da3f,semantic_recovery,none,True,34.0,44.0,1130.0,True,449,11,6,1,2,17,8
+GPT-5.6 Luna,2753e76c,both_correct,none,True,47.0,54.0,1580.0,True,458,14,8,7,1,21,19
+GPT-5.6 Luna,27a77e38,both_correct,none,True,24.0,28.0,761.0,True,196,10,5,3,1,12,9
+GPT-5.6 Luna,27f8ce4f,both_correct,none,True,19.0,23.0,704.0,True,197,14,7,2,1,8,10
+GPT-5.6 Luna,281123b4,both_correct,none,True,23.0,26.0,794.0,True,230,12,4,2,1,6,7
+GPT-5.6 Luna,292dd178,both_correct,none,True,67.0,80.0,2511.0,True,676,13,12,12,1,25,27
+GPT-5.6 Luna,29700607,both_correct,none,True,51.0,61.0,1573.0,True,420,11,7,7,1,24,17
+GPT-5.6 Luna,2a5f8217,both_correct,none,True,44.0,52.0,1581.0,True,482,13,7,4,1,20,15
+GPT-5.6 Luna,2b01abd0,both_correct,none,True,58.0,66.0,1779.0,True,454,11,10,13,1,24,27
+GPT-5.6 Luna,2c0b0aff,both_failed,representation_ceiling,False,50.0,65.0,1809.0,True,586,14,6,8,1,25,18
+GPT-5.6 Luna,2c737e39,semantic_recovery,none,True,51.0,67.0,1663.0,True,512,10,7,9,1,20,20
+GPT-5.6 Luna,2f0c5170,both_correct,none,True,64.0,80.0,2243.0,True,713,14,9,8,2,31,24
+GPT-5.6 Luna,310f3251,both_correct,none,True,19.0,23.0,583.0,True,195,12,5,2,1,8,9
+GPT-5.6 Luna,3194b014,both_correct,none,True,30.0,36.0,1081.0,True,306,13,4,3,1,12,10
+GPT-5.6 Luna,319f2597,both_correct,none,True,27.0,33.0,825.0,True,273,12,4,5,1,10,12
+GPT-5.6 Luna,31adaf00,both_failed,spurious_overfitting,False,41.0,47.0,1824.0,True,421,15,12,11,1,15,27
+GPT-5.6 Luna,31d5ba1a,both_correct,none,True,12.0,14.0,406.0,True,134,11,2,0,1,6,3
+GPT-5.6 Luna,32e9702f,both_correct,none,True,9.0,11.0,356.0,True,136,11,2,1,1,4,5
+GPT-5.6 Luna,332efdb3,both_correct,none,True,7.0,7.0,237.0,True,90,11,0,0,1,2,2
+GPT-5.6 Luna,3391f8c0,semantic_recovery,none,True,60.0,78.0,2229.0,True,618,13,11,5,1,24,21
+GPT-5.6 Luna,33b52de3,semantic_recovery,none,True,65.0,81.0,2446.0,True,714,14,11,6,1,26,22
+GPT-5.6 Luna,3490cc26,both_failed,representation_ceiling,False,112.0,138.0,4826.0,True,1319,14,22,23,3,35,55
+GPT-5.6 Luna,34b99a2b,both_correct,none,True,10.0,10.0,284.0,True,93,12,1,0,1,3,2
+GPT-5.6 Luna,351d6448,both_failed,spurious_overfitting,False,54.0,66.0,1852.0,True,533,10,6,11,1,28,23
+GPT-5.6 Luna,358ba94e,semantic_recovery,none,True,57.0,69.0,2019.0,True,565,13,8,6,1,21,18
+GPT-5.6 Luna,37d3e8b2,both_failed,representation_ceiling,False,71.0,89.0,2727.0,True,714,17,10,14,1,37,30
+GPT-5.6 Luna,3979b1a8,both_correct,none,True,18.0,20.0,661.0,True,212,8,0,0,1,5,1
+GPT-5.6 Luna,3a301edc,both_correct,none,True,50.0,59.0,1677.0,True,509,12,5,5,1,24,13
+GPT-5.6 Luna,3b4c2228,both_correct,none,True,41.0,50.0,1511.0,True,430,13,5,4,1,15,13
+GPT-5.6 Luna,3d31c5b3,both_correct,none,True,14.0,16.0,440.0,True,129,13,3,1,1,5,5
+GPT-5.6 Luna,3ed85e70,both_failed,representation_ceiling,False,121.0,159.0,4664.0,True,1184,13,18,15,2,56,39
+GPT-5.6 Luna,3ee1011a,both_correct,none,True,50.0,60.0,1713.0,True,508,13,8,3,1,19,14
+GPT-5.6 Luna,3f23242b,semantic_recovery,none,True,25.0,32.0,769.0,True,272,10,6,1,1,15,8
+GPT-5.6 Luna,40f6cd08,semantic_recovery,none,True,104.0,129.0,3702.0,True,969,13,15,11,1,42,30
+GPT-5.6 Luna,414297c0,both_correct,none,True,98.0,120.0,3212.0,True,899,12,16,22,2,41,44
+GPT-5.6 Luna,423a55dc,both_correct,none,True,19.0,24.0,630.0,True,205,11,4,4,1,8,9
+GPT-5.4 Nano,00576224,both_failed,representation_ceiling,False,15.0,25.0,855.0,True,231,13,2,3,1,7,6
+GPT-5.4 Nano,009d5c81,both_failed,representation_ceiling,False,54.0,72.0,2085.0,True,564,12,9,9,1,29,19
+GPT-5.4 Nano,00dbd492,both_failed,representation_ceiling,False,48.0,62.0,2068.0,True,552,13,6,11,3,23,20
+GPT-5.4 Nano,03560426,both_failed,representation_ceiling,False,87.0,121.0,4728.0,True,969,14,14,12,2,49,30
+GPT-5.4 Nano,05a7bcf2,both_failed,representation_ceiling,False,42.0,69.0,2677.0,True,485,14,11,9,2,18,25
+GPT-5.4 Nano,0607ce86,both_failed,representation_ceiling,False,23.0,45.0,1510.0,True,320,10,1,3,1,15,7
+GPT-5.4 Nano,0692e18c,both_failed,representation_ceiling,False,19.0,30.0,1239.0,True,278,10,2,2,1,6,6
+GPT-5.4 Nano,070dd51e,both_failed,representation_ceiling,False,38.0,47.0,1502.0,True,395,12,8,5,1,19,14
+GPT-5.4 Nano,08573cc6,both_failed,representation_ceiling,False,40.0,67.0,2237.0,True,391,10,4,8,1,18,13
+GPT-5.4 Nano,0934a4d8,both_failed,representation_ceiling,False,30.0,41.0,1354.0,True,351,10,6,6,1,17,14
+GPT-5.4 Nano,09c534e7,both_failed,representation_ceiling,False,35.0,54.0,2289.0,True,499,13,5,4,2,18,13
+GPT-5.4 Nano,0a1d4ef5,both_failed,representation_ceiling,False,85.0,110.0,3625.0,True,789,11,13,17,2,40,36
+GPT-5.4 Nano,0a2355a6,both_failed,representation_ceiling,False,115.0,152.0,5729.0,True,1238,14,17,22,4,62,45
+GPT-5.4 Nano,0b17323b,both_failed,representation_ceiling,False,40.0,60.0,1988.0,True,525,10,4,5,2,24,13
+GPT-5.4 Nano,0bb8deee,both_failed,representation_ceiling,False,59.0,83.0,2665.0,True,647,11,9,15,2,29,29
+GPT-5.4 Nano,0becf7df,both_failed,representation_ceiling,False,40.0,66.0,2471.0,True,521,13,9,5,2,15,20
+GPT-5.4 Nano,0c786b71,semantic_recovery,none,True,16.0,27.0,1101.0,True,320,13,2,3,1,8,9
+GPT-5.4 Nano,0c9aba6e,both_failed,representation_ceiling,False,19.0,30.0,956.0,True,186,11,3,4,1,7,9
+GPT-5.4 Nano,0d87d2a6,both_failed,representation_ceiling,False,41.0,60.0,2432.0,True,520,13,8,10,1,21,21
+GPT-5.4 Nano,0e671a1a,both_failed,representation_ceiling,False,20.0,34.0,1144.0,True,240,10,6,1,1,10,8
+GPT-5.4 Nano,0f63c0b9,both_failed,representation_ceiling,False,39.0,60.0,1958.0,True,443,12,6,4,2,19,11
+GPT-5.4 Nano,103eff5b,both_failed,representation_ceiling,False,22.0,30.0,1035.0,True,343,10,1,5,1,12,9
+GPT-5.4 Nano,11e1fe23,both_failed,representation_ceiling,False,32.0,46.0,1480.0,True,393,11,6,6,1,15,16
+GPT-5.4 Nano,12422b43,both_failed,representation_ceiling,False,33.0,41.0,1185.0,True,311,11,6,5,1,16,14
+GPT-5.4 Nano,12997ef3,both_failed,representation_ceiling,False,62.0,90.0,3259.0,True,707,12,12,4,1,39,21
+GPT-5.4 Nano,12eac192,both_failed,representation_ceiling,False,20.0,29.0,993.0,True,252,13,5,4,1,7,14
+GPT-5.4 Nano,136b0064,both_failed,representation_ceiling,False,16.0,34.0,1041.0,True,179,10,2,2,1,9,6
+GPT-5.4 Nano,13713586,both_failed,representation_ceiling,False,37.0,48.0,1443.0,True,443,11,9,14,1,17,25
+GPT-5.4 Nano,137f0df0,both_failed,representation_ceiling,False,41.0,62.0,2436.0,True,581,12,3,9,1,24,20
+GPT-5.4 Nano,140c817e,both_failed,representation_ceiling,False,44.0,72.0,2645.0,True,666,11,10,9,2,11,21
+GPT-5.4 Nano,14754a24,both_failed,representation_ceiling,False,11.0,16.0,610.0,True,181,13,3,2,1,4,7
+GPT-5.4 Nano,15113be4,both_failed,representation_ceiling,False,39.0,59.0,1854.0,True,421,12,6,8,1,16,15
+GPT-5.4 Nano,15663ba9,both_failed,representation_ceiling,False,37.0,63.0,2367.0,True,443,12,4,9,1,19,16
+GPT-5.4 Nano,15696249,both_failed,representation_ceiling,False,20.0,35.0,1469.0,True,215,14,4,3,1,11,8
+GPT-5.4 Nano,16b78196,both_failed,representation_ceiling,False,61.0,105.0,4792.0,True,827,13,8,14,1,35,29
+GPT-5.4 Nano,17b80ad2,both_failed,representation_ceiling,False,24.0,55.0,2345.0,True,252,11,6,5,1,8,12
+GPT-5.4 Nano,17cae0c1,both_failed,representation_ceiling,False,70.0,115.0,4394.0,True,612,12,10,16,2,25,32
+GPT-5.4 Nano,18419cfa,both_failed,representation_ceiling,False,43.0,63.0,2171.0,True,655,12,6,8,1,20,20
+GPT-5.4 Nano,184a9768,both_failed,representation_ceiling,False,51.0,63.0,2434.0,True,679,14,9,12,1,30,24
+GPT-5.4 Nano,195ba7dc,both_failed,representation_ceiling,False,47.0,70.0,2566.0,True,481,12,7,9,1,23,20
+GPT-5.4 Nano,1990f7a8,both_failed,representation_ceiling,False,58.0,75.0,2706.0,True,737,14,10,10,2,29,23
+GPT-5.4 Nano,19bb5feb,both_failed,representation_ceiling,False,44.0,62.0,2032.0,True,467,11,6,9,1,24,17
+GPT-5.4 Nano,1a2e2828,both_failed,representation_ceiling,False,29.0,41.0,1272.0,True,269,11,4,6,1,14,11
+GPT-5.4 Nano,1a6449f1,both_failed,representation_ceiling,False,57.0,81.0,2973.0,True,899,11,9,8,1,31,25
+GPT-5.4 Nano,1acc24af,both_failed,representation_ceiling,False,41.0,108.0,5680.0,True,591,15,6,8,2,23,19
+GPT-5.4 Nano,1c02dbbe,both_failed,representation_ceiling,False,75.0,116.0,5149.0,True,995,15,18,7,1,38,31
+GPT-5.4 Nano,1c0d0a4b,both_failed,representation_ceiling,False,25.0,40.0,1568.0,True,298,13,2,7,1,13,15
+GPT-5.4 Nano,1c56ad9f,both_failed,representation_ceiling,False,41.0,55.0,1897.0,True,493,11,5,15,1,19,22
+GPT-5.4 Nano,1d0a4b61,both_failed,representation_ceiling,False,45.0,66.0,2422.0,True,537,12,8,6,1,20,17
+GPT-5.4 Nano,1d398264,both_failed,representation_ceiling,False,59.0,88.0,3275.0,True,703,12,15,9,3,24,27
+GPT-5.4 Nano,1da012fc,both_failed,representation_ceiling,False,44.0,56.0,1949.0,True,541,14,9,13,2,20,25
+GPT-5.4 Nano,1e81d6f9,both_failed,representation_ceiling,False,33.0,50.0,1591.0,True,319,12,8,7,1,11,17
+GPT-5.4 Nano,1e97544e,both_failed,representation_ceiling,False,43.0,65.0,2248.0,True,500,14,6,10,1,22,26
+GPT-5.4 Nano,2037f2c7,both_failed,representation_ceiling,False,65.0,87.0,2700.0,True,733,12,13,13,2,28,32
+GPT-5.4 Nano,2072aba6,semantic_recovery,none,True,32.0,66.0,2700.0,True,408,12,2,5,3,13,10
+GPT-5.4 Nano,20818e16,both_failed,representation_ceiling,False,92.0,114.0,4200.0,True,1278,13,15,20,1,60,38
+GPT-5.4 Nano,20981f0e,both_failed,representation_ceiling,False,30.0,46.0,1688.0,True,405,11,4,3,2,13,10
+GPT-5.4 Nano,212895b5,both_failed,representation_ceiling,False,48.0,78.0,2938.0,True,629,13,10,10,2,16,30
+GPT-5.4 Nano,21f83797,both_failed,representation_ceiling,False,21.0,40.0,1488.0,True,318,10,4,1,1,13,6
+GPT-5.4 Nano,22a4bbc2,both_failed,representation_ceiling,False,75.0,98.0,3560.0,True,761,13,14,19,1,32,38
+GPT-5.4 Nano,25094a63,both_failed,representation_ceiling,False,67.0,105.0,3579.0,True,759,13,12,14,4,27,34
+GPT-5.4 Nano,2546ccf6,both_failed,representation_ceiling,False,17.0,35.0,1199.0,True,272,11,2,2,1,11,7
+GPT-5.4 Nano,256b0a75,both_failed,representation_ceiling,False,73.0,92.0,3048.0,True,816,11,15,15,2,38,36
+GPT-5.4 Nano,2685904e,both_failed,representation_ceiling,False,32.0,67.0,3243.0,True,387,12,4,5,1,17,10
+GPT-5.4 Nano,2697da3f,both_failed,representation_ceiling,False,34.0,81.0,2642.0,True,408,12,3,4,2,17,10
+GPT-5.4 Nano,2753e76c,both_failed,representation_ceiling,False,115.0,158.0,5471.0,True,1318,13,16,25,3,55,54
+GPT-5.4 Nano,27a77e38,both_failed,representation_ceiling,False,21.0,31.0,984.0,True,193,11,1,4,1,11,6
+GPT-5.4 Nano,27f8ce4f,both_failed,representation_ceiling,False,12.0,34.0,1602.0,True,168,10,4,0,1,6,5
+GPT-5.4 Nano,281123b4,both_failed,representation_ceiling,False,87.0,120.0,4019.0,True,1059,13,13,17,2,56,36
+GPT-5.4 Nano,292dd178,both_failed,representation_ceiling,False,38.0,66.0,2440.0,True,556,12,6,8,1,19,20
+GPT-5.4 Nano,29700607,both_failed,representation_ceiling,False,63.0,94.0,2990.0,True,575,11,11,13,2,24,25
+GPT-5.4 Nano,2a5f8217,semantic_recovery,none,True,48.0,84.0,3721.0,True,585,13,8,7,2,20,18
+GPT-5.4 Nano,2b01abd0,both_failed,representation_ceiling,False,33.0,54.0,1731.0,True,325,11,7,6,1,15,15
+GPT-5.4 Nano,2c0b0aff,both_failed,representation_ceiling,False,80.0,108.0,3697.0,True,1071,11,9,15,2,48,27
+GPT-5.4 Nano,2c737e39,both_failed,representation_ceiling,False,53.0,97.0,3958.0,True,732,12,7,7,2,30,21
+GPT-5.4 Nano,2f0c5170,both_failed,representation_ceiling,False,48.0,63.0,2101.0,True,584,11,5,5,4,21,12
+GPT-5.4 Nano,310f3251,both_failed,representation_ceiling,False,28.0,49.0,1664.0,True,353,12,2,9,1,14,14
+GPT-5.4 Nano,3194b014,semantic_recovery,none,True,44.0,57.0,2195.0,True,435,14,8,12,1,12,23
+GPT-5.4 Nano,319f2597,both_failed,representation_ceiling,False,25.0,40.0,1441.0,True,284,10,6,9,1,13,16
+GPT-5.4 Nano,31adaf00,both_failed,representation_ceiling,False,11.0,16.0,695.0,True,164,14,4,2,1,3,8
+GPT-5.4 Nano,31d5ba1a,both_failed,representation_ceiling,False,48.0,80.0,3188.0,True,734,13,6,5,2,28,19
+GPT-5.4 Nano,32e9702f,both_failed,representation_ceiling,False,42.0,68.0,2293.0,True,555,12,7,9,1,25,19
+GPT-5.4 Nano,332efdb3,both_correct,none,True,8.0,8.0,277.0,True,120,11,2,0,1,4,4
+GPT-5.4 Nano,3391f8c0,both_failed,representation_ceiling,False,94.0,125.0,4813.0,True,1267,13,17,15,5,40,39
+GPT-5.4 Nano,33b52de3,both_failed,representation_ceiling,False,80.0,103.0,3216.0,True,890,12,13,10,4,38,27
+GPT-5.4 Nano,3490cc26,both_failed,representation_ceiling,False,75.0,107.0,3723.0,True,1011,12,29,11,2,13,43
+GPT-5.4 Nano,34b99a2b,both_failed,representation_ceiling,False,40.0,70.0,2490.0,True,436,11,3,10,1,21,14
+GPT-5.4 Nano,351d6448,both_failed,representation_ceiling,False,50.0,67.0,2613.0,True,621,13,6,11,1,30,22
+GPT-5.4 Nano,358ba94e,both_failed,representation_ceiling,False,54.0,86.0,3134.0,True,695,13,5,5,1,38,13
+GPT-5.4 Nano,37d3e8b2,both_failed,representation_ceiling,False,54.0,80.0,3251.0,True,688,13,11,6,1,25,20
+GPT-5.4 Nano,3979b1a8,both_failed,representation_ceiling,False,62.0,86.0,2675.0,True,630,12,13,10,1,30,28
+GPT-5.4 Nano,3a301edc,both_failed,representation_ceiling,False,24.0,39.0,1367.0,True,368,11,3,3,1,14,9
+GPT-5.4 Nano,3b4c2228,both_failed,representation_ceiling,False,23.0,34.0,1214.0,True,286,10,3,2,1,13,7
+GPT-5.4 Nano,3d31c5b3,both_failed,representation_ceiling,False,42.0,68.0,2631.0,True,625,11,6,7,1,25,14
+GPT-5.4 Nano,3ed85e70,both_failed,representation_ceiling,False,19.0,28.0,967.0,True,206,11,3,4,1,8,9
+GPT-5.4 Nano,3ee1011a,both_failed,representation_ceiling,False,35.0,51.0,1372.0,True,377,11,5,7,1,18,14
+GPT-5.4 Nano,3f23242b,both_failed,representation_ceiling,False,54.0,88.0,2350.0,True,543,10,7,4,2,16,13
+GPT-5.4 Nano,40f6cd08,both_failed,representation_ceiling,False,68.0,97.0,4222.0,True,859,13,15,20,2,24,40
+GPT-5.4 Nano,414297c0,both_failed,representation_ceiling,False,23.0,35.0,1088.0,True,341,11,3,2,1,15,6
+GPT-5.4 Nano,423a55dc,both_failed,representation_ceiling,False,18.0,23.0,755.0,True,264,10,1,2,1,12,5

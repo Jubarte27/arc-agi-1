@@ -42,8 +42,9 @@ def analyze_guttman_hierarchy(
         - consecutive_subsumption: list of P(M_{i} | M_{i+1})
         - guttman_metrics: CR, MMR, CS, error count, total evaluations
     """
-    # Create pivot table: tasks x models
-    pivot = df.pivot(index="task_id", columns="model", values=strategy_col).astype(int)
+    # Create pivot table: tasks x models (using friendly_name if available)
+    model_col = "friendly_name" if "friendly_name" in df.columns else "model"
+    pivot = df.pivot(index="task_id", columns=model_col, values=strategy_col).astype(int)
 
     # Rank models by accuracy descending
     model_acc = pivot.mean(axis=0).sort_values(ascending=False)

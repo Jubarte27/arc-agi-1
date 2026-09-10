@@ -1,0 +1,159 @@
+\section{Resultados}
+\label{sec:resultados}
+
+Nesta se\c{c}\~{a}o, apresentamos os resultados obtidos na avalia\c{c}\~{a}o de 8 modelos de linguagem em 100 tarefas do ARC-AGI, totalizando 800 pares de execu\c{c}\~{a}o. Analisamos a acur\'{a}cia das abordagens, o comportamento qualitativo do c\'{o}digo, a estrutura de dificuldade das tarefas, a complexidade do c\'{o}digo gerado e a din\^{a}mica do ciclo iterativo.
+
+\subsection{Compara\c{c}\~{a}o de Acur\'{a}cia: CEGIS vs. AntiCheat}
+
+A Tabela~\ref{tab:modelos} resume o desempenho de cada modelo sob as duas estrat\'{e}gias. No total de 800 avalia\c{c}\~{o}es, o CEGIS acertou 403 tarefas (50,4\%), enquanto o AntiCheat acertou 398 tarefas (49,8\%), representando uma diferen\c{c}a absoluta de apenas 5 tarefas ($-0,62$ pontos percentuais).
+
+\begin{table}[h!]
+\centering
+\caption{Desempenho por modelo no CEGIS e no AntiCheat (100 tarefas por modelo).}
+\label{tab:modelos}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Modelo} & \textbf{CEGIS (\%)} & \textbf{AntiCheat (\%)} & \textbf{Dif. (\%)} & \textbf{Vit\'{o}rias ($b / c$)} & \textbf{$p$-valor bruto} & \textbf{$p$ ajustado (Bonferroni)} \\
+\midrule
+Grok 4.6 & 92,0\% & 92,0\% & 0,0\% & 0 / 0 & 1,0000 & 1,0000 \\
+DeepSeek V4 Flash 0731 & 86,0\% & 86,0\% & 0,0\% & 0 / 0 & 1,0000 & 1,0000 \\
+GPT-5.6 Luna & 77,0\% & 79,0\% & +2,0\% & 2 / 4 & 0,6875 & 1,0000 \\
+Claude Sonnet 5 & 62,0\% & 60,0\% & -2,0\% & 5 / 3 & 0,7266 & 1,0000 \\
+Gemini 3.5 Flash Lite & 43,0\% & 45,0\% & +2,0\% & 6 / 8 & 0,7905 & 1,0000 \\
+Gemini 3.1 Flash Lite & 31,0\% & 24,0\% & -7,0\% & 7 / 0 & 0,0156 & 0,1250 \\
+Leanstral 1.5.1 & 7,0\% & 9,0\% & +2,0\% & 2 / 4 & 0,6875 & 1,0000 \\
+GPT-5.4 Nano & 5,0\% & 3,0\% & -2,0\% & 3 / 1 & 0,6250 & 1,0000 \\
+\midrule
+\textbf{Total Agregado} & \textbf{50,4\%} & \textbf{49,8\%} & \textbf{-0,6\%} & \textbf{25 / 20} & \textbf{0,5515} & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para verificar se essa diferen\c{c}a tem significado estat\'{\i}stico, aplicamos testes pareados nos pares discordantes (casos em que um m\'{e}todo acertou e o outro errou):
+\begin{itemize}
+    \item \textbf{Teste Binomial Exato}: Dos 45 casos de discord\^{a}ncia, o CEGIS venceu 25 e o AntiCheat venceu 20. O teste binomial exato resulta em $p = 0,5515$.
+    \item \textbf{Teste de Permuta\c{c}\~{a}o}: Com 100.000 permuta\c{c}\~{o}es de sinal pareadas, obtivemos $p = 0,5501$.
+    \item \textbf{Intervalo de Confian\c{c}a (\textit{Bootstrap})}: O intervalo de confian\c{c}a de 95\% com 10.000 reamostragens ficou entre $[-2,25\%, +1,00\%]$.
+\end{itemize}
+
+Como o valor de $p$ \'{e} substancialmente superior a $0,05$ e o intervalo de confian\c{c}a inclui o zero, \textbf{n\~{a}o h\'{a} evid\^{e}ncia estat\'{\i}stica de que a estrat\'{e}gia AntiCheat seja superior ou inferior ao CEGIS}.
+
+Em rela\c{c}\~{a}o ao modelo \texttt{Gemini 3.1 Flash Lite}, que apresentou uma queda aparente de 7\% (7 acertos exclusivos do CEGIS contra 0 do AntiCheat, com $p = 0,0156$ n\~{a}o corrigido), a aplica\c{c}\~{a}o da corre\c{c}\~{a}o de Bonferroni para os 8 modelos avaliados eleva o $p$-valor para $0,1250$. Esse resultado neutraliza a diferen\c{c}a, indicando que a varia\c{c}\~{a}o observada \'{e} compat\'{\i}vel com a oscila\c{c}\~{a}o esperada do acaso ao testar m\'{u}ltiplas hip\'{o}teses simultaneamente, n\~{a}o se configurando como uma regress\~{a}o inesperada.
+
+\subsection{An\'{a}lise Qualitativa do C\'{o}digo e Motivos de Falha}
+
+Buscamos entender se, al\'{e}m dos n\'{u}meros de acur\'{a}cia, as regras do AntiCheat provocavam altera\c{c}\~{o}es qualitativas relevantes nos programas gerados. Inspecionamos detalhadamente os 45 casos discordantes e os motivos de falha de cada estrat\'{e}gia:
+
+\begin{enumerate}
+    \item \textbf{Motivo de falha predominante}: Nos 25 casos em que o CEGIS venceu, a falha do AntiCheat decorreu de teto de representa\c{c}\~{a}o (\textit{representation ceiling}) em 23 deles (92,0\%). Da mesma forma, nos 20 casos em que o AntiCheat venceu, o CEGIS falhou por teto de representa\c{c}\~{a}o em 18 deles (90,0\%). Em ambos os casos, a estrat\'{e}gia perdedora simplesmente n\~{a}o conseguiu encontrar uma l\'{o}gica que satisfizesse os exemplos de treino no limite de 5 itera\c{c}\~{o}es.
+    \item \textbf{Ocorr\^{e}ncia de sobreajuste esp\'{u}rio}: O sobreajuste esp\'{u}rio (acertar o treino, mas errar o teste) ocorreu em apenas 2 tarefas de cada lado.
+    \item \textbf{Aus\^{e}ncia de trapa\c{c}as por coordenadas}: Uma varredura est\'{a}tica em todas as 2.398 fun\c{c}\~{o}es geradas no benchmark revelou que apenas 7 c\'{o}digos (0,29\%) continham coordenadas fixas ou condicionais direcionadas a exemplos isolados.
+\end{enumerate}
+
+A inspe\c{c}\~{a}o do c\'{o}digo-fonte revelou que os dois m\'{e}todos produzem solu\c{c}\~{o}es estruturalmente muito pr\'{o}ximas. O modelo mant\'{e}m a mesma estrat\'{e}gia algor\'{\i}tmica b\'{a}sica em ambos os casos, e pequenas varia\c{c}\~{o}es no prompt afetam apenas detalhes pontuais de indexa\c{c}\~{a}o ou busca geom\'{e}trica. Portanto, \textbf{n\~{a}o se observa diferen\c{c}a qualitativa sistem\'{a}tica} entre o c\'{o}digo do CEGIS e o c\'{o}digo do AntiCheat.
+
+\subsection{Dificuldade das Tarefas e Escala de Guttman}
+
+A distribui\c{c}\~{a}o do n\'{u}mero de modelos que resolveram cada uma das 100 tarefas \'{e} apresentada na Figura~\ref{fig:task_dist}. Observamos que:
+\begin{itemize}
+    \item \textbf{Tarefas Universalmente Resolvidas}: Apenas 3 tarefas (3\%) foram resolvidas por todos os 8 modelos (\texttt{0c786b71}, \texttt{2072aba6}, \texttt{332efdb3}).
+    \item \textbf{Tarefas Universalmente N\~{a}o Resolvidas}: 7 tarefas (7\%) n\~{a}o foram solucionadas por nenhum dos modelos avaliados.
+    \item \textbf{Armadilhas Indutivas}: Foram identificadas 5 tarefas em que a maioria dos modelos atingiu 100\% de acerto nos treinos, mas falhou totalmente no teste (por exemplo, a tarefa \texttt{351d6448}, onde 6 dos 8 modelos convergiram no treino, mas nenhum acertou o teste).
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\linewidth]{static_analysis_output/plot_task_solve_distribution.png}
+\caption{Distribui\c{c}\~{a}o de tarefas resolvidas por quantidade de modelos.}
+\label{fig:task_dist}
+\end{figure}
+
+Para analisar se o benchmark mede uma habilidade cumulativa \'{u}nica, calculamos a Matriz de Subsun\c{c}\~{a}o de Guttman, ilustrada na Figura~\ref{fig:guttman}. A probabilidade de um modelo superior acertar as tarefas que um modelo inferior acerta \'{e} expressiva:
+\begin{itemize}
+    \item \texttt{Grok 4.6} resolveu \textbf{100,0\%} das tarefas resolvidas pelo \texttt{DeepSeek V4 Flash};
+    \item \texttt{DeepSeek V4 Flash} resolveu \textbf{97,4\%} das tarefas resolvidas pelo \texttt{GPT-5.6 Luna};
+    \item \texttt{GPT-5.6 Luna} resolveu \textbf{91,9\%} das tarefas resolvidas pelo \texttt{Claude Sonnet 5};
+    \item \texttt{Claude Sonnet 5} resolveu \textbf{86,0\%} das tarefas resolvidas pelo \texttt{Gemini 3.5 Flash Lite}.
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\linewidth]{static_analysis_output/plot_guttman_subsumption.png}
+\caption{Matriz de Subsun\c{c}\~{a}o de Guttman entre os 8 modelos avaliados.}
+\label{fig:guttman}
+\end{figure}
+
+Os \'{\i}ndices psicom\'{e}tricos calculados confirmam que o ARC-AGI forma uma escala unidimensional quase perfeita:
+\begin{itemize}
+    \item \textbf{Coeficiente de Reprodutibilidade (CR)}: $0,9738$ (o limiar de aceita\c{c}\~{a}o psicom\'{e}trico \'{e} $\ge 0,90$);
+    \item \textbf{Coeficiente de Escalabilidade (CS)}: $0,8757$ (o limiar de aceita\c{c}\~{a}o \'{e} $\ge 0,60$).
+\end{itemize}
+Isso confirma que o ganho de desempenho dos modelos segue uma progress\~{a}o estritamente hier\'{a}rquica de compet\^{e}ncias.
+
+\subsection{Complexidade do C\'{o}digo e a Navalha de Occam}
+
+Analisamos a \'{A}rvore Sint\'{a}tica Abstrata (AST) dos programas gerados para investigar a rela\c{c}\~{a}o entre o tamanho do c\'{o}digo e o sucesso da solu\c{c}\~{a}o (Figura~\ref{fig:complexity}).
+
+\begin{table}[h!]
+\centering
+\caption{Complexidade estrutural do c\'{o}digo por desfecho da execu\c{c}\~{a}o.}
+\label{tab:complexity}
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Categoria de Desfecho} & \textbf{Amostras} & \textbf{Linhas (SLOC)} & \textbf{La\c{c}os (\textit{loops})} & \textbf{Condicionais (\textit{ifs})} & \textbf{Profundidade AST} \\
+\midrule
+Acerto de Primeira (\textit{both correct}) & 289 & 34,6 & 6,2 & 4,9 & 12,2 \\
+Recuperado via CEGIS (\textit{semantic recovery}) & 114 & 44,5 & 7,6 & 7,0 & 12,7 \\
+Sobreajuste Esp\'{u}rio (\textit{spurious overfitting}) & 52 & 55,9 & 8,8 & 8,7 & 13,1 \\
+Falha no Treino (\textit{ceiling}) & 342 & 44,4 & 7,9 & 7,5 & 12,8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\linewidth]{static_analysis_output/plot_code_complexity_by_outcome.png}
+\caption{Distribui\c{c}\~{a}o das linhas de c\'{o}digo (SLOC) de acordo com o desfecho da tarefa.}
+\label{fig:complexity}
+\end{figure}
+
+Como resumido na Tabela~\ref{tab:complexity}, os c\'{o}digos que acertam na primeira tentativa possuem m\'{e}dia de 34,6 linhas de c\'{o}digo. Em contraste, os c\'{o}digos que caem em sobreajuste esp\'{u}rio apresentam uma m\'{e}dia de 55,9 linhas. Esse aumento representa um fator de incha\c{c}o (\textit{Bloat Factor}) de \textbf{1,61 vezes} ($p = 5,15 \times 10^{-9}$ no teste de Mann-Whitney U). Esse resultado fornece uma valida\c{c}\~{a}o emp\'{\i}rica rigorosa do princ\'{\i}pio da \textbf{Navalha de Occam}: quando os modelos tentam acomodar contraexemplos sem entender o padr\~{a}o geral, tendem a inflar o programa com condicionais e la\c{c}os adicionais que n\~{a}o generalizam.
+
+\subsection{Din\^{a}mica de Itera\c{c}\~{o}es do CEGIS}
+
+Avaliamos quantas itera\c{c}\~{o}es s\~{a}o necess\'{a}rias para que o CEGIS conserte c\'{o}digos que falharam na primeira tentativa. Conforme apresentado na Tabela~\ref{tab:iterations} e na Figura~\ref{fig:iterations}:
+\begin{itemize}
+    \item 71,7\% (289 tarefas) do total de acertos ocorrem na primeira itera\c{c}\~{a}o;
+    \item Para as 114 tarefas corrigidas ao longo do ciclo iterativo, 60,5\% das corre\c{c}\~{o}es acontecem logo na 2\textordfeminine{} itera\c{c}\~{a}o e 25,4\% ocorrem na 3\textordfeminine{} itera\c{c}\~{a}o;
+    \item As itera\c{c}\~{o}es 4 e 5 respondem por apenas 7,9\% e 6,1\% das corre\c{c}\~{o}es, respectivamente.
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Distribui\c{c}\~{a}o de recupera\c{c}\~{a}o de tarefas ao longo das itera\c{c}\~{o}es do CEGIS.}
+\label{tab:iterations}
+\small
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Itera\c{c}\~{a}o} & \textbf{Tarefas Resolvidas} & \textbf{\% do Total Resolvido} & \textbf{Tarefas Recuperadas} & \textbf{\% Acumulado de Recupera\c{c}\~{o}es} \\
+\midrule
+1 & 289 & 71,7\% & 0 & 0,0\% \\
+2 & 69 & 17,1\% & 69 & 60,5\% \\
+3 & 29 & 7,2\% & 29 & \textbf{86,0\%} \\
+4 & 9 & 2,2\% & 9 & 93,9\% \\
+5 & 7 & 1,7\% & 7 & 100,0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\linewidth]{static_analysis_output/plot_iteration_diminishing_returns.png}
+\caption{Rendimentos decrescentes ao longo das itera\c{c}\~{o}es do CEGIS.}
+\label{fig:iterations}
+\end{figure}
+
+Esse comportamento demonstra um retorno decrescente r\'{a}pido. Fixar o limite do CEGIS em \textbf{3 itera\c{c}\~{o}es} permite capturar 86,0\% de todos os reparos poss\'{\i}veis, evitando o consumo desnecess\'{a}rio de tokens e processamento nas rodadas finais.
+

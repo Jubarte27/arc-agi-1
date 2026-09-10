@@ -43,8 +43,9 @@ def analyze_iteration_dynamics(
     if success_col not in df.columns or iter_col not in df.columns:
         raise ValueError(f"Required columns '{success_col}' or '{iter_col}' not found in dataframe.")
 
+    model_col = "friendly_name" if "friendly_name" in df.columns else "model"
     solved_df = df[df[success_col] == True]
-    all_models = sorted(df["model"].unique().tolist())
+    all_models = sorted(df[model_col].unique().tolist())
     max_iter = int(df[iter_col].max())
 
     # Overall solved distribution by iteration
@@ -87,7 +88,7 @@ def analyze_iteration_dynamics(
 
     # Per-model breakdown
     model_crosstab = (
-        pd.crosstab(solved_df["model"], solved_df[iter_col])
+        pd.crosstab(solved_df[model_col], solved_df[iter_col])
         .reindex(index=all_models, columns=range(1, max_iter + 1), fill_value=0)
     )
 

@@ -1,0 +1,46 @@
+model,task_id,winning_strategy,losing_strategy,cegis_success,anticheat_success,cegis_iterations,anticheat_iterations,anticheat_converged_train,losing_failure_reason,cegis_code_lines,anticheat_code_lines,cegis_converged_train
+Claude Sonnet 5,0f63c0b9,CEGIS,AntiCheat,True,False,5,5,False,representation_ceiling,59,51,
+Claude Sonnet 5,12eac192,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,65,76,
+Claude Sonnet 5,1d398264,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,75,53,
+Claude Sonnet 5,2037f2c7,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,100,112,
+Claude Sonnet 5,292dd178,CEGIS,AntiCheat,True,False,4,3,True,spurious_overfitting,91,82,
+Claude Sonnet 5,27a77e38,AntiCheat,CEGIS,False,True,3,2,,spurious_overfitting,37,55,True
+Claude Sonnet 5,3194b014,AntiCheat,CEGIS,False,True,5,3,,representation_ceiling,60,62,False
+Claude Sonnet 5,31adaf00,AntiCheat,CEGIS,False,True,5,4,,representation_ceiling,58,107,False
+GPT-5.4 Nano,0c786b71,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,27,31,
+GPT-5.4 Nano,2072aba6,CEGIS,AntiCheat,True,False,5,5,False,representation_ceiling,66,38,
+GPT-5.4 Nano,2a5f8217,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,84,56,
+GPT-5.4 Nano,19bb5feb,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,62,42,False
+GPT-5.6 Luna,15663ba9,CEGIS,AntiCheat,True,False,5,5,False,representation_ceiling,98,73,
+GPT-5.6 Luna,1e97544e,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,34,29,
+GPT-5.6 Luna,09c534e7,AntiCheat,CEGIS,False,True,5,5,,representation_ceiling,48,63,False
+GPT-5.6 Luna,18419cfa,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,157,102,False
+GPT-5.6 Luna,2c0b0aff,AntiCheat,CEGIS,False,True,5,5,,representation_ceiling,65,84,False
+GPT-5.6 Luna,37d3e8b2,AntiCheat,CEGIS,False,True,5,3,,representation_ceiling,89,78,False
+Gemini 3.1 Flash Lite,1c0d0a4b,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,46,32,
+Gemini 3.1 Flash Lite,27f8ce4f,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,46,22,
+Gemini 3.1 Flash Lite,281123b4,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,48,40,
+Gemini 3.1 Flash Lite,3b4c2228,CEGIS,AntiCheat,True,False,4,5,False,representation_ceiling,68,28,
+Gemini 3.1 Flash Lite,3d31c5b3,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,46,27,
+Gemini 3.1 Flash Lite,3f23242b,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,59,33,
+Gemini 3.1 Flash Lite,423a55dc,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,45,35,
+Gemini 3.5 Flash Lite,17b80ad2,CEGIS,AntiCheat,True,False,4,4,False,representation_ceiling,35,38,
+Gemini 3.5 Flash Lite,1990f7a8,CEGIS,AntiCheat,True,False,2,2,True,spurious_overfitting,273,74,
+Gemini 3.5 Flash Lite,1c02dbbe,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,229,154,
+Gemini 3.5 Flash Lite,1e81d6f9,CEGIS,AntiCheat,True,False,3,5,False,representation_ceiling,228,6,
+Gemini 3.5 Flash Lite,22a4bbc2,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,125,40,
+Gemini 3.5 Flash Lite,3979b1a8,CEGIS,AntiCheat,True,False,5,5,False,representation_ceiling,87,55,
+Gemini 3.5 Flash Lite,070dd51e,AntiCheat,CEGIS,False,True,3,2,,representation_ceiling,49,38,False
+Gemini 3.5 Flash Lite,0becf7df,AntiCheat,CEGIS,False,True,5,1,,representation_ceiling,95,141,False
+Gemini 3.5 Flash Lite,0c9aba6e,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,26,22,False
+Gemini 3.5 Flash Lite,0e671a1a,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,47,43,False
+Gemini 3.5 Flash Lite,12997ef3,AntiCheat,CEGIS,False,True,5,3,,representation_ceiling,61,60,False
+Gemini 3.5 Flash Lite,15696249,AntiCheat,CEGIS,False,True,4,2,,spurious_overfitting,73,41,True
+Gemini 3.5 Flash Lite,1a6449f1,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,60,47,False
+Gemini 3.5 Flash Lite,2f0c5170,AntiCheat,CEGIS,False,True,5,4,,representation_ceiling,115,93,False
+Leanstral 1.5.1,1a2e2828,CEGIS,AntiCheat,True,False,2,5,False,representation_ceiling,35,29,
+Leanstral 1.5.1,27f8ce4f,CEGIS,AntiCheat,True,False,5,5,False,representation_ceiling,45,22,
+Leanstral 1.5.1,00576224,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,11,17,False
+Leanstral 1.5.1,195ba7dc,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,31,19,False
+Leanstral 1.5.1,31d5ba1a,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,63,13,False
+Leanstral 1.5.1,32e9702f,AntiCheat,CEGIS,False,True,5,2,,representation_ceiling,38,15,False
