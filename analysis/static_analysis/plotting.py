@@ -68,14 +68,8 @@ def plot_task_solve_distribution(topology_results: dict[str, Any], output_path: 
                 fontweight="bold",
             )
 
-    ax.set_xlabel(f"Number of Models Solving the Task (out of {total_models})", fontsize=11, fontweight="bold")
-    ax.set_ylabel("Task Count", fontsize=11, fontweight="bold")
-    ax.set_title(
-        f"Task Solvability Distribution: Universally Solved ({topology_results['universally_solved_count']}) vs. Unsolved ({topology_results['universally_unsolved_count']})",
-        fontsize=12,
-        fontweight="bold",
-        pad=15,
-    )
+    ax.set_xlabel(f"Número de Modelos que Resolveram a Tarefa (de {total_models})", fontsize=11, fontweight="bold")
+    ax.set_ylabel("Quantidade de Tarefas", fontsize=11, fontweight="bold")
     ax.set_xticks(x)
     ax.set_ylim(0, max(y) * 1.15)
     ax.grid(axis="y", linestyle="--", alpha=0.6)
@@ -117,19 +111,11 @@ def plot_guttman_hierarchy(guttman_results: dict[str, Any], output_path: str | P
     ax.set_xticklabels(short_names, rotation=35, ha="right", fontsize=9)
     ax.set_yticklabels(short_names, fontsize=9)
 
-    ax.set_xlabel("Conditioning Model B (Tasks Solved by B)", fontsize=11, fontweight="bold", labelpad=8)
-    ax.set_ylabel("Subsuming Model A (Also Solved by A)", fontsize=11, fontweight="bold", labelpad=8)
-
-    gm = guttman_results["guttman_metrics"]
-    title_str = (
-        f"Guttman Task Subsumption Matrix P(Model A | Model B)\n"
-        f"Coefficient of Reproducibility (CR) = {gm['coefficient_of_reproducibility_cr']:.3f} | "
-        f"Scalability (CS) = {gm['coefficient_of_scalability_cs']:.3f}"
-    )
-    ax.set_title(title_str, fontsize=11, fontweight="bold", pad=15)
+    ax.set_xlabel("Modelo Condicionante B (Tarefas Resolvidas por B)", fontsize=11, fontweight="bold", labelpad=8)
+    ax.set_ylabel("Modelo Subsunçor A (Também Resolvidas por A)", fontsize=11, fontweight="bold", labelpad=8)
 
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label("Conditional Probability P(A | B)", fontsize=10)
+    cbar.set_label("Probabilidade Condicional P(A | B)", fontsize=10)
 
     plt.tight_layout()
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -149,10 +135,10 @@ def plot_code_complexity_by_outcome(complexity_results: dict[str, Any], output_p
     df = df[df["valid_syntax"] == True]
 
     categories = [
-        ("Both Correct\n(First-Shot)", df[df["outcome_category"] == "both_correct"]["sloc"].values),
-        ("Semantic Recovery\n(Repaired)", df[df["outcome_category"] == "semantic_recovery"]["sloc"].values),
-        ("Spurious Overfit\n(Failed Test)", df[df["failure_type"] == "spurious_overfitting"]["sloc"].values),
-        ("Representation Ceiling\n(Failed Train)", df[df["failure_type"] == "representation_ceiling"]["sloc"].values),
+        ("Acerto de Primeira\n(1ª Tentativa)", df[df["outcome_category"] == "both_correct"]["sloc"].values),
+        ("Recuperação Semântica\n(Reparação)", df[df["outcome_category"] == "semantic_recovery"]["sloc"].values),
+        ("Sobreajuste Espúrio\n(Falhou no Teste)", df[df["failure_type"] == "spurious_overfitting"]["sloc"].values),
+        ("Teto de Representação\n(Falhou no Treino)", df[df["failure_type"] == "representation_ceiling"]["sloc"].values),
     ]
 
     labels = [c[0] for c in categories]
@@ -173,15 +159,7 @@ def plot_code_complexity_by_outcome(complexity_results: dict[str, Any], output_p
         patch.set_facecolor(color)
         patch.set_alpha(0.75)
 
-    om = complexity_results["occams_razor_metrics"]
-    ax.set_ylabel("Source Lines of Code (SLOC)", fontsize=11, fontweight="bold")
-    ax.set_title(
-        f"Occam's Razor in Program Synthesis: Code Bloat by Evaluation Outcome\n"
-        f"Bloat Factor = {om['bloat_factor_vs_both_correct']:.2f}x (p = {om['mann_whitney_u_pvalue_greater']:.2e})",
-        fontsize=12,
-        fontweight="bold",
-        pad=15,
-    )
+    ax.set_ylabel("Linhas de Código-Fonte (SLOC)", fontsize=11, fontweight="bold")
     ax.grid(axis="y", linestyle="--", alpha=0.6)
 
     plt.tight_layout()
@@ -202,9 +180,9 @@ def plot_iteration_diminishing_returns(iteration_results: dict[str, Any], output
 
     # Bar chart for tasks solved
     color_bar = "#4a90e2"
-    bars = ax1.bar(iters, solved, color=color_bar, alpha=0.85, width=0.55, edgecolor="black", label="Tasks Solved")
-    ax1.set_xlabel("Iteration Number (1 = Baseline, 2-5 = Repairs)", fontsize=11, fontweight="bold")
-    ax1.set_ylabel("Tasks Solved", color="#1c4b82", fontsize=11, fontweight="bold")
+    bars = ax1.bar(iters, solved, color=color_bar, alpha=0.85, width=0.55, edgecolor="black", label="Tarefas Resolvidas")
+    ax1.set_xlabel("Número da Iteração (1 = Linha de Base, 2–5 = Reparos)", fontsize=11, fontweight="bold")
+    ax1.set_ylabel("Tarefas Resolvidas", color="#1c4b82", fontsize=11, fontweight="bold")
     ax1.set_xticks(iters)
     ax1.set_ylim(0, max(solved) * 1.15)
     ax1.grid(axis="y", linestyle="--", alpha=0.5)
@@ -216,22 +194,13 @@ def plot_iteration_diminishing_returns(iteration_results: dict[str, Any], output
     # Secondary line for cumulative recovery %
     ax2 = ax1.twinx()
     color_line = "#e65100"
-    ax2.plot(iters[1:], cum_pct[1:], color=color_line, marker="s", linewidth=2.2, markersize=8, label="Cumulative Recoveries (%)")
-    ax2.set_ylabel("Cumulative Recovery Share (%)", color=color_line, fontsize=11, fontweight="bold")
+    ax2.plot(iters[1:], cum_pct[1:], color=color_line, marker="s", linewidth=2.2, markersize=8, label="Recuperações Acumuladas (%)")
+    ax2.set_ylabel("Parcela Acumulada de Recuperações (%)", color=color_line, fontsize=11, fontweight="bold")
     ax2.set_ylim(0, 110)
     ax2.grid(False)
 
     for x_i, y_i in zip(iters[1:], cum_pct[1:]):
         ax2.annotate(f"{y_i:.1f}%", (x_i, y_i), xytext=(0, 7), textcoords="offset points", ha="center", va="bottom", fontsize=9, fontweight="bold", color=color_line)
-
-    cap = iteration_results["recommended_iteration_cap"]
-    ret = iteration_results["recommended_cap_recovery_retention_pct"]
-    plt.title(
-        f"Iteration Convergence & Diminishing Returns\nRecommended Cap: {cap} Iterations (Retains {ret:.1f}% of Recoveries)",
-        fontsize=12,
-        fontweight="bold",
-        pad=15,
-    )
 
     plt.tight_layout()
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -247,10 +216,10 @@ def plot_strategy_discrepancy(discrepancy_results: dict[str, Any], output_path: 
     s2_name = discrepancy_results["strategy_2"]
 
     labels = [
-        f"Both\nSucceeded\n({ct['both_succeeded']})",
-        f"{s1_name} Only\nSucceeded\n({ct[f'{s1_name}_only_succeeded']})",
-        f"{s2_name} Only\nSucceeded\n({ct[f'{s2_name}_only_succeeded']})",
-        f"Both\nFailed\n({ct['both_failed']})",
+        f"Ambos\nAcertaram\n({ct['both_succeeded']})",
+        f"Apenas\n{s1_name}\n({ct[f'{s1_name}_only_succeeded']})",
+        f"Apenas\n{s2_name}\n({ct[f'{s2_name}_only_succeeded']})",
+        f"Ambos\nFalharam\n({ct['both_failed']})",
     ]
     vals = [
         ct["both_succeeded"],
@@ -269,16 +238,7 @@ def plot_strategy_discrepancy(discrepancy_results: dict[str, Any], output_path: 
         pct = (h / tot) * 100
         ax.annotate(f"{pct:.1f}%", (bar.get_x() + bar.get_width() / 2, h), xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=9, fontweight="bold")
 
-    ax.set_ylabel("Evaluation Count", fontsize=11, fontweight="bold")
-    om = discrepancy_results["oracle_ensemble_metrics"]
-    ax.set_title(
-        f"Strategy Discrepancy & Complementarity: {s1_name} vs. {s2_name}\n"
-        f"Oracle Ensemble Accuracy = {om['oracle_ensemble_accuracy']*100:.1f}% "
-        f"(+{om[f'oracle_lift_over_{s1_name}']*100:.1f}% over {s1_name})",
-        fontsize=12,
-        fontweight="bold",
-        pad=15,
-    )
+    ax.set_ylabel("Quantidade de Avaliações", fontsize=11, fontweight="bold")
     ax.set_ylim(0, max(vals) * 1.15)
     ax.grid(axis="y", linestyle="--", alpha=0.5)
 

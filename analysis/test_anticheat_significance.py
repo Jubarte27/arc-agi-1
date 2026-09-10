@@ -339,7 +339,7 @@ def plot_forest_plot(results: dict[str, Any], output_path: str | Path) -> None:
     pooled = results["pooled"]
 
     # Sort models by accuracy or delta
-    labels = [m["model"] for m in models_data] + ["POOLED OVERALL"]
+    labels = [m["model"] for m in models_data] + ["AGREGADO GERAL"]
     deltas = [m["delta"] * 100 for m in models_data] + [pooled["delta_accuracy"] * 100]
     ci_lowers = [m["bootstrap_95_ci"][0] * 100 for m in models_data] + [pooled["tests"]["bootstrap_95_ci"][0] * 100]
     ci_uppers = [m["bootstrap_95_ci"][1] * 100 for m in models_data] + [pooled["tests"]["bootstrap_95_ci"][1] * 100]
@@ -390,14 +390,7 @@ def plot_forest_plot(results: dict[str, Any], output_path: str | Path) -> None:
     ax.set_yticklabels(labels, fontsize=9.5, fontweight="bold")
     ax.invert_yaxis()  # Top-down order
 
-    ax.set_xlabel("Accuracy Difference Δ (%) [AntiCheat − CEGIS]", fontsize=11, fontweight="bold")
-    ax.set_title(
-        "Statistical Significance Forest Plot: AntiCheat vs. Standard CEGIS\n"
-        f"Pooled Difference: {pooled['delta_accuracy']*100:+.2f}% (95% CI: [{pooled['tests']['bootstrap_95_ci'][0]*100:+.2f}%, {pooled['tests']['bootstrap_95_ci'][1]*100:+.2f}%], p = {pooled['tests']['exact_binomial_pvalue']:.4f})",
-        fontsize=11.5,
-        fontweight="bold",
-        pad=15,
-    )
+    ax.set_xlabel("Diferença de Acurácia Δ (%) [AntiCheat − CEGIS]", fontsize=11, fontweight="bold")
     ax.set_xlim(-16, 22)
     ax.grid(axis="x", linestyle="--", alpha=0.5)
 
