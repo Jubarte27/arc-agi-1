@@ -34,6 +34,18 @@ Usage examples:
 
   # 8. Output compact CSV without code, while saving all code in a separate JSON file
   python analysis/compile_results_to_csv.py --tasks -o tasks.csv --code-json code.json
+
+  # 9. Specify friendly names for models via CLI key-value pairs
+  python analysis/compile_results_to_csv.py -fn "gemini-3.1-flash-lite=Gemini 3.1 Flash Lite" -o summary.csv
+
+  # 10. Load friendly names from a JSON mapping file or inline JSON
+  python analysis/compile_results_to_csv.py --friendly-names model_names.json -o summary.csv
+
+  # 11. Pass positional labels matching input files (consistent with generate_latex_table.py)
+  python analysis/compile_results_to_csv.py file1.json file2.json --label "Model A" --label "Model B"
+
+  # 12. Keep raw model identifiers in 'model' column while still including 'friendly_name'
+  python analysis/compile_results_to_csv.py --keep-raw-model -o summary.csv
 """
 
 from __future__ import annotations
@@ -319,12 +331,204 @@ def extract_provider_and_model(path: Path, payload: dict[str, Any]) -> tuple[str
     return provider or "unknown", model
 
 
-def extract_summary_record(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
+# Known model friendly names established in the repository
+DEFAULT_MODEL_FRIENDLY_NAMES: dict[str | tuple[str, str], str] = {
+    ("google", "gemini-3.1-flash-lite"): "Gemini 3.1 Flash Lite",
+    ("google", "gemini-3.5-flash-lite"): "Gemini 3.5 Flash Lite",
+    ("pollinations", "chigwell/claude-sonnet-5"): "Claude Sonnet 5",
+    ("pollinations", "chigwell/grok-4.6"): "Grok 4.6",
+    ("pollinations", "morriszdweck/glm-fast"): "GLM 5.3 Flash",
+    ("pollinations", "openai"): "GPT-5.4 Nano",
+    ("pollinations", "gpt-5.6-luna"): "GPT-5.6 Luna",
+    ("pollinations", "deepseek"): "DeepSeek V4 Flash 0731",
+    ("mistral", "labs-leanstral-1-5-1"): "Leanstral 1.5.1",
+    # Direct model identifier lookups
+    "gemini-3.1-flash-lite": "Gemini 3.1 Flash Lite",
+    "gemini-3.5-flash-lite": "Gemini 3.5 Flash Lite",
+    "chigwell/claude-sonnet-5": "Claude Sonnet 5",
+    "claude-sonnet-5": "Claude Sonnet 5",
+    "chigwell/grok-4.6": "Grok 4.6",
+    "grok-4.6": "Grok 4.6",
+    "morriszdweck/glm-fast": "GLM 5.3 Flash",
+    "glm-fast": "GLM 5.3 Flash",
+    "openai": "GPT-5.4 Nano",
+    "gpt-5.6-luna": "GPT-5.6 Luna",
+    "deepseek": "DeepSeek V4 Flash 0731",
+    "labs-leanstral-1-5-1": "Leanstral 1.5.1",
+}
+
+
+def normalize_friendly_names(
+    friendly_names_arg: Any = None,
+    friendly_name_pairs: Sequence[str] | None = None,
+    labels: Sequence[str] | None = None,
+) -> dict[Any, str] | list[str] | None:
+    """Normalize diverse friendly name specifications into a unified lookup map or positional list.
+
+    Supports:
+    - Dict mapping (e.g. {('google', 'model'): 'Friendly', 'model': 'Friendly'})
+    - JSON string or Path to JSON file
+    - Key-value pairs (e.g. ['gemini=Gemini 3.1', 'pollinations/openai=GPT-5.4 Nano'])
+    - Positional labels list
+    """
+    mapping: dict[Any, str] = {}
+    has_dict_items = False
+
+    # 1. Process friendly_names_arg (dict, list, Path, str)
+    if isinstance(friendly_names_arg, dict):
+        mapping.update(friendly_names_arg)
+        has_dict_items = True
+    elif isinstance(friendly_names_arg, (list, tuple)):
+        all_pairs = all(isinstance(x, str) and "=" in x for x in friendly_names_arg)
+        if all_pairs and friendly_names_arg:
+            for item in friendly_names_arg:
+                k, v = item.split("=", 1)
+                mapping[k.strip()] = v.strip()
+            has_dict_items = True
+        else:
+            return list(friendly_names_arg)
+    elif isinstance(friendly_names_arg, (str, Path)):
+        p = Path(friendly_names_arg)
+        if p.is_file():
+            with p.open("r", encoding="utf-8") as f:
+                loaded = json.load(f)
+            if isinstance(loaded, dict):
+                mapping.update(loaded)
+                has_dict_items = True
+            elif isinstance(loaded, list):
+                return list(loaded)
+        else:
+            s = str(friendly_names_arg).strip()
+            if s.startswith("{") and s.endswith("}"):
+                try:
+                    loaded = json.loads(s)
+                    if isinstance(loaded, dict):
+                        mapping.update(loaded)
+                        has_dict_items = True
+                except Exception:
+                    pass
+            elif "=" in s:
+                for chunk in s.split(","):
+                    if "=" in chunk:
+                        k, v = chunk.split("=", 1)
+                        mapping[k.strip()] = v.strip()
+                has_dict_items = True
+
+    # 2. Process repeated key-value pairs (e.g. from --friendly-name "model=Name")
+    if friendly_name_pairs:
+        for pair in friendly_name_pairs:
+            if "=" in pair:
+                k, v = pair.split("=", 1)
+                mapping[k.strip()] = v.strip()
+                has_dict_items = True
+            else:
+                mapping[pair.strip()] = pair.strip()
+                has_dict_items = True
+
+    # 3. Process positional labels if provided and no dict mapping was formed
+    if labels and not has_dict_items:
+        return list(labels)
+
+    return mapping if has_dict_items else (list(labels) if labels else None)
+
+
+def resolve_friendly_name(
+    model: str,
+    provider: str = "",
+    path: Path | None = None,
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    file_index: int | None = None,
+    use_defaults: bool = True,
+) -> str:
+    """Resolve human-readable friendly name for a model given its identifier, provider, and file path.
+
+    Lookup hierarchy:
+    1. Positional list matching file_index (if friendly_names is a list/tuple)
+    2. Dict lookup in friendly_names:
+       a. (provider, model) tuple
+       b. f"{provider}/{model}"
+       c. model exact match
+       d. Path strings (relative path, resolved absolute path, filename stem, parent folder)
+       e. model.split("/")[-1] (unqualified model name)
+    3. Default repository known models lookup (if use_defaults is True)
+    4. Fallback: original model identifier
+    """
+    if friendly_names:
+        if isinstance(friendly_names, (list, tuple)):
+            if file_index is not None and 0 <= file_index < len(friendly_names):
+                candidate = friendly_names[file_index]
+                if candidate:
+                    return str(candidate).strip()
+        elif isinstance(friendly_names, dict):
+            # (provider, model)
+            if provider and (provider, model) in friendly_names:
+                return str(friendly_names[(provider, model)]).strip()
+            # "provider/model"
+            if provider and f"{provider}/{model}" in friendly_names:
+                return str(friendly_names[f"{provider}/{model}"]).strip()
+            # exact model string
+            if model in friendly_names:
+                return str(friendly_names[model]).strip()
+            # Path based lookup
+            if path is not None:
+                p_str = str(path)
+                if p_str in friendly_names:
+                    return str(friendly_names[p_str]).strip()
+                try:
+                    rel = str(path.resolve().relative_to(Path.cwd().resolve()))
+                    if rel in friendly_names:
+                        return str(friendly_names[rel]).strip()
+                except ValueError:
+                    pass
+                if path.name in friendly_names:
+                    return str(friendly_names[path.name]).strip()
+                if path.stem in friendly_names:
+                    return str(friendly_names[path.stem]).strip()
+                if path.parent.name in friendly_names:
+                    return str(friendly_names[path.parent.name]).strip()
+            # Suffix match (e.g. "claude-sonnet-5" for "chigwell/claude-sonnet-5")
+            if "/" in model:
+                suffix = model.split("/")[-1]
+                if suffix in friendly_names:
+                    return str(friendly_names[suffix]).strip()
+
+    if use_defaults:
+        if provider and (provider, model) in DEFAULT_MODEL_FRIENDLY_NAMES:
+            return str(DEFAULT_MODEL_FRIENDLY_NAMES[(provider, model)])
+        if provider and f"{provider}/{model}" in DEFAULT_MODEL_FRIENDLY_NAMES:
+            return str(DEFAULT_MODEL_FRIENDLY_NAMES[f"{provider}/{model}"])
+        if model in DEFAULT_MODEL_FRIENDLY_NAMES:
+            return str(DEFAULT_MODEL_FRIENDLY_NAMES[model])
+        if "/" in model:
+            suffix = model.split("/")[-1]
+            if suffix in DEFAULT_MODEL_FRIENDLY_NAMES:
+                return str(DEFAULT_MODEL_FRIENDLY_NAMES[suffix])
+
+    return model
+
+
+def extract_summary_record(
+    path: Path,
+    payload: dict[str, Any],
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    file_index: int | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
+) -> dict[str, Any]:
     """Extract a summary-level record (1 row) from an experiment results file."""
     config = payload.get("config", {}) if isinstance(payload.get("config"), dict) else {}
     results = payload.get("results", []) if isinstance(payload.get("results"), list) else []
 
-    provider, model = extract_provider_and_model(path, payload)
+    provider, raw_model = extract_provider_and_model(path, payload)
+    friendly_name = resolve_friendly_name(
+        raw_model,
+        provider=provider,
+        path=path,
+        friendly_names=friendly_names,
+        file_index=file_index,
+        use_defaults=use_defaults,
+    )
+    model_col = friendly_name if (replace_model and friendly_name) else raw_model
     n_tasks = len(results)
 
     # Calculate or retrieve correct counts and accuracies
@@ -434,7 +638,9 @@ def extract_summary_record(path: Path, payload: dict[str, Any]) -> dict[str, Any
         rel_path = str(path.resolve())
 
     return {
-        "model": model,
+        "model": model_col,
+        "friendly_name": friendly_name,
+        "raw_model": raw_model,
         "provider": provider,
         "tasks_evaluated": n_tasks,
         "completed_tasks": config.get("completed_tasks", n_tasks),
@@ -474,9 +680,22 @@ def extract_task_records(
     payload: dict[str, Any],
     include_code: bool = False,
     minify_code: bool = True,
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    file_index: int | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
 ) -> list[dict[str, Any]]:
     """Extract granular per-task records (N rows) from an experiment results file."""
-    provider, model = extract_provider_and_model(path, payload)
+    provider, raw_model = extract_provider_and_model(path, payload)
+    friendly_name = resolve_friendly_name(
+        raw_model,
+        provider=provider,
+        path=path,
+        friendly_names=friendly_names,
+        file_index=file_index,
+        use_defaults=use_defaults,
+    )
+    model_col = friendly_name if (replace_model and friendly_name) else raw_model
     results = payload.get("results", []) if isinstance(payload.get("results"), list) else []
 
     try:
@@ -536,7 +755,9 @@ def extract_task_records(
         row: dict[str, Any] = {
             "source_file": rel_path,
             "provider": provider,
-            "model": model,
+            "model": model_col,
+            "friendly_name": friendly_name,
+            "raw_model": raw_model,
             "task_id": task_id,
             # Baseline outcomes
             "baseline_success": b_success,
@@ -643,6 +864,9 @@ def compile_code_data(
     files: Sequence[Path] | None = None,
     minify_code: bool = True,
     code_format: str = "nested",
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
     verbose: bool = False,
 ) -> dict[str, Any] | list[dict[str, Any]]:
     """Compile code across all specified results files.
@@ -650,21 +874,32 @@ def compile_code_data(
     If code_format == 'nested':
         Returns {model_name: {task_id: {strategy: code_str}}}
     If code_format == 'flat':
-        Returns [{provider: ..., model: ..., task_id: ..., baseline: ..., cegis: ...}]
+        Returns [{provider: ..., model: ..., friendly_name: ..., raw_model: ..., task_id: ..., baseline: ..., cegis: ...}]
     """
     if files is None:
         files = discover_result_files()
     if code_format == "flat":
         flat_records: list[dict[str, Any]] = []
-        for path in files:
+        for idx, path in enumerate(files):
             try:
                 payload = load_result_payload(path)
-                provider, model = extract_provider_and_model(path, payload)
+                provider, raw_model = extract_provider_and_model(path, payload)
+                friendly_name = resolve_friendly_name(
+                    raw_model,
+                    provider=provider,
+                    path=path,
+                    friendly_names=friendly_names,
+                    file_index=idx,
+                    use_defaults=use_defaults,
+                )
+                model_col = friendly_name if (replace_model and friendly_name) else raw_model
                 file_tasks = extract_file_code(path, payload, minify_code=minify_code)
                 for task_id, strats in file_tasks.items():
                     entry: dict[str, Any] = {
                         "provider": provider,
-                        "model": model,
+                        "model": model_col,
+                        "friendly_name": friendly_name,
+                        "raw_model": raw_model,
                         "task_id": task_id,
                     }
                     entry.update(strats)
@@ -676,17 +911,25 @@ def compile_code_data(
 
     # Nested format: {model: {task_id: {strategy: code}}}
     nested_data: dict[str, dict[str, dict[str, str]]] = {}
-    for path in files:
+    for idx, path in enumerate(files):
         try:
             payload = load_result_payload(path)
-            provider, model = extract_provider_and_model(path, payload)
-            model_key = model
+            provider, raw_model = extract_provider_and_model(path, payload)
+            friendly_name = resolve_friendly_name(
+                raw_model,
+                provider=provider,
+                path=path,
+                friendly_names=friendly_names,
+                file_index=idx,
+                use_defaults=use_defaults,
+            )
+            model_key = friendly_name if (replace_model and friendly_name) else raw_model
             if model_key in nested_data:
                 # Disambiguate if model name already exists from another folder/file
                 if path.parent.name and path.parent.name != model_key:
-                    model_key = f"{model} ({path.parent.name})"
+                    model_key = f"{model_key} ({path.parent.name})"
                 else:
-                    model_key = f"{model} ({path.stem})"
+                    model_key = f"{model_key} ({path.stem})"
 
             file_tasks = extract_file_code(path, payload, minify_code=minify_code)
             nested_data[model_key] = file_tasks
@@ -708,24 +951,42 @@ def write_code_json(
         json.dump(code_data, f, indent=2, ensure_ascii=False)
 
 
-def extract_model_metadata(files: Sequence[Path]) -> dict[str, dict[str, str]]:
-    """Extract metadata for each model (provider, relative file path)."""
+def extract_model_metadata(
+    files: Sequence[Path],
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
+) -> dict[str, dict[str, str]]:
+    """Extract metadata for each model (provider, relative file path, friendly name, raw model)."""
     meta: dict[str, dict[str, str]] = {}
-    for path in files:
+    for idx, path in enumerate(files):
         try:
             payload = load_result_payload(path)
-            provider, model = extract_provider_and_model(path, payload)
+            provider, raw_model = extract_provider_and_model(path, payload)
+            friendly_name = resolve_friendly_name(
+                raw_model,
+                provider=provider,
+                path=path,
+                friendly_names=friendly_names,
+                file_index=idx,
+                use_defaults=use_defaults,
+            )
             try:
                 rel_path = str(path.resolve().relative_to(Path.cwd().resolve()))
             except ValueError:
                 rel_path = str(path.resolve())
-            model_key = model
+            model_key = friendly_name if (replace_model and friendly_name) else raw_model
             if model_key in meta:
                 if path.parent.name and path.parent.name != model_key:
-                    model_key = f"{model} ({path.parent.name})"
+                    model_key = f"{model_key} ({path.parent.name})"
                 else:
-                    model_key = f"{model} ({path.stem})"
-            meta[model_key] = {"provider": provider, "file_path": rel_path}
+                    model_key = f"{model_key} ({path.stem})"
+            meta[model_key] = {
+                "provider": provider,
+                "file_path": rel_path,
+                "friendly_name": friendly_name,
+                "raw_model": raw_model,
+            }
         except Exception:
             pass
     return meta
@@ -756,6 +1017,12 @@ def format_code_markdown(
         lines.append(f"## {model_name}\n")
         meta = (model_metadata or {}).get(model_name, {})
         details: list[str] = []
+        if meta.get("friendly_name") and meta.get("friendly_name") != meta.get("raw_model"):
+            details.append(f"**Model:** `{meta['friendly_name']}`")
+            if meta.get("raw_model"):
+                details.append(f"**Identifier:** `{meta['raw_model']}`")
+        elif meta.get("raw_model"):
+            details.append(f"**Model:** `{meta['raw_model']}`")
         if meta.get("provider"):
             details.append(f"**Provider:** `{meta['provider']}`")
         if meta.get("file_path"):
@@ -797,15 +1064,25 @@ def compile_summary(
     files: Sequence[Path],
     sort_by: str = "primary_accuracy",
     descending: bool = True,
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
     verbose: bool = False,
 ) -> list[dict[str, Any]]:
     """Compile summary records across all specified results files."""
     rows: list[dict[str, Any]] = []
 
-    for path in files:
+    for idx, path in enumerate(files):
         try:
             payload = load_result_payload(path)
-            record = extract_summary_record(path, payload)
+            record = extract_summary_record(
+                path,
+                payload,
+                friendly_names=friendly_names,
+                file_index=idx,
+                use_defaults=use_defaults,
+                replace_model=replace_model,
+            )
             rows.append(record)
         except Exception as err:
             if verbose:
@@ -827,16 +1104,26 @@ def compile_tasks(
     files: Sequence[Path],
     include_code: bool = False,
     minify_code: bool = True,
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
     verbose: bool = False,
 ) -> list[dict[str, Any]]:
     """Compile all per-task records across all specified results files."""
     all_rows: list[dict[str, Any]] = []
 
-    for path in files:
+    for idx, path in enumerate(files):
         try:
             payload = load_result_payload(path)
             task_rows = extract_task_records(
-                path, payload, include_code=include_code, minify_code=minify_code
+                path,
+                payload,
+                include_code=include_code,
+                minify_code=minify_code,
+                friendly_names=friendly_names,
+                file_index=idx,
+                use_defaults=use_defaults,
+                replace_model=replace_model,
             )
             all_rows.extend(task_rows)
         except Exception as err:
@@ -884,13 +1171,23 @@ def compile_summary_df(
     files: Sequence[Path] | None = None,
     sort_by: str = "primary_accuracy",
     descending: bool = True,
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
 ) -> Any:
     """Compile summary records as a pandas DataFrame."""
     import pandas as pd  # type: ignore
 
     if files is None:
         files = discover_result_files()
-    rows = compile_summary(files, sort_by=sort_by, descending=descending)
+    rows = compile_summary(
+        files,
+        sort_by=sort_by,
+        descending=descending,
+        friendly_names=friendly_names,
+        use_defaults=use_defaults,
+        replace_model=replace_model,
+    )
     return pd.DataFrame(rows)
 
 
@@ -898,13 +1195,23 @@ def compile_tasks_df(
     files: Sequence[Path] | None = None,
     include_code: bool = False,
     minify_code: bool = True,
+    friendly_names: dict[Any, str] | Sequence[str] | None = None,
+    use_defaults: bool = True,
+    replace_model: bool = True,
 ) -> Any:
     """Compile task-level records as a pandas DataFrame."""
     import pandas as pd  # type: ignore
 
     if files is None:
         files = discover_result_files()
-    rows = compile_tasks(files, include_code=include_code, minify_code=minify_code)
+    rows = compile_tasks(
+        files,
+        include_code=include_code,
+        minify_code=minify_code,
+        friendly_names=friendly_names,
+        use_defaults=use_defaults,
+        replace_model=replace_model,
+    )
     return pd.DataFrame(rows)
 
 
@@ -1022,6 +1329,39 @@ Examples:
         help="Extract and write only the code to a JSON/Markdown file (skips CSV generation).",
     )
     parser.add_argument(
+        "--friendly-names",
+        type=str,
+        default=None,
+        metavar="JSON_OR_PATH",
+        help="Path to JSON file or inline JSON string mapping model IDs to friendly names.",
+    )
+    parser.add_argument(
+        "-fn", "--friendly-name",
+        action="append",
+        default=[],
+        metavar="MODEL=NAME",
+        help="Specify friendly name for a model (e.g. --friendly-name 'gemini-3.1-flash-lite=Gemini 3.1 Flash Lite'). Can be repeated.",
+    )
+    parser.add_argument(
+        "--label",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help="Positional display label corresponding to input files (matching generate_latex_table.py). Can be repeated.",
+    )
+    parser.add_argument(
+        "--keep-raw-model",
+        action="store_true",
+        help="Keep 'model' column as raw model identifier instead of setting it to friendly name.",
+    )
+    parser.add_argument(
+        "--no-default-friendly-names",
+        action="store_false",
+        dest="use_default_friendly_names",
+        default=True,
+        help="Disable automatic fallback to known repository model friendly names.",
+    )
+    parser.add_argument(
         "--sort-by",
         type=str,
         default="primary_accuracy",
@@ -1060,6 +1400,15 @@ def main() -> int:
     if args.verbose:
         sys.stderr.write(f"Found {len(files)} result file(s) to process.\n")
 
+    # Normalize friendly names
+    normalized_names = normalize_friendly_names(
+        friendly_names_arg=args.friendly_names,
+        friendly_name_pairs=args.friendly_name,
+        labels=args.label,
+    )
+    replace_model = not args.keep_raw_model
+    use_defaults = args.use_default_friendly_names
+
     # Handle code-only export (JSON and/or Markdown) if requested
     is_code_md = bool(args.code_md)
     is_code_json = bool(args.code_json)
@@ -1082,6 +1431,9 @@ def main() -> int:
             files,
             minify_code=args.minify_code,
             code_format=args.code_format,
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
             verbose=args.verbose,
         )
         write_code_json(code_data, code_out)
@@ -1104,9 +1456,17 @@ def main() -> int:
             files,
             minify_code=args.minify_code,
             code_format="nested",
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
             verbose=args.verbose,
         )
-        model_meta = extract_model_metadata(files)
+        model_meta = extract_model_metadata(
+            files,
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
+        )
         write_code_markdown(nested_code, md_out, model_metadata=model_meta)
         sys.stderr.write(f"Wrote code Markdown ({len(nested_code)} models) -> {md_out}\n")
 
@@ -1129,7 +1489,13 @@ def main() -> int:
         tasks_file = out_parent / f"{out_stem}_tasks{out_suffix}"
 
         summary_records = compile_summary(
-            files, sort_by=args.sort_by, descending=descending, verbose=args.verbose
+            files,
+            sort_by=args.sort_by,
+            descending=descending,
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
+            verbose=args.verbose,
         )
         write_csv(summary_records, summary_file)
         sys.stderr.write(f"Wrote summary CSV ({len(summary_records)} rows) -> {summary_file}\n")
@@ -1138,6 +1504,9 @@ def main() -> int:
             files,
             include_code=args.include_code,
             minify_code=args.minify_code,
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
             verbose=args.verbose,
         )
         write_csv(task_records, tasks_file)
@@ -1146,7 +1515,13 @@ def main() -> int:
 
     if args.mode == "summary":
         summary_records = compile_summary(
-            files, sort_by=args.sort_by, descending=descending, verbose=args.verbose
+            files,
+            sort_by=args.sort_by,
+            descending=descending,
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
+            verbose=args.verbose,
         )
         write_csv(summary_records, args.output)
         if args.output:
@@ -1158,6 +1533,9 @@ def main() -> int:
             files,
             include_code=args.include_code,
             minify_code=args.minify_code,
+            friendly_names=normalized_names,
+            use_defaults=use_defaults,
+            replace_model=replace_model,
             verbose=args.verbose,
         )
         write_csv(task_records, args.output)
