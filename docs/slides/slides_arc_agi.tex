@@ -9,8 +9,13 @@
 \usepackage{color}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{minted}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!20]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!20]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!20]
+\tikzstyle{arrow} = [thick, ->, >=Stealth]
 
 % Theme configuration
 \usetheme{Madrid}
@@ -52,7 +57,6 @@
 }
 
 \title[ARC-AGI: CEGIS e Anti-Overfitting]{S\'{\i}ntese de Programas com CEGIS e Restri\c{c}\~{o}es Anti-Overfitting no ARC-AGI}
-\subtitle{Uma An\'{a}lise Estrutural e Estat\'{\i}stica}
 \author{Fabio Luiz da Costa Cieslak \and Izadora Candotti de Oliveira \and Matheus Machado}
 \institute{Universidade Federal do Rio Grande do Sul (UFRGS)}
 \date{2026}
@@ -62,31 +66,59 @@
 % -------------------------------------------------------------
 % SLIDE 1: Capa
 % -------------------------------------------------------------
-\begin{frame}
-    \titlepage
+\begin{frame}[plain]
+  \centering
+  \color{mainblue}
+  
+  {\huge \bfseries S\'{\i}ntese de Programas com CEGIS e Restri\c{c}\~{o}es Anti-Overfitting no ARC-AGI}\\[0.5em]
+
+  \smallskip
+  \noindent\rule{\textwidth}{1.5pt}
+  \medskip
+
+  \textbf{Fabio Luiz da Costa Cieslakk, Izadora Candotti de Oliveira e Matheus Machado}\\[0.3em]
+  {\small Universidade Federal do Rio Grande do Sul}\\[1cm]
 \end{frame}
 
 % -------------------------------------------------------------
 % SLIDE 2: Contexto: ARC-AGI e Síntese de Programas
 % -------------------------------------------------------------
-\begin{frame}{Contexto: ARC-AGI e S\'{\i}ntese de Programas}
+\begin{frame}[fragile]{ARC-AGI}
     \vspace{1.0em}
-    \begin{itemize}\setlength{\itemsep}{1.1em}
-        \item Desafio de \textbf{racioc\'{\i}nio indutivo} com 2--5 demonstra\c{c}\~{o}es visuais in\'{e}ditas
-        \item Avalia\c{c}\~{a}o \textbf{cega e estrita} por acerto bin\'{a}rio na \textbf{grade de teste oculta}
-        \item S\'{\i}ntese de fun\c{c}\~{a}o determin\'{\i}stica \textbf{\texttt{transform(grid)}} em Python nativo
-    \end{itemize}
+    
+    \begin{center}
+        \Large Desafio de \textbf{racioc\'{\i}nio indutivo} baseado em transformações de grids coloridos a partir de demonstra\c{c}\~{o}es visuais
+    \end{center}
+
+    
 \end{frame}
 
+\begin{frame}[fragile]{S\'{\i}ntese de Programas}
+    \vspace{1.0em}
+    \begin{itemize}\setlength{\itemsep}{1.1em}
+        \item S\'{\i}ntese de fun\c{c}\~{a}o em Python que busca resolver a tarefa de transformação:
+            \begin{center}
+                \begin{minted}[fontsize=\small, frame=none]{python}
+def transform(grid: list[list[int]]) -> list[list[int]]:
+                \end{minted}
+            \end{center}
+        \item Criado a partir da grade de \textbf{treinamento}
+        \item Avalia\c{c}\~{a}o por acerto bin\'{a}rio na grade de teste \textbf{oculta}
+    \end{itemize}
+\end{frame}
 % -------------------------------------------------------------
 % SLIDE 3: Abordagens Avaliadas: Baseline vs. CEGIS
 % -------------------------------------------------------------
-\begin{frame}{Abordagens Avaliadas: Baseline vs. CEGIS}
+\begin{frame}{Abordagens Avaliadas}
     \vspace{1.0em}
+    \textbf{Baseline}:\vspace{0.5em}
     \begin{itemize}\setlength{\itemsep}{1.1em}
         \item Gera\c{c}\~{a}o est\'{a}tica em \textbf{tentativa \'{u}nica (1-Shot)}, sem mecanismos de reparo
+    \end{itemize}
+    \vspace{1.0em}
+    \textbf{CEGIS}:\vspace{0.5em}
+    \begin{itemize}\setlength{\itemsep}{1.1em}
         \item Refinamento \textbf{iterativo guiado por contraexemplos (CEGIS)} em at\'{e} 5 rodadas
-        \item Execu\c{c}\~{a}o isolada em \textbf{sandbox determin\'{\i}stico} nos pares de treino
         \item Retorno do \textbf{primeiro contraexemplo} \`{a} LLM para corre\c{c}\~{a}o de c\'{o}digo
     \end{itemize}
 \end{frame}
@@ -94,47 +126,37 @@
 % -------------------------------------------------------------
 % SLIDE 4: Estratégia Proposta (AntiCheat) e Hipótese
 % -------------------------------------------------------------
-\begin{frame}{Estrat\'{e}gia Proposta (AntiCheat) e Hip\'{o}tese}
+\begin{frame}{Estrat\'{e}gia Proposta (AntiCheat)}
     \vspace{0.6em}
     \begin{itemize}\setlength{\itemsep}{0.9em}
-        \item Veda\c{c}\~{a}o expl\'{\i}cita a \textbf{atalhos} e \textbf{coordenadas fixas} das grades de treino
+        \item Proibi\c{c}\~{a}o de uso de \textbf{atalhos} ou \textbf{coordenadas fixas} nas grades de treino
         \item Obrigatoriedade de enunciar o \textbf{invariante abstrato} antes de emitir o c\'{o}digo
     \end{itemize}
     \vspace{0.8em}
     \begin{center}
         {\color{mainblue}\rule{0.8\linewidth}{0.5pt}}\\[0.6em]
-        \textbf{Hip\'{o}tese Central de Pesquisa}
+        \textbf{Hip\'{o}tese Central}
     \end{center}
     \begin{quote}
         \small\centering\itshape
-        ``Restri\c{c}\~{o}es sem\^{a}nticas anti-hardcoding e reflex\~{a}o sobre invariantes melhoram a acur\'{a}cia no teste oculto do ARC-AGI?''
+        ``Restri\c{c}\~{o}es sem\^{a}nticas anti-hardcoding e reflex\~{a}o sobre invariantes melhoram a acur\'{a}cia no teste oculto do ARC-AGI''
     \end{quote}
 \end{frame}
 
 % -------------------------------------------------------------
 % SLIDE 5: Escala Experimental e Protocolo Pareado
 % -------------------------------------------------------------
-\begin{frame}{Escala Experimental e Protocolo Pareado}
+\begin{frame}{Escala Experimental}
     \vspace{0.8em}
     \begin{itemize}\setlength{\itemsep}{0.9em}
         \item Amostra de \textbf{100 tarefas} avaliadas em \textbf{8 modelos} (\textbf{800 testes pareados})
-        \item Ampla cobertura em tr\^{e}s faixas de capacidade de LLMs:
+        \item Cobertura em tr\^{e}s faixas de capacidade de LLMs:
             \begin{itemize}\setlength{\itemsep}{0.3em}
                 \item \textbf{Fronteira} com Grok 4.6, DeepSeek V4 Flash e GPT-5.6 Luna
                 \item \textbf{Intermedi\'{a}rios} com Claude Sonnet 5 e fam\'{\i}lia Gemini Flash
                 \item \textbf{Compactos} com Leanstral 1.5.1 e GPT-5.4 Nano
             \end{itemize}
-        \item Execu\c{c}\~{a}o determin\'{\i}stica \textbf{rigorosamente pareada} entre CEGIS e AntiCheat
-        \item Crit\'{e}rio de avalia\c{c}\~{a}o por \textbf{acerto bin\'{a}rio estrito} na grade de teste oculta
     \end{itemize}
-\end{frame}
-
-% -------------------------------------------------------------
-% SLIDE 6: Distribuição de Resolução das Tarefas (IMAGEM SOZINHA)
-% -------------------------------------------------------------
-\begin{frame}{Distribui\c{c}\~{a}o de Resolu\c{c}\~{a}o das Tarefas}
-    \centering
-    \includegraphics[width=\linewidth, height=0.79\textheight, keepaspectratio]{figures/plot_task_solve_distribution.png}
 \end{frame}
 
 % -------------------------------------------------------------
@@ -188,6 +210,14 @@
 \end{frame}
 
 % -------------------------------------------------------------
+% SLIDE 6: Distribuição de Resolução das Tarefas (IMAGEM SOZINHA)
+% -------------------------------------------------------------
+\begin{frame}{Distribui\c{c}\~{a}o de Resolu\c{c}\~{a}o das Tarefas}
+    \centering
+    \includegraphics[width=\linewidth, height=0.79\textheight, keepaspectratio]{figures/plot_task_solve_distribution.png}
+\end{frame}
+
+% -------------------------------------------------------------
 % SLIDE 9: Matriz de Discrepância das Estratégias (IMAGEM SOZINHA)
 % -------------------------------------------------------------
 \begin{frame}{Matriz de Discrep\^{a}ncia das Estrat\'{e}gias}
@@ -204,34 +234,15 @@
     \resizebox{0.95\linewidth}{!}{%
     \begin{tabular}{lccc}
         \toprule
-        \textbf{Teste Estat\'{\i}stico} & \textbf{Configura\c{c}\~{a}o} & \textbf{Valor / Intervalo} & \textbf{Conclus\~{a}o} \\
+        \textbf{Teste Estat\'{\i}stico} & \textbf{Valor / Intervalo} & \textbf{Conclus\~{a}o} \\
         \midrule
-        Teste Binomial Exato & Casos Discordantes ($b=25, c=20$) & $p = 0{,}5515$ & N\~{a}o significante \\
-        Teste de Permuta\c{c}\~{a}o & 100.000 itera\c{c}\~{o}es pareadas & $p = 0{,}5501$ & N\~{a}o significante \\
-        Intervalo de Confian\c{c}a Bootstrap & 10.000 reamostragens (95\%) & $[-2{,}25\%, +1{,}00\%]$ & Cont\'{e}m o zero \\
-        Corre\c{c}\~{a}o de Bonferroni & Gemini 3.1 ($k=8$ modelos) & $p_{\text{adj}} = 0{,}1250$ & N\~{a}o significante \\
+        Teste Binomial Exato & $p = 0{,}5515$ & N\~{a}o significante \\
+        Teste de Permuta\c{c}\~{a}o & $p = 0{,}5501$ & N\~{a}o significante \\
+        Intervalo de Confian\c{c}a Bootstrap & $[-2{,}25\%, +1{,}00\%]$ & Cont\'{e}m o zero \\
+        Corre\c{c}\~{a}o de Bonferroni ao Gemini 3.1 & $p_{\text{adj}} = 0{,}1250$ & N\~{a}o significante \\
         \bottomrule
     \end{tabular}%
     }
-\end{frame}
-
-% -------------------------------------------------------------
-% SLIDE 11: Diagnóstico das Falhas e Varredura (TABELA SOZINHA)
-% -------------------------------------------------------------
-\begin{frame}{Diagn\'{o}stico de Falhas e Varredura de C\'{o}digo}
-    \centering
-    \vspace{0.8em}
-    \small
-    \begin{tabular}{lccc}
-        \toprule
-        \textbf{Dimens\~{a}o Avaliada} & \textbf{Ocorr\^{e}ncias} & \textbf{Percentual} & \textbf{Diagn\'{o}stico} \\
-        \midrule
-        Teto de Representa\c{c}\~{a}o (CEGIS venceu) & 23 em 25 & 92,0\% & Falha no treino \\
-        Teto de Representa\c{c}\~{a}o (AntiCheat venceu) & 18 em 20 & 90,0\% & Falha no treino \\
-        Sobreajuste Esp\'{u}rio nos Casos Discordantes & 4 em 45 & 8,9\% & Raro \\
-        Trapa\c{c}as por Coordenadas Fixas & 7 em 2.398 & 0,29\% & Residual \\
-        \bottomrule
-    \end{tabular}
 \end{frame}
 
 % -------------------------------------------------------------
@@ -240,60 +251,21 @@
 \begin{frame}{Diagn\'{o}stico Qualitativo: Vi\'{e}s e Gargalo Real}
     \vspace{1.0em}
     \begin{itemize}\setlength{\itemsep}{1.1em}
-        \item LLMs apresentam \textbf{vi\'{e}s algor\'{\i}tmico natural}, com trapa\c{c}as residuais de apenas \textbf{$0{,}29\%$}
         \item C\'{o}digos gerados sob CEGIS e AntiCheat s\~{a}o \textbf{estruturalmente quase id\^{e}nticos}
         \item Mais de \textbf{$90\%$ das falhas} decorrem da incapacidade de resolver os treinos (\textbf{teto de representa\c{c}\~{a}o})
-        \item Instru\c{c}\~{o}es no prompt \textbf{n\~{a}o expandem} o espa\c{c}o de hip\'{o}teses indutivo do modelo
     \end{itemize}
 \end{frame}
 
 % -------------------------------------------------------------
 % SLIDE 13: Métricas Psicométricas de Guttman (TABELA SOZINHA)
 % -------------------------------------------------------------
-\begin{frame}{M\'{e}tricas Psicom\'{e}tricas de Guttman}
-    \centering
-    \vspace{0.8em}
-    \small
-    \begin{tabular}{lccc}
-        \toprule
-        \textbf{M\'{e}trica Psicom\'{e}trica} & \textbf{Valor Obtido} & \textbf{Limiar de Aceita\c{c}\~{a}o} & \textbf{Status} \\
-        \midrule
-        Coeficiente de Reprodutibilidade ($CR$) & 0,9738 & $\ge 0{,}90$ & Confirmado \\
-        Reprodutibilidade Marginal M\'{\i}nima ($MMR$) & 0,7887 & --- & Linha de Base \\
-        Coeficiente de Escalabilidade ($CS$) & 0,8757 & $\ge 0{,}60$ & Escala Forte \\
-        Subsun\c{c}\~{a}o Grok 4.6 $\to$ DeepSeek V4 & 100,0\% & --- & Monot\^{o}nica \\
-        Subsun\c{c}\~{a}o DeepSeek V4 $\to$ GPT-5.6 & 97,4\% & --- & Quase Perfeita \\
-        \bottomrule
-    \end{tabular}
-\end{frame}
-
-% -------------------------------------------------------------
-% SLIDE 14: Distribuição de Complexidade de Código (IMAGEM SOZINHA)
-% -------------------------------------------------------------
-\begin{frame}{Distribui\c{c}\~{a}o de Complexidade de C\'{o}digo}
-    \centering
-    \includegraphics[width=\linewidth, height=0.79\textheight, keepaspectratio]{figures/plot_code_complexity_by_outcome.png}
-\end{frame}
-
-% -------------------------------------------------------------
-% SLIDE 15: Complexidade Estrutural e Occam (TABELA SOZINHA)
-% -------------------------------------------------------------
-\begin{frame}{Complexidade Estrutural e a Navalha de Occam}
-    \centering
-    \vspace{0.5em}
-    \small
-    \begin{tabular}{lccccc}
-        \toprule
-        \textbf{Desfecho da Execu\c{c}\~{a}o} & \textbf{Amostras} & \textbf{SLOC M\'{e}dio} & \textbf{La\c{c}os} & \textbf{Condicionais} & \textbf{Profundidade AST} \\
-        \midrule
-        Acerto de Primeira & 289 & 34,6 & 6,2 & 4,9 & 12,2 \\
-        Recuperado via CEGIS & 114 & 44,5 & 7,6 & 7,0 & 12,7 \\
-        Sobreajuste Esp\'{u}rio & 52 & 55,9 & 8,8 & 8,7 & 13,1 \\
-        Falha no Treino & 342 & 44,4 & 7,9 & 7,5 & 12,8 \\
-        \midrule
-        \textbf{Incha\c{c}o no Sobreajuste} & --- & \textbf{1,61$\times$} & --- & --- & \textbf{$p = 5{,}15 \times 10^{-9}$} \\
-        \bottomrule
-    \end{tabular}
+\begin{frame}{Hierarquia de Tarefas}
+    \vspace{1.0em}
+    \begin{itemize}\setlength{\itemsep}{1.1em}
+        \item Tarefas seguem um modelo quase que totalmente \textbf{hierárquico}
+        \item Grok 4.6 (1º) acertou \textbf{100\%} das tarefas que o DeepSeek V4 (2º) acertou
+        \item DeepSeek V4 (2º) acertou \textbf{97,4\%} das tarefas que o GPT-5.6 Luna (3º) acertou
+    \end{itemize}
 \end{frame}
 
 % -------------------------------------------------------------
@@ -323,20 +295,6 @@
         \bottomrule
     \end{tabular}
 \end{frame}
-
-% -------------------------------------------------------------
-% SLIDE 18: Diretrizes Práticas para Síntese no ARC-AGI
-% -------------------------------------------------------------
-\begin{frame}{Diretrizes Pr\'{a}ticas para S\'{\i}ntese de Programas}
-    \vspace{1.0em}
-    \begin{itemize}\setlength{\itemsep}{1.1em}
-        \item Aplica\c{c}\~{a}o de \textbf{penalidade de complexidade por AST} baseada em n\'{o}s e SLOC
-        \item \textbf{Poda autom\'{a}tica de ramifica\c{c}\~{o}es} com incha\c{c}o estrutural para evitar sobreajuste
-        \item Ado\c{c}\~{a}o de \textbf{parada precoce em 3 itera\c{c}\~{o}es}, retendo \textbf{$86\%$ dos reparos vi\'{a}veis}
-        \item Economia de mais de \textbf{$45\%$ em chamadas de API} e tempo de infer\^{e}ncia
-    \end{itemize}
-\end{frame}
-
 % -------------------------------------------------------------
 % SLIDE 19: Conclusões
 % -------------------------------------------------------------
@@ -346,7 +304,6 @@
         \item Refinamento por \textbf{CEGIS supera o Baseline em $+14{,}3\%$} (114 tarefas recuperadas)
         \item Restri\c{c}\~{o}es \textbf{AntiCheat s\~{a}o estatisticamente equivalentes} ao CEGIS padr\~{a}o ($p = 0{,}5515$)
         \item Principal gargalo reside no \textbf{teto de representa\c{c}\~{a}o ($>90\%$)}, e n\~{a}o em trapa\c{c}as ($0{,}29\%$)
-        \item ARC-AGI exibe \textbf{escala de Guttman unidimensional} ($CR = 0{,}9738$) e \textbf{incha\c{c}o de Occam} ($1{,}61\times$)
     \end{itemize}
 \end{frame}
 

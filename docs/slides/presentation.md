@@ -8,15 +8,6 @@
 
 ---
 
-## Estrutura e Princípios Visuais da Apresentação
-
-1. **Frases-chave e termos em destaque**: os slides conceituais contêm apenas tópicos essenciais e frases-chave compactas com palavras-chave em negrito, sem títulos prefixados nem caixas de texto.
-2. **Tabelas e gráficos em tela cheia**: cada visualização quantitativa ocupa um slide exclusivo com alta legibilidade e sem poluição textual concorrente.
-3. **Dados numéricos em gráficos e tabelas**: as métricas e dados experimentais detalhados ficam concentrados nas tabelas e figuras dedicadas.
-4. **Divisão em 20 slides coesos**: consolidação equilibrada de tópicos correlatos (contexto, abordagens, hipótese, diagnóstico e diretrizes), mantendo uma progressão linear, ágil e focada.
-
----
-
 ## Roteiro Slide a Slide (20 Slides)
 
 ### Slide 1: Capa
@@ -228,23 +219,3 @@
   - Manter este slide na tela e utilizar as notas de Q&A para aprofundamento das questões técnicas.
 
 ---
-
-## Perguntas Frequentes da Banca (Q&A Estratégico)
-
-1. **"Por que as tabelas e gráficos estão sozinhos nos slides?"**  
-   *Resposta:* Adotamos uma divisão estrita de elementos visuais. Cada gráfico e tabela é apresentado em escala completa, com alta legibilidade e sem competição visual com blocos de texto, permitindo foco analítico direto nos dados empíricos.
-
-2. **"Por que a taxa de trapaças deliberadas por coordenadas fixas foi tão baixa (0,29%)?"**  
-   *Resposta:* Grandes modelos de linguagem são pré-treinados predominantemente em código aberto estruturado. Ao processar matrizes bidimensionais, sua tendência espontânea é gerar transformações matriciais paramétricas e laços, raramente gerando comparações literais `if (r == x and c == y)`.
-
-3. **"Se o AntiCheat não superou o CEGIS padrão, isso invalida o uso de restrições?"**  
-   *Resposta:* Não. O resultado demonstra que restrições meramente verbais inseridas no prompt não alteram o espaço de representação acessível à LLM. O sobreajuste no ARC decorre da dificuldade de induzir a regra latente, e não de memorização mecânica. Portanto, restrições devem ser aplicadas como filtros computacionais na AST pós-geração, e não como regras de linguagem natural.
-
-4. **"O que o inchaço de 1,61x na AST indica sobre a dinâmica de correção?"**  
-   *Resposta:* Mostra que, quando a hipótese inicial da LLM está incorreta, as rodadas subsequentes de reparo tendem a adicionar remendos condicionais ad-hoc em vez de reformular o algoritmo base. Esse inchaço sintático serve como um indicador em tempo real de que a busca está sobreajustando.
-
-5. **"Qual a justificativa prática para limitar o ciclo de CEGIS em 3 iterações?"**  
-   *Resposta:* Nossos dados mostram que 86% de todas as tarefas corrigíveis são recuperadas até a terceira rodada. As iterações 4 e 5 trazem retornos fortemente decrescentes (apenas 14% das recuperações), porém consomem proporção equivalente de chamadas de API e tempo de inferência. Fixar em 3 rodadas otimiza drasticamente a relação custo-benefício.
-
-6. **"O que a confirmação da Escala de Guttman (CR = 0,9738) nos ensina sobre o benchmark ARC-AGI?"**  
-   *Resposta:* Demonstra que o ARC-AGI mede uma dimensão coesa e cumulativa de habilidade indutiva. Não há desordem estocástica na qual modelos menores superem modelos de fronteira em subconjuntos aleatórios; o domínio das tarefas obedece a uma hierarquia unidimensional consistente.
